@@ -62,65 +62,64 @@ Runs on the Raspberry Pi. Uses `docker run` directly — no compose file.
 
 **Running containers after deploy:**
 
-| Container | Port | Image |
-|---|---|---|
-| `cockpit_api_prod` | 8000 | `ghcr.io/marcinparda/cockpit-api:latest` |
-| `cockpit_db_prod` | — | `postgres:15-alpine` |
-| `cockpit_redis_prod` | — | `redis/redis-stack-server:latest` |
-| `hermes` | 8642 | `nousresearch/hermes-agent:latest` |
-| `actual-http-api` | 5007 | `jhonderson/actual-http-api:latest` |
-| `open-webui` | 4206 | `ghcr.io/open-webui/open-webui:main` |
+| Container            | Port | Image                                    |
+| -------------------- | ---- | ---------------------------------------- |
+| `cockpit_api_prod`   | 8000 | `ghcr.io/marcinparda/cockpit-api:latest` |
+| `cockpit_db_prod`    | —    | `postgres:15-alpine`                     |
+| `cockpit_redis_prod` | —    | `redis/redis-stack-server:latest`        |
+| `hermes`             | 8642 | `nousresearch/hermes-agent:latest`       |
+| `actual-http-api`    | 5007 | `jhonderson/actual-http-api:latest`      |
+| `open-webui`         | 4206 | `ghcr.io/open-webui/open-webui:main`     |
 
 ## Required GitHub Secrets
 
 ### SSH / Infrastructure
 
-| Secret | Description |
-|---|---|
-| `RASPBERRY_PI_SSH_KEY` | Private SSH key for Pi |
-| `SSH_KNOWN_HOSTS` | Known hosts for SSH verification |
-| `CLOUDFLARE_TUNNEL_DOMAIN` | Cloudflare tunnel hostname |
-| `RASPBERRY_PI_USERNAME` | SSH username |
+| Secret                     | Description                      |
+| -------------------------- | -------------------------------- |
+| `RASPBERRY_PI_SSH_KEY`     | Private SSH key for Pi           |
+| `SSH_KNOWN_HOSTS`          | Known hosts for SSH verification |
+| `CLOUDFLARE_TUNNEL_DOMAIN` | Cloudflare tunnel hostname       |
+| `RASPBERRY_PI_USERNAME`    | SSH username                     |
 
 ### Database
 
-| Secret | Description |
-|---|---|
-| `DB_USER` | PostgreSQL username |
+| Secret        | Description         |
+| ------------- | ------------------- |
+| `DB_USER`     | PostgreSQL username |
 | `DB_PASSWORD` | PostgreSQL password |
-| `DB_HOST` | Database host |
-| `DB_NAME` | Database name |
-| `DB_PORT` | Database port |
+| `DB_HOST`     | Database host       |
+| `DB_NAME`     | Database name       |
+| `DB_PORT`     | Database port       |
 
 ### Application
 
-| Secret | Description |
-|---|---|
-| `CORS_ORIGINS` | Allowed CORS origins |
-| `JWT_SECRET_KEY` | JWT signing key |
-| `JWT_ALGORITHM` | JWT algorithm |
-| `JWT_EXPIRE_HOURS` | Token expiry |
-| `BCRYPT_ROUNDS` | Password hashing rounds |
-| `COOKIE_DOMAIN` | Session cookie domain |
-| `REDIS_PASSWORD` | Redis auth password |
-| `OAUTH_SERVER_URL` | OAuth server base URL |
+| Secret             | Description             |
+| ------------------ | ----------------------- |
+| `CORS_ORIGINS`     | Allowed CORS origins    |
+| `JWT_SECRET_KEY`   | JWT signing key         |
+| `JWT_ALGORITHM`    | JWT algorithm           |
+| `JWT_EXPIRE_HOURS` | Token expiry            |
+| `BCRYPT_ROUNDS`    | Password hashing rounds |
+| `COOKIE_DOMAIN`    | Session cookie domain   |
+| `REDIS_PASSWORD`   | Redis auth password     |
+| `OAUTH_SERVER_URL` | OAuth server base URL   |
 
 ### External Services
 
-| Secret | Description |
-|---|---|
-| `VIKUNJA_USERNAME` | Vikunja login |
-| `VIKUNJA_PASSWORD` | Vikunja password |
-| `ACTUAL_HTTP_API_KEY` | Actual Budget HTTP API key |
-| `ACTUAL_BUDGET_SYNC_ID` | Actual Budget sync ID |
-| `ACTUAL_SERVER_URL` | Actual Budget server URL |
-| `ACTUAL_SERVER_PASSWORD` | Actual Budget server password |
-| `OPEN_ROUTER_KEY` | OpenRouter API key |
-| `SERPER_API_KEY` | Serper search API key |
-| `BRAIN_NOTES_PATH` | Path to brain notes on Pi |
-| `BRAIN_GIT_REMOTE` | Git remote for brain notes |
-| `MCP_API_KEY` | MCP server auth key |
-| `HERMES_API_KEY` | Hermes Agent API key |
+| Secret                  | Description                |
+| ----------------------- | -------------------------- |
+| `VIKUNJA_USERNAME`      | Vikunja login              |
+| `VIKUNJA_PASSWORD`      | Vikunja password           |
+| `ACTUAL_HTTP_API_KEY`   | Actual Budget HTTP API key |
+| `ACTUAL_BUDGET_SYNC_ID` | Actual Budget sync ID      |
+| `ACTUAL_SERVER_URL`     | Actual Budget server URL   |
+| `OPEN_ROUTER_KEY`       | OpenRouter API key         |
+| `SERPER_API_KEY`        | Serper search API key      |
+| `BRAIN_NOTES_PATH`      | Path to brain notes on Pi  |
+| `BRAIN_GIT_REMOTE`      | Git remote for brain notes |
+| `MCP_API_KEY`           | MCP server auth key        |
+| `HERMES_API_KEY`        | Hermes Agent API key       |
 
 `GITHUB_TOKEN` is provided automatically by GitHub Actions.
 
@@ -180,9 +179,9 @@ cat /tmp/deploy.exit   # exit code
 
 **Common issues:**
 
-| Issue | Check |
-|---|---|
-| SSH timeout in CI | Cloudflare tunnel status; polling loop handles transient drops |
-| Image pull fails | `docker login ghcr.io` manually; verify `GITHUB_TOKEN` |
-| API not healthy | `docker logs cockpit_api_prod`; check DB container is up |
-| Container won't start | `docker ps -a`; inspect logs for the failed container |
+| Issue                 | Check                                                          |
+| --------------------- | -------------------------------------------------------------- |
+| SSH timeout in CI     | Cloudflare tunnel status; polling loop handles transient drops |
+| Image pull fails      | `docker login ghcr.io` manually; verify `GITHUB_TOKEN`         |
+| API not healthy       | `docker logs cockpit_api_prod`; check DB container is up       |
+| Container won't start | `docker ps -a`; inspect logs for the failed container          |

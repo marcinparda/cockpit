@@ -9,18 +9,18 @@ Personal agent platform. Two projects:
 
 Deployed via SSH through Cloudflare Tunnel. No docker-compose in prod — raw `docker run`.
 
-| Container | Port | Source |
-|---|---|---|
-| `cockpit_api_prod` | 8000 | `ghcr.io/marcinparda/cockpit:latest` |
-| `cockpit_db_prod` | — | PostgreSQL 15 (internal) |
-| `cockpit_redis_prod` | — | Redis Stack (internal) |
-| `actual-http-api` | 5007 | Actual Budget HTTP wrapper |
-| `open-webui` | 4206 | Open WebUI |
-| `hermes` | 8642 | Hermes Agent gateway |
-| `login` | 4202 | `ghcr.io/marcinparda/cockpit-login:latest` |
-| `cockpit` | 4203 | `ghcr.io/marcinparda/cockpit-cockpit:latest` |
-| `cv` | 4204 | `ghcr.io/marcinparda/cockpit-cv:latest` |
-| `store` | 4205 | `ghcr.io/marcinparda/cockpit-store:latest` |
+| Container            | Port | Source                                       |
+| -------------------- | ---- | -------------------------------------------- |
+| `cockpit_api_prod`   | 8000 | `ghcr.io/marcinparda/cockpit:latest`         |
+| `cockpit_db_prod`    | —    | PostgreSQL 15 (internal)                     |
+| `cockpit_redis_prod` | —    | Redis Stack (internal)                       |
+| `actual-http-api`    | 5007 | Actual Budget HTTP wrapper                   |
+| `open-webui`         | 4206 | Open WebUI                                   |
+| `hermes`             | 8642 | Hermes Agent gateway                         |
+| `login`              | 4202 | `ghcr.io/marcinparda/cockpit-login:latest`   |
+| `cockpit`            | 4203 | `ghcr.io/marcinparda/cockpit-cockpit:latest` |
+| `cv`                 | 4204 | `ghcr.io/marcinparda/cockpit-cv:latest`      |
+| `store`              | 4205 | `ghcr.io/marcinparda/cockpit-store:latest`   |
 
 ## CI/CD
 
@@ -35,7 +35,7 @@ Deploy scripts on Pi: `~/deploy-api.sh` and `~/deploy.sh`. Env vars passed via `
 
 SSH: `RASPBERRY_PI_SSH_KEY`, `SSH_KNOWN_HOSTS`, `RASPBERRY_PI_USERNAME`, `CLOUDFLARE_TUNNEL_DOMAIN`
 
-API: `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`, `DB_PORT`, `CORS_ORIGINS`, `JWT_SECRET_KEY`, `JWT_ALGORITHM`, `JWT_EXPIRE_HOURS`, `BCRYPT_ROUNDS`, `COOKIE_DOMAIN`, `REDIS_PASSWORD`, `VIKUNJA_USERNAME`, `VIKUNJA_PASSWORD`, `ACTUAL_HTTP_API_KEY`, `ACTUAL_BUDGET_SYNC_ID`, `ACTUAL_SERVER_URL`, `ACTUAL_SERVER_PASSWORD`, `OPEN_ROUTER_KEY`, `SERPER_API_KEY`, `BRAIN_NOTES_PATH`, `BRAIN_GIT_REMOTE`, `MCP_API_KEY`, `HERMES_API_KEY`, `OAUTH_SERVER_URL`
+API: `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`, `DB_PORT`, `CORS_ORIGINS`, `JWT_SECRET_KEY`, `JWT_ALGORITHM`, `JWT_EXPIRE_HOURS`, `BCRYPT_ROUNDS`, `COOKIE_DOMAIN`, `REDIS_PASSWORD`, `VIKUNJA_USERNAME`, `VIKUNJA_PASSWORD`, `ACTUAL_HTTP_API_KEY`, `ACTUAL_BUDGET_SYNC_ID`, `ACTUAL_SERVER_URL`, `OPEN_ROUTER_KEY`, `SERPER_API_KEY`, `BRAIN_NOTES_PATH`, `BRAIN_GIT_REMOTE`, `MCP_API_KEY`, `HERMES_API_KEY`, `OAUTH_SERVER_URL`
 
 App: `ENVIRONMENTS` (full environments.ts content)
 
