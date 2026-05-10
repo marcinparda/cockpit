@@ -1,16 +1,10 @@
-name: Deploy API to Production
+name: Deploy Extras
 
 on:
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Deploy API"]
-    types:
-      - completed
-    branches: [master]
 
 jobs:
-  deploy-to-production:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+  deploy-extras:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -48,33 +42,10 @@ jobs:
       - name: Write deploy env file on Pi
         run: |
           cat > /tmp/deploy.env << 'EOF'
-          export GITHUB_TOKEN='${{ secrets.GITHUB_TOKEN }}'
-          export GITHUB_ACTOR='${{ github.actor }}'
-          export DB_USER='${{ secrets.DB_USER }}'
-          export DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
-          export DB_HOST='${{ secrets.DB_HOST }}'
-          export DB_NAME='${{ secrets.DB_NAME }}'
-          export DB_PORT='${{ secrets.DB_PORT }}'
-          export CORS_ORIGINS='${{ secrets.CORS_ORIGINS }}'
-          export JWT_SECRET_KEY='${{ secrets.JWT_SECRET_KEY }}'
-          export JWT_ALGORITHM='${{ secrets.JWT_ALGORITHM }}'
-          export JWT_EXPIRE_HOURS='${{ secrets.JWT_EXPIRE_HOURS }}'
-          export BCRYPT_ROUNDS='${{ secrets.BCRYPT_ROUNDS }}'
-          export COOKIE_DOMAIN='${{ secrets.COOKIE_DOMAIN }}'
-          export COOKIE_SECURE=True
-          export ENVIRONMENT=production
-          export REDIS_PASSWORD='${{ secrets.REDIS_PASSWORD }}'
-          export VIKUNJA_USERNAME='${{ secrets.VIKUNJA_USERNAME }}'
-          export VIKUNJA_PASSWORD='${{ secrets.VIKUNJA_PASSWORD }}'
-          export ACTUAL_HTTP_API_KEY='${{ secrets.ACTUAL_HTTP_API_KEY }}'
-          export ACTUAL_BUDGET_SYNC_ID='${{ secrets.ACTUAL_BUDGET_SYNC_ID }}'
           export OPEN_ROUTER_KEY='${{ secrets.OPEN_ROUTER_KEY }}'
-          export SERPER_API_KEY='${{ secrets.SERPER_API_KEY }}'
-          export BRAIN_NOTES_PATH='${{ secrets.BRAIN_NOTES_PATH }}'
-          export BRAIN_GIT_REMOTE='${{ secrets.BRAIN_GIT_REMOTE }}'
-          export MCP_API_KEY='${{ secrets.MCP_API_KEY }}'
           export HERMES_API_KEY='${{ secrets.HERMES_API_KEY }}'
-          export OAUTH_SERVER_URL='${{ secrets.OAUTH_SERVER_URL }}'
+          export MCP_API_KEY='${{ secrets.MCP_API_KEY }}'
+          export ACTUAL_HTTP_API_KEY='${{ secrets.ACTUAL_HTTP_API_KEY }}'
           EOF
           chmod 600 /tmp/deploy.env
           scp /tmp/deploy.env ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:/tmp/deploy.env
@@ -86,7 +57,7 @@ jobs:
         run: |
           ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "
           rm -f /tmp/deploy.log /tmp/deploy.exit
-          nohup bash -c 'source /tmp/deploy.env && ~/deployment-scripts/deploy-api.sh > /tmp/deploy.log 2>&1; echo \$? > /tmp/deploy.exit; rm -f /tmp/deploy.env' > /dev/null 2>&1 &
+          nohup bash -c 'source /tmp/deploy.env && ~/deployment-scripts/deploy-extras.sh > /tmp/deploy.log 2>&1; echo \$? > /tmp/deploy.exit; rm -f /tmp/deploy.env' > /dev/null 2>&1 &
           disown
           sleep 2
           echo 'Deploy launched'
@@ -97,21 +68,16 @@ jobs:
         timeout-minutes: 30
         run: |
           HOST="${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}"
-          echo "Polling deploy status every 10s (max 30 min)..."
           for i in $(seq 1 180); do
             result=$(ssh -o ConnectTimeout=10 "$HOST" \
               "[ -f /tmp/deploy.exit ] && echo done:\$(cat /tmp/deploy.exit) || echo running" 2>/dev/null || echo unreachable)
             echo "[$i/180] $result"
             case "$result" in
-              done:0)
-                echo "Deploy succeeded"
-                exit 0
-                ;;
+              done:0) echo "Deploy succeeded"; exit 0 ;;
               done:*)
                 echo "Deploy failed — last 50 lines of log:"
                 ssh "$HOST" "tail -50 /tmp/deploy.log" 2>/dev/null || true
-                exit 1
-                ;;
+                exit 1 ;;
             esac
             sleep 10
           done
@@ -121,9 +87,7 @@ jobs:
 
       - name: Generate deployment summary
         run: |
-          echo "## Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Status:** Successfully deployed to Raspberry Pi" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "## Extras Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**Status:** Successfully deployed extras to Raspberry Pi" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed:** Hermes, actual-http-api, Open WebUI" >> $GITHUB_STEP_SUMMARY
           echo "**Deployed at:** \`$(date -u)\`" >> $GITHUB_STEP_SUMMARY

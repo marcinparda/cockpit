@@ -40,6 +40,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Copy deployment scripts to Pi
+        run: |
+          ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "mkdir -p ~/deployment-scripts"
+          scp deployment-scripts/*.sh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:~/deployment-scripts/
+          ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "chmod +x ~/deployment-scripts/*.sh"
+
       - name: Write deploy env file on Pi
         run: |
           {
@@ -49,18 +55,13 @@ jobs:
             echo "REPO=cockpit"
           } | ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "cat > /tmp/deploy.env && chmod 600 /tmp/deploy.env"
 
-      - name: Copy deploy script to Pi
-        run: |
-          scp cockpit-app/deploy.sh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:~/deploy.sh
-
       - name: Launch deploy on Pi
         run: |
           ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} \
             "rm -f /tmp/deploy.exit /tmp/deploy.log && \
-            chmod +x ~/deploy.sh && \
             nohup bash -c \
             'set -a; source /tmp/deploy.env; set +a; \
-            ~/deploy.sh > /tmp/deploy.log 2>&1; \
+            ~/deployment-scripts/deploy-apps.sh > /tmp/deploy.log 2>&1; \
             echo \$? > /tmp/deploy.exit; rm -f /tmp/deploy.env' \
             </dev/null > /dev/null 2>&1 &"
 
@@ -85,8 +86,7 @@ jobs:
 
       - name: Cleanup SSH
         if: always()
-        run: |
-          rm -f ~/.ssh/id_ed25519
+        run: rm -f ~/.ssh/id_ed25519
 
   summary:
     needs: deploy-to-production
@@ -96,13 +96,13 @@ jobs:
     steps:
       - name: Deployment Summary
         run: |
-          echo "# 🚀 Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "# Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
           if [[ "${{ needs.deploy-to-production.outputs.deployment-status }}" == "success" ]]; then
-            echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+            echo "## Deployment Successful!" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Apps deployed to Raspberry Pi." >> $GITHUB_STEP_SUMMARY
           else
-            echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+            echo "## Deployment Failed" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "Deployment encountered an error. Check logs above." >> $GITHUB_STEP_SUMMARY
           fi
