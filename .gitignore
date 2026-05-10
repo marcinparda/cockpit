@@ -1,0 +1,12 @@
+# cockpit-api
+cockpit-api/postgres-data/
+cockpit-api/__pycache__/
+cockpit-api/**/__pycache__/
+cockpit-api/backups/
+cockpit-api/.venv/
+
+# cockpit-app
+cockpit-app/node_modules/
+cockpit-app/dist/
+cockpit-app/tmp/
+cockpit-app/.nx/cache/
