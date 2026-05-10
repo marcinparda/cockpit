@@ -113,7 +113,6 @@ Runs on the Raspberry Pi. Uses `docker run` directly — no compose file.
 | `VIKUNJA_PASSWORD`      | Vikunja password           |
 | `ACTUAL_HTTP_API_KEY`   | Actual Budget HTTP API key |
 | `ACTUAL_BUDGET_SYNC_ID` | Actual Budget sync ID      |
-| `ACTUAL_SERVER_URL`     | Actual Budget server URL   |
 | `OPEN_ROUTER_KEY`       | OpenRouter API key         |
 | `SERPER_API_KEY`        | Serper search API key      |
 | `BRAIN_NOTES_PATH`      | Path to brain notes on Pi  |

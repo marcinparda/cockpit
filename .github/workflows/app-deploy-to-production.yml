@@ -1,0 +1,108 @@
+name: Deploy App to Production
+
+on:
+  workflow_call:
+    secrets:
+      CLOUDFLARE_TUNNEL_DOMAIN:
+        required: true
+      RASPBERRY_PI_USERNAME:
+        required: true
+      RASPBERRY_PI_SSH_KEY:
+        required: true
+      SSH_KNOWN_HOSTS:
+        required: true
+
+jobs:
+  deploy-to-production:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-status: ${{ steps.wait.outcome }}
+
+    steps:
+      - name: Set up Cloudflared
+        uses: AnimMouse/setup-cloudflared@v2
+
+      - name: Setup SSH Configuration
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          cat <<EOF > ~/.ssh/config
+          Host ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
+            User ${{ secrets.RASPBERRY_PI_USERNAME }}
+            IdentityFile ~/.ssh/id_ed25519
+            ProxyCommand cloudflared access ssh --hostname %h
+            StrictHostKeyChecking no
+          EOF
+          chmod 600 ~/.ssh/config
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Write deploy env file on Pi
+        run: |
+          {
+            echo "GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}"
+            echo "GITHUB_ACTOR=${{ github.actor }}"
+            echo "OWNER=${{ github.repository_owner }}"
+            echo "REPO=cockpit"
+          } | ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "cat > /tmp/deploy.env && chmod 600 /tmp/deploy.env"
+
+      - name: Copy deploy script to Pi
+        run: |
+          scp cockpit-app/deploy.sh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:~/deploy.sh
+
+      - name: Launch deploy on Pi
+        run: |
+          ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} \
+            "rm -f /tmp/deploy.exit /tmp/deploy.log && \
+            chmod +x ~/deploy.sh && \
+            nohup bash -c \
+            'set -a; source /tmp/deploy.env; set +a; \
+            ~/deploy.sh > /tmp/deploy.log 2>&1; \
+            echo \$? > /tmp/deploy.exit; rm -f /tmp/deploy.env' \
+            </dev/null > /dev/null 2>&1 &"
+
+      - name: Wait for deployment
+        id: wait
+        timeout-minutes: 30
+        run: |
+          for i in $(seq 1 180); do
+            result=$(ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} \
+              "[ -f /tmp/deploy.exit ] && echo done:\$(cat /tmp/deploy.exit) || echo running" 2>/dev/null || echo unreachable)
+            echo "[$i] $result"
+            case "$result" in
+              done:0) echo "Deploy succeeded"; exit 0 ;;
+              done:*)
+                echo "Deploy failed. Last log:"
+                ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "tail -30 /tmp/deploy.log" 2>/dev/null || true
+                exit 1 ;;
+            esac
+            sleep 10
+          done
+          echo "Timed out waiting"; exit 1
+
+      - name: Cleanup SSH
+        if: always()
+        run: |
+          rm -f ~/.ssh/id_ed25519
+
+  summary:
+    needs: deploy-to-production
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "# 🚀 Production Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ needs.deploy-to-production.outputs.deployment-status }}" == "success" ]]; then
+            echo "## 🎉 Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Apps deployed to Raspberry Pi." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Deployment Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Deployment encountered an error. Check logs above." >> $GITHUB_STEP_SUMMARY
+          fi
