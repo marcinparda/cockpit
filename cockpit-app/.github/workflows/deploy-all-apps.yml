@@ -43,7 +43,7 @@ jobs:
         run: npm ci
 
       - name: Build all apps
-        run: npx nx run-many --target=lint,build,test --projects=login,cockpit,cv,store,agent --parallel=5
+        run: npx nx run-many --target=lint,build,test --projects=login,cockpit,cv,store --parallel=5
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -100,20 +100,6 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      # Build and push Docker image for agent
-      - name: Build and push Docker image for agent
-        if: ${{ always() }}
-        uses: docker/build-push-action@v6
-        with:
-          context: ./cockpit-app
-          file: ./cockpit-app/apps/agent/Dockerfile
-          push: true
-          tags: |
-            ghcr.io/${{ github.repository }}-agent:latest
-            ghcr.io/${{ github.repository }}-agent:${{ github.sha }}
-          platforms: linux/arm64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   deploy-to-raspberry:
     needs: [validate-types, build-test-and-push]
