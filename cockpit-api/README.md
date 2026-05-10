@@ -1,0 +1,154 @@
+# Cockpit API
+
+Cockpit API is the backend service for a personal productivity platform. Built with [FastAPI](https://fastapi.tiangolo.com/), it provides high performance, modern Python type safety, and automatic OpenAPI documentation.
+
+### Services
+
+- **Agent** — AI agent for CV tailoring; agentic loop with SSE streaming, LiteLLM (Claude), Serper web search, Redis CV read/write (`/api/v1/agent/`)
+- **Vikunja** — proxy to self-hosted Vikunja task manager; JWT auth per request (`/api/v1/vikunja/`)
+- **Actual Budget** — proxy to self-hosted Actual Budget via `actual-http-api` wrapper; API key auth (`/api/v1/actual/`)
+- **Redis Store** — generic key-value store (`/api/v1/store/{prefix}/{category}/{key}`) backed by Redis, used by the CV app to store CV sections and preset registries
+- **Authentication** — JWT-based sessions with cookie transport
+- **Authorization** — role and permission management
+
+### Agent service
+
+Handles CV tailoring via an agentic LLM loop. All routes require authentication (`Features.AGENT` permission).
+
+**Routes**
+
+| Method   | Path                                        | Description               |
+| -------- | ------------------------------------------- | ------------------------- |
+| `GET`    | `/api/v1/agent/models`                      | List available LLM models |
+| `GET`    | `/api/v1/agent/conversations`               | List user's conversations |
+| `POST`   | `/api/v1/agent/conversations`               | Create conversation       |
+| `PATCH`  | `/api/v1/agent/conversations/{id}`          | Rename conversation       |
+| `DELETE` | `/api/v1/agent/conversations/{id}`          | Delete conversation       |
+| `GET`    | `/api/v1/agent/conversations/{id}/messages` | Get message history       |
+| `POST`   | `/api/v1/agent/conversations/{id}/messages` | Send message → SSE stream |
+
+**Agent tools (MVP)**
+
+| Tool                 | Action                                                                       |
+| -------------------- | ---------------------------------------------------------------------------- |
+| `search_company`     | POST to Serper API, returns top 5 organic results                            |
+| `get_cv_base_preset` | Reads all 8 CV sections from `base:cv:*` in Redis                            |
+| `create_cv_preset`   | Proposes preset — emits `confirm_required` SSE, writes on next "yes" message |
+
+**Environment variables required**
+
+```bash
+SERPER_API_KEY=      # from serper.dev
+```
+
+**Module layout**
+
+```
+src/services/agent/
+├── router.py          # FastAPI routes
+├── schemas.py         # Pydantic request/response models
+├── models.py          # SQLAlchemy: Conversation, Message
+├── services.py        # Agentic loop + SSE generator
+├── llm.py             # LiteLLM streaming wrapper + model list
+├── tools.py           # Tool definitions (JSON schema for Claude)
+├── tools_executor.py  # Executes tool calls, returns results
+└── repository.py      # DB access for conversations/messages
+```
+
+## Production Deployment (Raspberry Pi)
+
+### Architecture
+
+```
+Raspberry Pi
+├── cockpit_api_prod      — FastAPI app, port 8000
+├── cockpit_db_prod       — PostgreSQL 15
+├── cockpit_redis_prod    — Redis Stack
+├── actual-http-api       — Actual Budget HTTP wrapper, port 5007
+├── open-webui            — Open WebUI, port 4206
+└── vikunja               — Task manager (external, vikunja_default network)
+```
+
+### MCP Server
+
+Cockpit API exposes an MCP server at `/mcp` (Streamable HTTP transport).
+
+- **URL**: `http://<raspberry-ip>:8000/mcp`
+- **Auth**: `Authorization: Bearer <MCP_API_KEY>`
+- **Tools**: budget (Actual Budget), tasks (Vikunja), cv (Redis presets), brain (notes)
+
+Open WebUI connects to this MCP endpoint so AI models can call cockpit tools directly.
+
+### Open WebUI
+
+- **Port**: 4206
+- **LLM backend**: OpenRouter (`OPEN_ROUTER_KEY`)
+- **MCP**: connected to cockpit `/mcp` endpoint
+
+### Deploying
+
+```bash
+# Run on Raspberry Pi — reads all vars from environment
+./deploy-api.sh
+```
+
+Required env vars are listed at the top of `deploy-api.sh`. Key ones:
+
+| Variable                                | Purpose                                              |
+| --------------------------------------- | ---------------------------------------------------- |
+| `MCP_API_KEY`                           | Bearer token for `/mcp` endpoint                     |
+| `OPEN_ROUTER_KEY`                       | OpenRouter API key (used by both API and Open WebUI) |
+| `BRAIN_NOTES_PATH`                      | Host path mounted into container for notes           |
+| `VIKUNJA_USERNAME` / `VIKUNJA_PASSWORD` | Service account for Vikunja                          |
+| `ACTUAL_HTTP_API_KEY`                   | API key for actual-http-api sidecar                  |
+
+## Getting Started
+
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### Installation & Running the API
+
+Prepare your environment by copying the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+Update the `.env` file with your database connection details and other configurations.
+
+Start the development server using Docker Compose:
+
+```bash
+docker compose -f docker-compose.dev.yml up
+```
+
+### Database Migrations
+
+Autogenerate alembic migrations:
+
+```bash
+docker compose -f docker-compose.dev.yml run --rm app alembic revision --autogenerate -m "<your_message>"
+```
+
+To use alembic migrations:
+
+```bash
+docker compose -f docker-compose.dev.yml run --rm cockpit_api alembic upgrade head
+```
+
+The API will be available at [http://localhost:8000](http://localhost:8000).
+
+### API Documentation
+
+- Swagger UI: [http://localhost:8000/api/docs](http://localhost:8000/api/docs)
+
+## Contributing
+
+Contributions are not welcome yet! This project is currently in its early stages, and I am focusing on building the core features. However, if you have suggestions or ideas, feel free to open an issue.
+
+## License
+
+This project is licensed under the MIT License.

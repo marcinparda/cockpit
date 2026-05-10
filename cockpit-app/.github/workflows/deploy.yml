@@ -1,0 +1,216 @@
+name: Deploy App
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'cockpit-app/**'
+
+jobs:
+  validate-types:
+    name: Validate API Types
+    uses: ./.github/workflows/validate-types.yml
+
+  build-test-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Important for pushing to GHCR
+    defaults:
+      run:
+        working-directory: cockpit-app
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Restore npm cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Replace environments.ts with secret ENVIRONMENTS
+        run: |
+          echo "${{ secrets.ENVIRONMENTS }}" > libs/shared/utils/src/lib/environments/environments.ts
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get last successful commit SHA from this workflow
+        id: last_success
+        run: |
+          echo "Trying to find last successful SHA for workflow 'Deploy' on branch ${{ github.ref_name }}"
+
+          gh run list \
+            --workflow="Deploy" \
+            --branch=${{ github.ref_name }} \
+            --status=success \
+            --json headSha \
+            --limit 1 > result.json
+
+          LAST_SUCCESSFUL_SHA=$(jq -r '.[0].headSha // empty' result.json)
+
+          if [ -z "$LAST_SUCCESSFUL_SHA" ]; then
+            echo "⚠️ No successful run found. Falling back to origin/master"
+            git fetch origin master
+            LAST_SUCCESSFUL_SHA=$(git rev-parse origin/master)
+          fi
+
+          echo "🔍 Last successful/known good SHA for affected check: $LAST_SUCCESSFUL_SHA"
+          echo "LAST_SUCCESSFUL_SHA=$LAST_SUCCESSFUL_SHA" >> $GITHUB_ENV
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch all history for all tags and branches
+        run: git fetch --prune --unshallow --tags
+
+      - name: Run affected checks and builds
+        run: npx nx affected --targets=lint,build,test --base=$LAST_SUCCESSFUL_SHA --head=HEAD --parallel=4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Check if login build output exists
+      - name: Check if login build output exists
+        id: login_exists
+        run: |
+          if [ -d "dist/apps/login" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image for login
+        if: steps.login_exists.outputs.exists == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./cockpit-app
+          file: ./cockpit-app/apps/login/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}-login:latest
+            ghcr.io/${{ github.repository }}-login:${{ github.sha }}
+          platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Check if cockpit build output exists
+      - name: Check if cockpit build output exists
+        id: cockpit_exists
+        run: |
+          if [ -d "dist/apps/cockpit" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image for cockpit
+        if: steps.cockpit_exists.outputs.exists == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./cockpit-app
+          file: ./cockpit-app/apps/cockpit/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}-cockpit:latest
+            ghcr.io/${{ github.repository }}-cockpit:${{ github.sha }}
+          platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Check if cv build output exists
+      - name: Check if cv build output exists
+        id: cv_exists
+        run: |
+          if [ -d "dist/apps/cv" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image for cv
+        if: steps.cv_exists.outputs.exists == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./cockpit-app
+          file: ./cockpit-app/apps/cv/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}-cv:latest
+            ghcr.io/${{ github.repository }}-cv:${{ github.sha }}
+          platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Check if store build output exists
+      - name: Check if store build output exists
+        id: store_exists
+        run: |
+          if [ -d "dist/apps/store" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image for store
+        if: steps.store_exists.outputs.exists == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./cockpit-app
+          file: ./cockpit-app/apps/store/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}-store:latest
+            ghcr.io/${{ github.repository }}-store:${{ github.sha }}
+          platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # Check if agent build output exists
+      - name: Check if agent build output exists
+        id: agent_exists
+        run: |
+          if [ -d "dist/apps/agent" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image for agent
+        if: steps.agent_exists.outputs.exists == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./cockpit-app
+          file: ./cockpit-app/apps/agent/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}-agent:latest
+            ghcr.io/${{ github.repository }}-agent:${{ github.sha }}
+          platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy-to-raspberry:
+    needs: [validate-types, build-test-and-push]
+    uses: ./.github/workflows/deploy-to-production.yml
+    secrets:
+      CLOUDFLARE_TUNNEL_DOMAIN: ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
+      RASPBERRY_PI_USERNAME: ${{ secrets.RASPBERRY_PI_USERNAME }}
+      RASPBERRY_PI_SSH_KEY: ${{ secrets.RASPBERRY_PI_SSH_KEY }}
+      SSH_KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}

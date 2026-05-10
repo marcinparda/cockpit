@@ -1,0 +1,16 @@
+import { mode } from './consts';
+
+export const environments = {
+  VIKUNJA_USERNAME: '',
+  VIKUNJA_PASSWORD: '',
+  loginUrl: 'http://localhost:4202',
+  cockpitUrl: 'http://localhost:4203',
+  cvUrl: 'http://localhost:4204',
+  storeUrl: 'http://localhost:4205',
+  agentUrl: 'http://localhost:4206',
+  twodoUrl: 'https://twodo.parda.me',
+  actualUrl: 'https://budget.parda.me',
+  brainUrl: 'http://localhost:8384/',
+  apiUrl: 'http://localhost:8000',
+  mode: mode.development,
+};

@@ -1,0 +1,181 @@
+<div class="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-title">Store Browser</span>
+    <button
+      type="button"
+      pButton
+      icon="pi pi-plus"
+      label="New Entry"
+      title="New Entry"
+      severity="success"
+      size="small"
+      (click)="create.emit(null)"
+    ></button>
+  </div>
+
+  @if (loadingPrefixes) {
+    <div class="skeleton-list">
+      @for (i of [1, 2, 3]; track i) {
+        <p-skeleton height="2rem" styleClass="mb-1"></p-skeleton>
+      }
+    </div>
+  } @else if (error) {
+    <p-message severity="error" [text]="error"></p-message>
+  } @else {
+    <div class="tree">
+      @for (prefix of prefixNodes; track prefix.name) {
+        <div class="tree-node">
+          <div class="tree-row prefix-row" (click)="togglePrefix(prefix)">
+            <i
+              class="pi toggle-icon"
+              [ngClass]="prefix.expanded ? 'pi-chevron-down' : 'pi-chevron-right'"
+            ></i>
+            <i class="pi pi-server node-icon"></i>
+            <span class="node-label">{{ prefix.name }}</span>
+            @if (prefix.loading) {
+              <i class="pi pi-spin pi-spinner loading-icon"></i>
+            }
+          </div>
+
+          @if (prefix.expanded) {
+            <div class="tree-children">
+              @for (cat of prefix.categories; track cat.name) {
+                <div class="tree-node">
+                  <div
+                    class="tree-row category-row"
+                    (click)="toggleCategory(prefix.name, cat)"
+                  >
+                    <i
+                      class="pi toggle-icon"
+                      [ngClass]="cat.expanded ? 'pi-chevron-down' : 'pi-chevron-right'"
+                    ></i>
+                    <i class="pi pi-folder node-icon"></i>
+                    <span class="node-label">{{ cat.name }}</span>
+                    @if (cat.loading) {
+                      <i class="pi pi-spin pi-spinner loading-icon"></i>
+                    }
+                  </div>
+
+                  @if (cat.expanded) {
+                    <div class="tree-children">
+                      @for (key of cat.keys; track key) {
+                        <div
+                          class="tree-row key-row"
+                          [ngClass]="{ selected: key === selectedKey }"
+                          (click)="selectKey(key)"
+                        >
+                          <i class="pi pi-key node-icon"></i>
+                          <span class="node-label">{{ getKeyLabel(key) }}</span>
+                        </div>
+                      }
+                      @if (cat.keys.length === 0) {
+                        <div class="tree-row key-row">
+                          <span class="node-label muted">No keys</span>
+                        </div>
+                      }
+                      <div
+                        class="tree-row key-row add-entry-row"
+                        (click)="createInCategory(prefix.name, cat.name, $event)"
+                      >
+                        <i class="pi pi-plus node-icon"></i>
+                        <span class="node-label">New Entry</span>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (prefix.categories.length === 0 && !prefix.loading && !prefix.addingCategory) {
+                <div class="tree-row category-row muted-row">
+                  <span class="node-label muted">No categories</span>
+                </div>
+              }
+
+              @if (!prefix.addingCategory) {
+                <div class="tree-row add-category-row" (click)="startAddCategory(prefix, $event)">
+                  <i class="pi pi-plus node-icon"></i>
+                  <span class="node-label">New Category</span>
+                </div>
+              }
+
+              @if (prefix.addingCategory) {
+                <div class="tree-row add-input-row category-input-row">
+                  <i class="pi pi-folder node-icon"></i>
+                  <input
+                    pInputText
+                    type="text"
+                    [(ngModel)]="prefix.newCategoryInput"
+                    placeholder="Category name..."
+                    class="add-input"
+                    (keydown.enter)="confirmAddCategory(prefix)"
+                    (keydown.escape)="cancelAddCategory(prefix)"
+                  />
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-check"
+                    title="Confirm"
+                    severity="success"
+                    text
+                    size="small"
+                    (click)="confirmAddCategory(prefix)"
+                  ></button>
+                  <button
+                    type="button"
+                    pButton
+                    icon="pi pi-times"
+                    title="Cancel"
+                    severity="secondary"
+                    text
+                    size="small"
+                    (click)="cancelAddCategory(prefix)"
+                  ></button>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (addingPrefix) {
+        <div class="tree-row add-input-row prefix-input-row">
+          <i class="pi pi-server node-icon"></i>
+          <input
+            pInputText
+            type="text"
+            [(ngModel)]="newPrefixInput"
+            placeholder="Prefix name..."
+            class="add-input"
+            (keydown.enter)="confirmAddPrefix()"
+            (keydown.escape)="cancelAddPrefix()"
+          />
+          <button
+            type="button"
+            pButton
+            icon="pi pi-check"
+            title="Confirm"
+            severity="success"
+            text
+            size="small"
+            (click)="confirmAddPrefix()"
+          ></button>
+          <button
+            type="button"
+            pButton
+            icon="pi pi-times"
+            title="Cancel"
+            severity="secondary"
+            text
+            size="small"
+            (click)="cancelAddPrefix()"
+          ></button>
+        </div>
+      } @else {
+        <div class="tree-row add-prefix-row" (click)="startAddPrefix($event)">
+          <i class="pi pi-plus node-icon"></i>
+          <span class="node-label">New Prefix</span>
+        </div>
+      }
+    </div>
+  }
+</div>

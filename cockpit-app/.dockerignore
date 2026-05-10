@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+npm-debug.log
+
+# Build outputs
+tmp/
+.angular/
+.nx/
+
+# Git and IDE
+.git/
+.github/
+.gitignore
+.vscode/
+.idea/
+
+# Environment files (except the production one)
+src/environments/*.ts
+!src/environments/environment.production.ts
+
+# Documentation and other unnecessary files
+*.md
+LICENSE
