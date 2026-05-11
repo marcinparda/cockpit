@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Deploys extra services: Hermes, actual-http-api, Open WebUI.
+# Deploys extra services: Hermes, actual-http-api, Open WebUI, Vikunja.
 # Triggered manually — not part of the automatic API/app CI pipelines.
 set -e
 
@@ -14,5 +14,8 @@ bash "${SCRIPT_DIR}/deploy-actual.sh"
 
 echo "=== Deploying Open WebUI ==="
 bash "${SCRIPT_DIR}/deploy-open-webui.sh"
+
+echo "=== Deploying Vikunja ==="
+bash "${SCRIPT_DIR}/deploy-vikunja.sh"
 
 echo "=== All extras deployed ==="

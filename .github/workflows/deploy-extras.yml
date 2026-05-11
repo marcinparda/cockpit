@@ -46,6 +46,10 @@ jobs:
           export HERMES_API_KEY='${{ secrets.HERMES_API_KEY }}'
           export MCP_API_KEY='${{ secrets.MCP_API_KEY }}'
           export ACTUAL_HTTP_API_KEY='${{ secrets.ACTUAL_HTTP_API_KEY }}'
+          export VIKUNJA_DB_NAME='${{ secrets.VIKUNJA_DB_NAME }}'
+          export VIKUNJA_DB_USER='${{ secrets.VIKUNJA_DB_USER }}'
+          export VIKUNJA_DB_PASSWORD='${{ secrets.VIKUNJA_DB_PASSWORD }}'
+          export VIKUNJA_DB_ROOT_PASSWORD='${{ secrets.VIKUNJA_DB_ROOT_PASSWORD }}'
           EOF
           chmod 600 /tmp/deploy.env
           scp /tmp/deploy.env ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:/tmp/deploy.env
@@ -89,5 +93,5 @@ jobs:
         run: |
           echo "## Extras Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** Successfully deployed extras to Raspberry Pi" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployed:** Hermes, actual-http-api, Open WebUI" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed:** Hermes, actual-http-api, Open WebUI, Vikunja" >> $GITHUB_STEP_SUMMARY
           echo "**Deployed at:** \`$(date -u)\`" >> $GITHUB_STEP_SUMMARY
