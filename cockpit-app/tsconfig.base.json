@@ -18,29 +18,21 @@
     "target": "ES2022",
     "module": "ES2022",
     "useDefineForClassFields": false,
-    "lib": [
-      "ES2022",
-      "dom"
-    ],
+    "lib": ["ES2022", "dom"],
     "paths": {
-      "@cockpit-app/api-types": [
-        "libs/shared/types/api-types/src/index.ts"
-      ],
-      "@cockpit-app/cockpit-ui": [
-        "libs/cockpit/ui/src/index.ts"
-      ],
+      "@cockpit-app/api-types": ["libs/shared/types/api-types/src/index.ts"],
+      "@cockpit-app/cockpit-ui": ["libs/cockpit/ui/src/index.ts"],
       "@cockpit-app/common-shared-data-access": [
         "libs/shared/data-access/common/src/index.ts"
       ],
       "@cockpit-app/shared-react-data-access": [
         "libs/shared/data-access/react/src/index.ts"
       ],
-      "@cockpit-app/shared-react-ui": [
-        "libs/shared/ui/react/src/index.ts"
+      "@cockpit-app/shared-react-feature": [
+        "libs/shared/feature/react/src/index.ts"
       ],
-      "@cockpit-app/shared-utils": [
-        "libs/shared/utils/src/index.ts"
-      ]
+      "@cockpit-app/shared-react-ui": ["libs/shared/ui/react/src/index.ts"],
+      "@cockpit-app/shared-utils": ["libs/shared/utils/src/index.ts"]
     },
     "rootDir": "."
   },
@@ -50,8 +42,5 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }

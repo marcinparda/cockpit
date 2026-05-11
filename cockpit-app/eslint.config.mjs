@@ -28,7 +28,11 @@ export default [
             },
             {
               sourceTag: 'type:ui',
-              onlyDependOnLibsWithTags: ['type:util', 'type:data-access', 'type:ui'],
+              onlyDependOnLibsWithTags: [
+                'type:util',
+                'type:data-access',
+                'type:ui',
+              ],
             },
             {
               sourceTag: 'type:feature',
@@ -40,14 +44,26 @@ export default [
               ],
             },
             // Scope enforcement (app-specific libs cannot leak into other apps)
-            { sourceTag: 'scope:shared', onlyDependOnLibsWithTags: ['scope:shared'] },
+            {
+              sourceTag: 'scope:shared',
+              onlyDependOnLibsWithTags: ['scope:shared'],
+            },
             {
               sourceTag: 'scope:cockpit',
               onlyDependOnLibsWithTags: ['scope:shared', 'scope:cockpit'],
             },
-            { sourceTag: 'scope:login', onlyDependOnLibsWithTags: ['scope:shared'] },
-            { sourceTag: 'scope:cv', onlyDependOnLibsWithTags: ['scope:shared'] },
-            { sourceTag: 'scope:store', onlyDependOnLibsWithTags: ['scope:shared'] },
+            {
+              sourceTag: 'scope:login',
+              onlyDependOnLibsWithTags: ['scope:shared'],
+            },
+            {
+              sourceTag: 'scope:cv',
+              onlyDependOnLibsWithTags: ['scope:shared'],
+            },
+            {
+              sourceTag: 'scope:store',
+              onlyDependOnLibsWithTags: ['scope:shared'],
+            },
           ],
         },
       ],
