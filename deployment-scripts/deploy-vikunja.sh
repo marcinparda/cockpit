@@ -7,7 +7,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-required_vars=("VIKUNJA_DB_NAME" "VIKUNJA_DB_USER" "VIKUNJA_DB_PASSWORD" "VIKUNJA_DB_ROOT_PASSWORD")
+required_vars=("VIKUNJA_DB_NAME" "VIKUNJA_DB_USER" "VIKUNJA_DB_PASSWORD" "VIKUNJA_DB_ROOT_PASSWORD" "VIKUNJA_SERVICE_PUBLICURL")
 for var in "${required_vars[@]}"; do
     if [[ -z "${!var}" ]]; then
         echo -e "${RED}Error: Required environment variable $var is not set${NC}"
@@ -57,6 +57,8 @@ docker run -d \
   -e VIKUNJA_DATABASE_DATABASE="${VIKUNJA_DB_NAME}" \
   -e VIKUNJA_DATABASE_USER="${VIKUNJA_DB_USER}" \
   -e VIKUNJA_DATABASE_PASSWORD="${VIKUNJA_DB_PASSWORD}" \
+  -e VIKUNJA_SERVICE_PUBLICURL="${VIKUNJA_SERVICE_PUBLICURL}" \
+  -e VIKUNJA_SERVICE_ENABLEREGISTRATION=false \
   -v "${DATA_DIR}/files:/app/vikunja/files" \
   vikunja/vikunja:latest
 

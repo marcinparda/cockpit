@@ -7,10 +7,13 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-if [[ -z "$ACTUAL_HTTP_API_KEY" ]]; then
-    echo -e "${RED}Error: ACTUAL_HTTP_API_KEY is not set${NC}"
-    exit 1
-fi
+required_vars=("ACTUAL_HTTP_API_KEY" "ACTUAL_SERVER_PASSWORD")
+for var in "${required_vars[@]}"; do
+    if [[ -z "${!var}" ]]; then
+        echo -e "${RED}Error: Required environment variable $var is not set${NC}"
+        exit 1
+    fi
+done
 
 echo -e "${YELLOW}Pulling actual-http-api image...${NC}"
 docker pull jhonderson/actual-http-api:latest
@@ -31,6 +34,8 @@ docker run -d \
   -v actual_http_api_data:/data \
   -e API_KEY="${ACTUAL_HTTP_API_KEY}" \
   -e ACTUAL_DATA_DIR=/data \
+  -e ACTUAL_SERVER_URL=http://actual \
+  -e ACTUAL_SERVER_PASSWORD="${ACTUAL_SERVER_PASSWORD}" \
   jhonderson/actual-http-api:latest
 
 docker network connect cockpit_network_prod actual-http-api 2>/dev/null || true

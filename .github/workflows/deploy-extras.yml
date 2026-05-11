@@ -46,10 +46,12 @@ jobs:
           export HERMES_API_KEY='${{ secrets.HERMES_API_KEY }}'
           export MCP_API_KEY='${{ secrets.MCP_API_KEY }}'
           export ACTUAL_HTTP_API_KEY='${{ secrets.ACTUAL_HTTP_API_KEY }}'
+          export ACTUAL_SERVER_PASSWORD='${{ secrets.ACTUAL_SERVER_PASSWORD }}'
           export VIKUNJA_DB_NAME='${{ secrets.VIKUNJA_DB_NAME }}'
           export VIKUNJA_DB_USER='${{ secrets.VIKUNJA_DB_USER }}'
           export VIKUNJA_DB_PASSWORD='${{ secrets.VIKUNJA_DB_PASSWORD }}'
           export VIKUNJA_DB_ROOT_PASSWORD='${{ secrets.VIKUNJA_DB_ROOT_PASSWORD }}'
+          export VIKUNJA_SERVICE_PUBLICURL='${{ secrets.VIKUNJA_SERVICE_PUBLICURL }}'
           EOF
           chmod 600 /tmp/deploy.env
           scp /tmp/deploy.env ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:/tmp/deploy.env

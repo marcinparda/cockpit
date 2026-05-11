@@ -22,6 +22,9 @@ jobs:
     needs: [scheduled-type-check]
     runs-on: ubuntu-latest
     if: needs.scheduled-type-check.outputs.has_drift == 'true' || github.event.inputs.force-update == 'true'
+    permissions:
+      contents: write
+      pull-requests: write
     defaults:
       run:
         working-directory: cockpit-app
