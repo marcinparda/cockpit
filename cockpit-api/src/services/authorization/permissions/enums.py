@@ -16,4 +16,3 @@ class Features(str, Enum):
     REDIS_STORE = "redis_store"
     BRAIN = "brain"
     VIKUNJA = "vikunja"
-    ACTUAL_BUDGET = "actual_budget"
