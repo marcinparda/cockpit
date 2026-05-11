@@ -33,5 +33,16 @@ jobs:
       - name: Install dependencies
         run: poetry install --with dev
 
+      - name: Enforce Mapped[] on all ORM columns
+        run: |
+          # Fail if any models.py uses bare Column() without a Mapped[] annotation
+          # See docs/ARCHITECTURE.md — every column must use Mapped[T] = mapped_column(...)
+          VIOLATIONS=$(grep -rn "= Column(" src --include="models.py" || true)
+          if [ -n "$VIOLATIONS" ]; then
+            echo "ERROR: bare Column() found in models — use Mapped[T] = mapped_column() instead"
+            echo "$VIOLATIONS"
+            exit 1
+          fi
+
       - name: Run tests
         run: poetry run pytest src/tests/ -v

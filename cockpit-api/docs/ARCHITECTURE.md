@@ -47,7 +47,18 @@ Some services intentionally deviate from the standard 3-layer structure:
 - **Timestamps**: All models inherit from `BaseModel` which provides `created_at` and `updated_at` fields
 - **Relationships**: Proper SQLAlchemy relationships with cascade delete where appropriate
 - **Async Operations**: Fully async database operations using SQLAlchemy's async engine
-- **Use Mapped for models**: SQLAlchemy's `Mapped` generic type for type-safe ORM models
+- **Use Mapped for every column**: Every ORM column and relationship attribute **must** use `Mapped[T]` + `mapped_column()`. Never use bare `Column()` without a `Mapped` annotation. This is required for mypy (via `sqlalchemy.ext.mypy.plugin`) to type-check models correctly.
+
+  ```python
+  # CORRECT
+  id: Mapped[UUID] = mapped_column(PG_UUID(as_uuid=True), primary_key=True, ...)
+  name: Mapped[str] = mapped_column(String(50), nullable=False)
+  description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, default=None)
+
+  # WRONG — mypy cannot infer types, will error
+  id = Column(PG_UUID(as_uuid=True), primary_key=True)
+  name = Column(String(50), nullable=False)
+  ```
 
 ## Database Changes
 
