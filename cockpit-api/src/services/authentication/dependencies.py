@@ -4,8 +4,8 @@ from fastapi import Depends, HTTPException, status, Cookie
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_db
-from src.services.authentication.tokens.service import verify_token
-from src.services.users.service import get_user_by_id
+from src.services.authentication.tokens import service as tokens_service
+from src.services.users import service as users_service
 from src.services.users.models import User
 
 
@@ -33,7 +33,7 @@ async def get_current_user(
         )
 
     try:
-        payload = await verify_token(access_token, db)
+        payload = await tokens_service.verify_token(access_token, db)
         user_id_str = payload.get("sub")
 
         if user_id_str is None:
@@ -55,7 +55,7 @@ async def get_current_user(
             detail="Invalid or expired token",
         )
 
-    user = await get_user_by_id(db, user_id)
+    user = await users_service.get_user_by_id(db, user_id)
 
     if user is None:
         raise HTTPException(

@@ -1,7 +1,28 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+CockpitApp is a multi-application monorepo built with Nx that includes several web applications with a comprehensive type-safe API integration system.
+
+### Deployment
+
+- See .github dir
+
+## API Integration Pattern
+
+The codebase uses a centralized API types system:
+
+1. OpenAPI specification is fetched from the live API (`https://api.parda.me/openapi.json`)
+2. TypeScript interfaces are generated using `openapi-typescript`
+3. Generated types to `@cockpit-app/api-types` are used across all applications for type-safe API calls
+4. Each app handles API calls through their respective data access patterns (React Query for React, custom services for Vue)
+
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
 
-# General Guidelines for working with Nx
+## General Guidelines for working with Nx
 
 - When running tasks (for example build, lint, test, e2e, etc.), always prefer running the task through `nx` (i.e. `nx run`, `nx run-many`, `nx affected`) instead of using the underlying tooling directly
 - You have access to the Nx MCP server and its tools, use them to help the user

@@ -1,54 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in cockpit-api repository.
+Guidance for Claude Code when working in `cockpit-api/`.
 
 ## Development Commands
 
-### Running the Application
-
-```bash
-# Start development environment with auto-reload
-docker compose -f docker-compose.dev.yml up
-
-# Run API container for one-off commands
-docker compose -f docker-compose.dev.yml run --rm cockpit_api <command>
-```
-
-### Database Management
-
-```bash
-# Create new migration
-docker compose -f docker-compose.dev.yml run --rm cockpit_api alembic revision --autogenerate -m "<migration_message>"
-
-# Apply migrations
-docker compose -f docker-compose.dev.yml run --rm cockpit_api alembic upgrade head
-
-# Downgrade migration
-docker compose -f docker-compose.dev.yml run --rm cockpit_api alembic downgrade -1
-```
-
-### Testing
-
-```bash
-# Run all tests (local - faster)
-poetry run pytest
-
-# Run all tests (Docker)
-docker compose -f docker-compose.dev.yml run --rm cockpit_api pytest
-
-# Run specific test file
-poetry run pytest src/tests/test_auth.py
-
-# Run with coverage
-poetry run pytest --cov=src
-```
-
-### Dependencies
-
-```bash
-# Install dependencies after modifying pyproject.toml
-poetry install
-```
+**If you need to run development commands (start app, DB migrations, tests, deps) — read [`docs/DEVELOPMENT_COMMANDS.md`](docs/DEVELOPMENT_COMMANDS.md) first.**
 
 ## Upstream API Documentation
 
@@ -66,70 +22,16 @@ To refresh specs when upstream updates:
 ./docs/update-upstream-docs.sh
 ```
 
-## Architecture Overview
+## Architecture
 
-### Database Design
+Modular monolith. Each service uses layered architecture: `router.py` → `service.py` → `repository.py`.
 
-- **Primary Keys**: All models use UUID primary keys with PostgreSQL's `uuid_generate_v4()`
-- **Timestamps**: All models inherit from `BaseModel` which provides `created_at` and `updated_at` fields
-- **Relationships**: Proper SQLAlchemy relationships with cascade delete where appropriate
-- **Async Operations**: Fully async database operations using SQLAlchemy's async engine
-- **Use Mapped for models**: SQLAlchemy's `Mapped` generic type for type-safe ORM models
-
-### Database Changes
-
-When adding new features:
-
-1. Create the database model in the appropriate service submodule (e.g., `src/services/agent/models.py`)
-2. Add the feature to `Features` enum in `src/services/authorization/permissions/enums.py`
-3. Create migration: `alembic revision --autogenerate -m "add_new_feature"`
-4. Update permissions by adding feature-action pairs to the permissions migration
-5. Apply migration: `alembic upgrade head`
-
-### Permission-Protected Endpoints
-
-All business endpoints should use permission checks via the `require_permission` dependency. Example usage:
-
-```python
-from src.services.authorization.permissions.dependencies import require_permission
-from src.services.authorization.permissions.enums import Actions, Features
-
-@router.get("/protected-endpoint")
-async def protected_endpoint(
-    current_user: User = Depends(require_permission(Features.AGENT, Actions.READ))
-):
-    # Endpoint logic here
-```
-
-### Imports
-
-- When importing service/repostitories modules
-  - Correct: `from src.services.authentication.sessions import service`
-  - Incorrect: `from src.services.authentication.sessions.service import login_user`
-
-### Creating a plans
-
-When creating a implementation/refactor plan save it under .ai/[plan_name].md
+**For models, migrations, permissions, import conventions, or full architecture detail — read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) first.**
 
 ## MCP Server
 
-MCP server mounted at `/mcp` (Streamable HTTP). Auth: `Authorization: Bearer <MCP_API_KEY>`.
+**If you need to add or modify MCP tools or resources — read [`docs/MCP_SERVER.md`](docs/MCP_SERVER.md) first.**
 
-Tools registered in `src/services/mcp/tools/`: `budget`, `tasks`, `cv`, `brain`.
-Resources registered in `src/services/mcp/resources/`: `brain`.
+## Production Stack
 
-When adding MCP tools: add a `register_*_tools(mcp)` call in `src/services/mcp/server.py`.
-
-## Production Stack (Raspberry Pi)
-
-Deployed via `./deploy-api.sh`. No compose file used in prod — containers started with `docker run` directly.
-
-| Container | Port | Notes |
-|---|---|---|
-| `cockpit_api_prod` | 8000 | main API + MCP |
-| `cockpit_db_prod` | — | PostgreSQL 15, internal only |
-| `cockpit_redis_prod` | — | Redis Stack, internal only |
-| `actual-http-api` | 5007 | Actual Budget HTTP wrapper |
-| `open-webui` | 4206 | Open WebUI, uses OpenRouter + cockpit MCP |
-
-`open-webui` connects to cockpit MCP at `http://cockpit_api_prod:8000/mcp` within `cockpit_network_prod`.
+**If you need to understand prod containers, ports, or networking — read [`docs/PRODUCTION_STACK.md`](docs/PRODUCTION_STACK.md) first.**

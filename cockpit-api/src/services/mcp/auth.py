@@ -40,14 +40,11 @@ class MCPAPIKeyMiddleware:
 
     async def _validate_oauth_token(self, token: str) -> bool:
         try:
-            from src.services.oauth.repository import (
-                get_oauth_access_token,
-                update_oauth_access_token_last_used,
-            )
+            from src.services.oauth import repository as oauth_repository
             from src.core.database import async_session_maker
 
             async with async_session_maker() as db:
-                record = await get_oauth_access_token(db, token)
+                record = await oauth_repository.get_oauth_access_token(db, token)
                 if record is None:
                     return False
                 if record.is_revoked:
@@ -55,7 +52,7 @@ class MCPAPIKeyMiddleware:
                 now = datetime.now(timezone.utc).replace(tzinfo=None)
                 if record.expires_at <= now:
                     return False
-                await update_oauth_access_token_last_used(db, token)
+                await oauth_repository.update_oauth_access_token_last_used(db, token)
                 return True
         except Exception:
             logger.exception("Error validating OAuth token")

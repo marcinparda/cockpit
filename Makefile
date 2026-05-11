@@ -64,7 +64,7 @@ app-run-store:
 	cd $(APP_DIR) && npx nx serve store
 
 app-build:
-	cd $(APP_DIR) && npm run build
+	cd $(APP_DIR) && npm run build:all
 
 app-test:
 	cd $(APP_DIR) && npm run test

@@ -4,8 +4,15 @@ from mcp.server.fastmcp import FastMCP
 
 
 def register_budget_tools(mcp: FastMCP) -> None:
-    from src.services.actual_budget.client import make_actual_client
+    import httpx
     from src.core.config import settings
+
+    def make_actual_client() -> httpx.AsyncClient:
+        return httpx.AsyncClient(
+            base_url=settings.ACTUAL_HTTP_API_URL,
+            headers={"X-Api-Key": settings.ACTUAL_HTTP_API_KEY},
+            timeout=15.0,
+        )
 
     def _budget_path(path: str) -> str:
         return f"/v1/budgets/{settings.ACTUAL_BUDGET_SYNC_ID}{path}"

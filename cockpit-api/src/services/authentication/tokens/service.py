@@ -6,15 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from jose import JWTError, jwt
 from src.core.config import settings
-from src.services.authentication.tokens.repository import (
-    create_access_token_record,
-    create_refresh_token_record,
-    get_access_token_by_jti,
-    get_refresh_token_by_jti,
-    update_access_token_revoked_status,
-    update_refresh_token_revoked_status,
-    update_access_token_last_used,
-)
+from src.services.authentication.tokens import repository
 
 
 def create_access_token_jwt(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
@@ -135,9 +127,9 @@ async def invalidate_token(token: str, db: AsyncSession) -> bool:
 
         token_type = payload.get("token_type", "access")
         if token_type == "refresh":
-            return await update_refresh_token_revoked_status(db, jti, True)
+            return await repository.update_refresh_token_revoked_status(db, jti, True)
         else:
-            return await update_access_token_revoked_status(db, jti, True)
+            return await repository.update_access_token_revoked_status(db, jti, True)
     except JWTError:
         return False
 
@@ -250,7 +242,7 @@ async def create_access_token(
     if expires_at.tzinfo is not None:
         expires_at = expires_at.replace(tzinfo=None)
 
-    return await create_access_token_record(db, jti, user_id, expires_at)
+    return await repository.create_access_token_record(db, jti, user_id, expires_at)
 
 
 async def create_refresh_token(
@@ -263,12 +255,12 @@ async def create_refresh_token(
     if expires_at.tzinfo is not None:
         expires_at = expires_at.replace(tzinfo=None)
 
-    return await create_refresh_token_record(db, jti, user_id, expires_at)
+    return await repository.create_refresh_token_record(db, jti, user_id, expires_at)
 
 
 async def is_access_token_valid(db: AsyncSession, jti: str) -> bool:
     """Check if an access token is valid (exists, not revoked, not expired)."""
-    token = await get_access_token_by_jti(db, jti)
+    token = await repository.get_access_token_by_jti(db, jti)
 
     if not token:
         return False
@@ -285,7 +277,7 @@ async def is_access_token_valid(db: AsyncSession, jti: str) -> bool:
 
 async def is_refresh_token_valid(db: AsyncSession, jti: str) -> bool:
     """Check if a refresh token is valid (exists, not revoked, not expired)."""
-    token = await get_refresh_token_by_jti(db, jti)
+    token = await repository.get_refresh_token_by_jti(db, jti)
 
     if not token:
         return False
@@ -304,7 +296,7 @@ async def is_refresh_token_valid(db: AsyncSession, jti: str) -> bool:
 async def update_access_token_last_used_timestamp(db: AsyncSession, jti: str) -> bool:
     """Update the last_used_at timestamp for an access token."""
     now = datetime.now(timezone.utc).replace(tzinfo=None)
-    return await update_access_token_last_used(db, jti, now)
+    return await repository.update_access_token_last_used(db, jti, now)
 
 
 def _validate_refresh_token_type(payload: Dict[str, Any]) -> None:

@@ -5,7 +5,7 @@ from typing import List
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.services.authorization.user_permissions.service import get_user_permissions
+from src.services.authorization.user_permissions import service as user_permissions_service
 from src.core.database import get_db
 from src.services.authorization.permissions.schemas import Permission
 from src.services.authentication.dependencies import get_current_user
@@ -21,4 +21,4 @@ async def get_current_user_permission(
     db: AsyncSession = Depends(get_db)
 ):
     """Get current user's permissions."""
-    return await get_user_permissions(db, UUID(str(current_user.id)))
+    return await user_permissions_service.get_user_permissions(db, UUID(str(current_user.id)))

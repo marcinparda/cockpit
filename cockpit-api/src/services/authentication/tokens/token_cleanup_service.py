@@ -7,15 +7,7 @@ from typing import Dict, Any, Optional
 from src.core.database import async_session_maker
 from src.core.config import settings
 
-from src.services.authentication.tokens.token_cleanup_repository import (delete_expired_access_tokens, delete_expired_refresh_tokens, delete_old_revoked_access_tokens, delete_old_revoked_refresh_tokens,
-                                                                         count_access_tokens_total,
-                                                                         count_access_tokens_active,
-                                                                         count_access_tokens_revoked,
-                                                                         count_access_tokens_expired,
-                                                                         count_refresh_tokens_total,
-                                                                         count_refresh_tokens_active,
-                                                                         count_refresh_tokens_revoked,
-                                                                         count_refresh_tokens_expired)
+from src.services.authentication.tokens import token_cleanup_repository
 
 
 logger = logging.getLogger(__name__)
@@ -26,8 +18,8 @@ async def cleanup_expired_tokens(db) -> dict:
     now = datetime.now(timezone.utc)
     now_naive = now.replace(tzinfo=None)
 
-    access_deleted = await delete_expired_access_tokens(db, now_naive)
-    refresh_deleted = await delete_expired_refresh_tokens(db, now_naive)
+    access_deleted = await token_cleanup_repository.delete_expired_access_tokens(db, now_naive)
+    refresh_deleted = await token_cleanup_repository.delete_expired_refresh_tokens(db, now_naive)
 
     return {
         "expired_access_tokens_deleted": access_deleted,
@@ -48,8 +40,8 @@ async def cleanup_old_revoked_tokens(
     cutoff_date = datetime.now(timezone.utc) - timedelta(days=retention_days)
     cutoff_date_naive = cutoff_date.replace(tzinfo=None)
 
-    access_deleted = await delete_old_revoked_access_tokens(db, cutoff_date_naive)
-    refresh_deleted = await delete_old_revoked_refresh_tokens(db, cutoff_date_naive)
+    access_deleted = await token_cleanup_repository.delete_old_revoked_access_tokens(db, cutoff_date_naive)
+    refresh_deleted = await token_cleanup_repository.delete_old_revoked_refresh_tokens(db, cutoff_date_naive)
 
     return {
         "old_revoked_access_tokens_deleted": access_deleted,
@@ -65,15 +57,15 @@ async def get_token_statistics(db) -> dict:
     now = datetime.now(timezone.utc)
     now_naive = now.replace(tzinfo=None)
 
-    access_total = await count_access_tokens_total(db)
-    access_active = await count_access_tokens_active(db, now_naive)
-    access_revoked = await count_access_tokens_revoked(db)
-    access_expired = await count_access_tokens_expired(db, now_naive)
+    access_total = await token_cleanup_repository.count_access_tokens_total(db)
+    access_active = await token_cleanup_repository.count_access_tokens_active(db, now_naive)
+    access_revoked = await token_cleanup_repository.count_access_tokens_revoked(db)
+    access_expired = await token_cleanup_repository.count_access_tokens_expired(db, now_naive)
 
-    refresh_total = await count_refresh_tokens_total(db)
-    refresh_active = await count_refresh_tokens_active(db, now_naive)
-    refresh_revoked = await count_refresh_tokens_revoked(db)
-    refresh_expired = await count_refresh_tokens_expired(db, now_naive)
+    refresh_total = await token_cleanup_repository.count_refresh_tokens_total(db)
+    refresh_active = await token_cleanup_repository.count_refresh_tokens_active(db, now_naive)
+    refresh_revoked = await token_cleanup_repository.count_refresh_tokens_revoked(db)
+    refresh_expired = await token_cleanup_repository.count_refresh_tokens_expired(db, now_naive)
 
     return {
         "access_tokens": {

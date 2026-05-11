@@ -7,8 +7,7 @@ from starlette.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError as DatabaseError
 from jose import JWTError
 
-from src.services.authentication.tokens.service import extract_token_id
-from src.services.authentication.tokens.service import is_access_token_valid, update_access_token_last_used_timestamp
+from src.services.authentication.tokens import service as tokens_service
 from src.core.database import async_session_maker
 import logging
 
@@ -52,11 +51,11 @@ class JWTValidationMiddleware(BaseHTTPMiddleware):
         if not token:
             return await call_next(request)
 
-        token_id = extract_token_id(token)
+        token_id = tokens_service.extract_token_id(token)
         if token_id:
             try:
                 async with async_session_maker() as db:
-                    is_valid = await is_access_token_valid(db, token_id)
+                    is_valid = await tokens_service.is_access_token_valid(db, token_id)
                     if not is_valid:
                         return JSONResponse(
                             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -65,7 +64,7 @@ class JWTValidationMiddleware(BaseHTTPMiddleware):
                             headers={"WWW-Authenticate": "Bearer"}
                         )
 
-                    await update_access_token_last_used_timestamp(db, token_id)
+                    await tokens_service.update_access_token_last_used_timestamp(db, token_id)
 
             except DatabaseError as db_error:
                 logging.getLogger(__name__).error(

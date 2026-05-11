@@ -6,12 +6,12 @@ from uuid import UUID
 
 from src.services.authorization.roles.models import UserRole
 from src.services.authorization.roles import repository
-from src.services.users.service import get_user_by_id
+from src.services.users import service as users_service
 
 
 async def get_user_roles_by_id(db: AsyncSession, user_id: UUID) -> Sequence[UserRole]:
     """Get a role by its ID."""
-    user = await get_user_by_id(db, user_id)
+    user = await users_service.get_user_by_id(db, user_id)
     if not user or not user.role_id:
         return []
 

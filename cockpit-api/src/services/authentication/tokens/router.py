@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_db
 from src.services.authentication.tokens.schemas import SimpleRefreshResponse
-from src.services.authentication.tokens.service import refresh_access_token
+from src.services.authentication.tokens import service as tokens_service
 from src.services.authentication.sessions.cookie_utils import set_auth_cookies
 from src.services.authentication.exception_utils import token_refresh_exception_handler
 
@@ -36,7 +36,7 @@ async def refresh_tokens(
             detail="Invalid refresh token format"
         )
 
-    new_access_token, new_refresh_token = await refresh_access_token(refresh_token, db)
+    new_access_token, new_refresh_token = await tokens_service.refresh_access_token(refresh_token, db)
 
     set_auth_cookies(response, new_access_token, new_refresh_token)
 

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_db
 from .schemas import UserRole
-from src.services.authorization.roles.service import get_all_roles, get_user_roles_by_id
+from src.services.authorization.roles import service as roles_service
 from src.services.authentication.dependencies import get_current_user
 from src.services.authorization.permissions.dependencies import require_admin_role
 from src.services.users.models import User
@@ -22,7 +22,7 @@ async def get_current_user_roles(
     db: AsyncSession = Depends(get_db)
 ):
     """Get current user's roles as a list of role names (strings)."""
-    user_roles = await get_user_roles_by_id(db, UUID(str(current_user.id)))
+    user_roles = await roles_service.get_user_roles_by_id(db, UUID(str(current_user.id)))
     print(f"User roles: {user_roles}")
     return [UserRole.model_validate(role) for role in user_roles]
 
@@ -33,5 +33,5 @@ async def list_all_roles(
     db: AsyncSession = Depends(get_db)
 ) -> List[UserRole]:
     """List all available user roles (admin only)."""
-    all_roles = await get_all_roles(db)
+    all_roles = await roles_service.get_all_roles(db)
     return [UserRole.model_validate(role) for role in all_roles]

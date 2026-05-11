@@ -10,3 +10,6 @@ cockpit-app/node_modules/
 cockpit-app/dist/
 cockpit-app/tmp/
 cockpit-app/.nx/cache/
+
+.claude
+.mypy_cache

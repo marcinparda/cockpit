@@ -14,7 +14,7 @@ from .schemas import (
 )
 from src.services.authorization.permissions.schemas import Permission
 from src.services.users import service
-from src.services.authorization.user_permissions.service import get_user_permissions
+from src.services.authorization.user_permissions import service as user_permissions_service
 from src.services.authorization.permissions.dependencies import require_admin_role
 from src.services.users.models import User as UserModel
 from src.services.users.schemas import User as UserSchema
@@ -140,4 +140,4 @@ async def get_user_permissions_endpoint(
     db: AsyncSession = Depends(get_db)
 ):
     """Get all permissions assigned to a user (admin only)."""
-    return await get_user_permissions(db, user_id)
+    return await user_permissions_service.get_user_permissions(db, user_id)

@@ -6,9 +6,10 @@ from fastapi import Request, Response, status
 from starlette.middleware.base import BaseHTTPMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 
-# Import parse_token_payload at module level to make it patchable in tests
+# Import at module level to make it patchable in tests
 try:
-    from src.services.authentication.tokens.service import parse_token_payload
+    from src.services.authentication.tokens import service as _tokens_service
+    parse_token_payload = _tokens_service.parse_token_payload
 except ImportError:
     # Handle the case where jwt module is not available during testing
     def parse_token_payload(token: str) -> Dict[str, Any]:

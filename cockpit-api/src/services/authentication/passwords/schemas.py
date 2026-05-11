@@ -12,9 +12,9 @@ class PasswordChangeRequest(BaseModel):
     @classmethod
     def validate_new_password(cls, v: str) -> str:
         """Validate new password strength."""
-        from src.services.authentication.passwords.service import validate_password_strength
+        from src.services.authentication.passwords import service as passwords_service
 
-        is_valid, errors = validate_password_strength(v)
+        is_valid, errors = passwords_service.validate_password_strength(v)
         if not is_valid:
             raise ValueError(
                 f"Password validation failed: {', '.join(errors)}")

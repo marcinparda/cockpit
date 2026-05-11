@@ -10,8 +10,7 @@ import string
 from src.services.users.models import User
 from src.services.users import repository
 from src.services.authorization.user_permissions.models import UserPermission
-from src.services.authentication.passwords.service import hash_password, verify_password, validate_password_strength
-from src.services.users import service as users_service
+from src.services.authentication.passwords import service as passwords_service
 
 
 async def get_user_by_id(db: AsyncSession, user_id: UUID) -> User:
@@ -41,7 +40,7 @@ async def get_user_by_email(db: AsyncSession, email: str) -> Optional[User]:
 
 async def _verify_current_password(user: User, current_password: str) -> None:
     """Verify user's current password."""
-    if not verify_password(current_password, str(user.password_hash)):
+    if not passwords_service.verify_password(current_password, str(user.password_hash)):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Current password is incorrect"
@@ -50,13 +49,13 @@ async def _verify_current_password(user: User, current_password: str) -> None:
 
 async def _validate_and_hash_new_password(new_password: str) -> str:
     """Validate new password strength and return hash."""
-    is_valid, errors = validate_password_strength(new_password)
+    is_valid, errors = passwords_service.validate_password_strength(new_password)
     if not is_valid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Password validation failed: {', '.join(errors)}"
         )
-    return hash_password(new_password)
+    return passwords_service.hash_password(new_password)
 
 
 async def change_user_password(
@@ -149,14 +148,14 @@ async def _prepare_user_password(temporary_password: Optional[str] = None) -> st
     if not temporary_password:
         temporary_password = generate_temporary_password()
 
-    is_valid, errors = validate_password_strength(temporary_password)
+    is_valid, errors = passwords_service.validate_password_strength(temporary_password)
     if not is_valid:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Password validation failed: {', '.join(errors)}"
         )
 
-    return hash_password(temporary_password)
+    return passwords_service.hash_password(temporary_password)
 
 
 async def create_user(
@@ -375,7 +374,7 @@ async def onboard_new_user(
     created_by_id: UUID,
     temporary_password: Optional[str] = None
 ) -> User:
-    new_user = await users_service.create_user(
+    new_user = await create_user(
         db=db,
         email=email,
         role_id=role_id,

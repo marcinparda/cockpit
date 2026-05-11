@@ -6,11 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import Response, HTTPException, status
 
 from src.services.users.models import User
-from src.services.users.service import get_user_by_email
+from src.services.users import service as users_service
 from src.services.authentication.sessions.schemas import LoginResponse, LogoutResponse
-from src.services.authentication.tokens.service import create_tokens_with_storage, invalidate_token
+from src.services.authentication.tokens import service as tokens_service
 from src.services.authentication.sessions.cookie_utils import set_auth_cookies, clear_auth_cookies
-from src.services.authentication.passwords.service import verify_password
+from src.services.authentication.passwords import service as passwords_service
 
 
 async def login_user(db: AsyncSession, email: str, password: str, response: Response) -> LoginResponse:
@@ -38,7 +38,7 @@ async def login_user(db: AsyncSession, email: str, password: str, response: Resp
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    access_token, refresh_token = await create_tokens_with_storage(
+    access_token, refresh_token = await tokens_service.create_tokens_with_storage(
         user_id=UUID(str(user.id)),
         email=str(user.email),
         db=db
@@ -52,10 +52,10 @@ async def login_user(db: AsyncSession, email: str, password: str, response: Resp
 async def logout(response, access_token_cookie: Optional[str], refresh_token_cookie: Optional[str], db: AsyncSession) -> LogoutResponse:
     """Logout the user by invalidating their tokens and clearing cookies."""
     if access_token_cookie:
-        await invalidate_token(access_token_cookie, db)
+        await tokens_service.invalidate_token(access_token_cookie, db)
 
     if refresh_token_cookie:
-        await invalidate_token(refresh_token_cookie, db)
+        await tokens_service.invalidate_token(refresh_token_cookie, db)
 
     clear_auth_cookies(response)
 
@@ -74,7 +74,7 @@ async def authenticate_user(db: AsyncSession, email: str, password: str) -> Opti
     Returns:
         User object if authentication successful, None otherwise
     """
-    user = await get_user_by_email(db, email)
+    user = await users_service.get_user_by_email(db, email)
 
     if not user:
         return None
@@ -82,7 +82,7 @@ async def authenticate_user(db: AsyncSession, email: str, password: str) -> Opti
     if bool(user.is_active) is False:
         return None
 
-    if not verify_password(password, str(user.password_hash)):
+    if not passwords_service.verify_password(password, str(user.password_hash)):
         return None
 
     return user

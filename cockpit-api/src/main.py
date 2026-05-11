@@ -10,7 +10,6 @@ from src.services.authorization.router import router as authorization_router
 from src.services.users.router import router as users_router
 from src.services.redis_store.router import router as redis_store_router
 from src.services.vikunja.router import router as vikunja_router
-from src.services.actual_budget.router import router as actual_budget_router
 from src.services.brain.router import router as brain_router
 from src.services.oauth.router import router as oauth_router
 from src.services.brain import search as brain_search
@@ -92,8 +91,6 @@ app.include_router(
     redis_store_router, prefix="/api/v1/store")
 app.include_router(
     vikunja_router, prefix="/api/v1/vikunja")
-app.include_router(
-    actual_budget_router, prefix="/api/v1/actual")
 app.include_router(
     brain_router, prefix="/api/v1/brain")
 app.include_router(

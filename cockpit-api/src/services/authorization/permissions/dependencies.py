@@ -9,7 +9,7 @@ from src.services.users.models import User
 
 from src.services.authorization.permissions.enums import Actions, Features
 from src.services.authorization.roles.enums import Roles
-from src.services.authorization.permissions.service import has_user_permission
+from src.services.authorization.permissions import service as permissions_service
 from src.services.authentication.dependencies import get_current_user
 
 
@@ -48,7 +48,7 @@ def require_permission(feature: Features, action: Actions):
             return current_user
 
         # Check specific permission for non-admin users
-        has_permission = await has_user_permission(
+        has_permission = await permissions_service.has_user_permission(
             db,
             UUID(str(current_user.id)),
             feature,

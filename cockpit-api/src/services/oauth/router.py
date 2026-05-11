@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
 from src.core.database import get_db
-from src.services.authentication.sessions.service import authenticate_user
+from src.services.authentication.sessions import service as sessions_service
 from src.services.oauth import service as oauth_service
 from src.services.oauth.schemas import (
     ClientRegistrationRequest,
@@ -175,7 +175,7 @@ async def authorize_post(
             status_code=exc.status_code,
         )
 
-    user = await authenticate_user(db, email, password)
+    user = await sessions_service.authenticate_user(db, email, password)
     if not user:
         return HTMLResponse(content=_login_form_html(
             client_id=client_id,
