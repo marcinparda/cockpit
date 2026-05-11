@@ -3,7 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/cv/src",
   "projectType": "application",
-  "tags": [],
+  "tags": ["scope:cv", "type:app"],
   "// targets": "to see all targets run: nx show project cv --web",
   "targets": {}
 }

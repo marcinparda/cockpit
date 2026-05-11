@@ -51,19 +51,7 @@ app-install:
 app-run:
 	cd $(APP_DIR) && npm run start:all
 
-app-run-cockpit:
-	cd $(APP_DIR) && npx nx serve cockpit
-
-app-run-login:
-	cd $(APP_DIR) && npx nx serve login
-
-app-run-cv:
-	cd $(APP_DIR) && npx nx serve cv
-
-app-run-store:
-	cd $(APP_DIR) && npx nx serve store
-
-app-build:
+app-lint:
 	cd $(APP_DIR) && npm run build:all
 
 app-test:

@@ -2,6 +2,7 @@
   "name": "store",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
+  "tags": ["scope:store", "type:app"],
   "sourceRoot": "apps/store/src",
   "prefix": "app",
   "generators": {},

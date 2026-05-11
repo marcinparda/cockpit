@@ -12,7 +12,8 @@
     "update:types": "npm run fetch-openapi && npm run generate:types",
     "validate:types": "tsx ./libs/shared/types/api-types/src/validateTypes.ts",
     "start:all": "nx run-many --target=serve --all --parallel",
-    "build:all": "nx run-many --target=build --all --parallel"
+    "build:all": "nx run-many --target=build --all --parallel",
+    "lint:all": "nx run-many --target=lint --all --parallel"
   },
   "private": true,
   "dependencies": {
