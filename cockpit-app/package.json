@@ -13,7 +13,9 @@
     "validate:types": "tsx ./libs/shared/types/api-types/src/validateTypes.ts",
     "start:all": "nx run-many --target=serve --all --parallel",
     "build:all": "nx run-many --target=build --all --parallel",
-    "lint:all": "nx run-many --target=lint --all --parallel"
+    "lint:all": "nx run-many --target=lint --all --parallel",
+    "test:all": "nx run-many --target=test --all --parallel",
+    "test:coverage-ui": "vitest --ui --coverage"
   },
   "private": true,
   "dependencies": {

@@ -118,7 +118,7 @@ Parameterized queries always (never string interpolation), eager loading to avoi
 Located in `.maister/docs/standards/testing/`
 
 #### Test Writing (`standards/testing/test-writing.md`)
-Test observable behavior not implementation details, descriptive test names (shouldReturnErrorWhenUserNotFound pattern), mock external dependencies (DBs, APIs, services), fast unit tests (milliseconds), risk-based prioritization, balance coverage with velocity, critical path coverage, edge case depth proportional to risk. Project setup: Vitest with jsdom for React/Vite apps, @vitest/coverage-v8, .spec.ts(x) suffix preferred, describe/it/expect with @testing-library/react co-located with source, pytest asyncio_mode=auto (no explicit markers), Playwright for E2E.
+Test observable behavior not implementation details, descriptive test names (shouldReturnErrorWhenUserNotFound pattern), mock external dependencies (DBs, APIs, services), fast unit tests (milliseconds), risk-based prioritization, balance coverage with velocity, critical path coverage, edge case depth proportional to risk. Project setup: Vitest with jsdom for React/Vite apps, @vitest/coverage-v8, .spec.ts(x) suffix preferred, describe/it/expect with @testing-library/react co-located with source, pytest asyncio_mode=auto (no explicit markers), Playwright for E2E. Coverage thresholds: both cockpit-app and cockpit-api enforce ≥80% lines/functions/branches/statements; below 80% fails CI.
 
 ---
 

@@ -7,7 +7,7 @@ import { nxCopyAssetsPlugin } from '@nx/vite/plugins/nx-copy-assets.plugin';
 
 export default defineConfig(() => ({
   root: __dirname,
-  cacheDir: '../../../../node_modules/.vite/libs/cockpit/data-access',
+  cacheDir: '../../../../node_modules/.vite/libs/shared/data-access/react',
   plugins: [
     nxViteTsPaths(),
     nxCopyAssetsPlugin(['*.md']),
@@ -23,7 +23,7 @@ export default defineConfig(() => ({
   // Configuration for building your library.
   // See: https://vitejs.dev/guide/build.html#library-mode
   build: {
-    outDir: '../../../../dist/libs/cockpit/data-access',
+    outDir: '../../../../dist/libs/shared/data-access/react',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {
@@ -46,12 +46,17 @@ export default defineConfig(() => ({
   test: {
     watch: false,
     globals: true,
-    environment: 'node',
+    environment: 'jsdom',
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     reporters: ['default'],
     coverage: {
-      reportsDirectory: '../../../../coverage/libs/cockpit/data-access',
+      reportsDirectory: '../../../../coverage/libs/shared/data-access/react',
       provider: 'v8' as const,
+      thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/index.ts', 'src/lib/tanstackQueryClient.ts'],
+      reporter: ['text-summary', 'lcov'],
     },
+    setupFiles: './setupTests.ts',
   },
 }));

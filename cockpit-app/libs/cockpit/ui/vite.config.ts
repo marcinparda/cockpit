@@ -46,6 +46,7 @@ export default defineConfig(() => ({
     },
   },
   test: {
+    name: 'cockpit-ui',
     watch: false,
     globals: true,
     environment: 'jsdom',
@@ -54,6 +55,11 @@ export default defineConfig(() => ({
     coverage: {
       reportsDirectory: '../../../coverage/libs/cockpit/ui',
       provider: 'v8' as const,
+      thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/index.ts'],
+      reporter: ['text-summary', 'lcov'],
     },
+    setupFiles: './setupTests.ts',
   },
 }));

@@ -19,6 +19,10 @@ export default defineConfig(() => ({
     coverage: {
       reportsDirectory: '../../../coverage/libs/shared/utils',
       provider: 'v8' as const,
+      thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/index.ts', 'src/lib/environments/environments.ts', 'src/lib/environments/consts.ts'],
+      reporter: ['text-summary', 'lcov'],
     },
   },
 }));

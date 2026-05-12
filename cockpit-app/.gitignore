@@ -37,6 +37,7 @@ yarn-error.log
 .sass-cache/
 /connect.lock
 /coverage
+/libs/coverage
 /libpeerconnection.log
 testem.log
 /typings
@@ -54,3 +55,4 @@ vitest.config.*.timestamp*
 .ai
 
 storybook-static
+apps/cockpit/html

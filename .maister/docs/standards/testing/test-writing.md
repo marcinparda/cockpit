@@ -59,3 +59,22 @@ async def test_something():  # works without @pytest.mark.asyncio
 
 ### Playwright for E2E
 End-to-end tests use Playwright (`@playwright/test ^1.36.0`). Source: `nx.json` @nx/playwright/plugin.
+
+## Coverage Thresholds
+
+### 80% Minimum Coverage Required
+Both `cockpit-app` and `cockpit-api` must maintain ≥80% coverage across lines, functions, branches, and statements. Coverage below 80% fails CI.
+
+- **cockpit-app**: Thresholds set per-package in each `vite.config.mts` under `test.coverage.thresholds`. CI runs `nx affected --targets=test -- --coverage` which enforces thresholds via Vitest.
+- **cockpit-api**: Threshold set in `pyproject.toml` under `[tool.coverage.report] fail_under = 80`. Coverage runs automatically via `addopts = "--cov=src"` in `[tool.pytest.ini_options]`.
+
+When adding a new `cockpit-app` package, include coverage thresholds in `vite.config.mts`:
+
+```ts
+coverage: {
+  provider: 'v8' as const,
+  thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
+  include: ['src/**/*.{ts,tsx}'],
+  reporter: ['text-summary', 'lcov'],
+}
+```

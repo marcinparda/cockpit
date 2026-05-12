@@ -37,7 +37,7 @@ test:
 	poetry run pytest
 
 test-cov:
-	poetry run pytest --cov=src
+	poetry run pytest --cov=src --cov-report=term-missing --cov-fail-under=80
 
 test-docker:
 	$(API) pytest

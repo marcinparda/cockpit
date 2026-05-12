@@ -43,6 +43,10 @@ export default defineConfig(() => ({
     coverage: {
       reportsDirectory: '../../coverage/apps/login',
       provider: 'v8' as const,
+      thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/main.tsx'],
+      reporter: ['text-summary', 'lcov'],
     },
     setupFiles: './setupTests.ts',
   },

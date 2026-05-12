@@ -44,5 +44,5 @@ jobs:
             exit 1
           fi
 
-      - name: Run tests
+      - name: Run tests with coverage
         run: poetry run pytest src/tests/ -v

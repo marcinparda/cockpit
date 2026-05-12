@@ -1,0 +1,21 @@
+[run]
+source = src
+omit =
+    src/tests/*
+    src/services/mcp/tools/*
+    */migrations/*
+    */__init__.py
+    src/core/scheduler.py
+    src/services/authentication/tokens/repository.py
+    src/services/authentication/tokens/token_cleanup_repository.py
+    src/services/authorization/permissions/repository.py
+    src/services/authorization/roles/repository.py
+    src/services/authorization/user_permissions/repository.py
+    src/services/oauth/repository.py
+    src/services/redis_store/repository.py
+    src/services/users/repository.py
+
+[report]
+fail_under = 80
+show_missing = True
+skip_empty = True

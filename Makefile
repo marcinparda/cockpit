@@ -55,13 +55,16 @@ app-lint:
 	cd $(APP_DIR) && npm run build:all
 
 app-test:
-	cd $(APP_DIR) && npm run test
+	cd $(APP_DIR) && npm run test:all
 
 app-update-types:
 	cd $(APP_DIR) && npm run update:types
 
 app-validate-types:
 	cd $(APP_DIR) && npm run validate:types
+
+app-coverage-ui:
+	cd $(APP_DIR) && npm run test:coverage-ui
 
 # ── Combined ──────────────────────────────────────────────────────────────────
 install:
@@ -78,5 +81,5 @@ test:
 	api-test api-test-cov api-shell \
 	app-install app-run \
 	app-run-cockpit app-run-login app-run-cv app-run-store \
-	app-build app-test app-update-types app-validate-types \
+	app-build app-test app-update-types app-validate-types app-coverage-ui \
 	install test

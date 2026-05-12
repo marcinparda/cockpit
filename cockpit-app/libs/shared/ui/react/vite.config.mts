@@ -54,8 +54,12 @@ export default defineConfig(() => ({
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     reporters: ['default'],
     coverage: {
-      reportsDirectory: '../../../coverage/libs/shared/react-ui',
+      reportsDirectory: '../../../../coverage/libs/shared/react-ui',
       provider: 'v8' as const,
+      thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: ['src/index.ts', 'src/**/*.stories.tsx'],
+      reporter: ['text-summary', 'lcov'],
     },
     setupFiles: './setupTests.ts',
   },

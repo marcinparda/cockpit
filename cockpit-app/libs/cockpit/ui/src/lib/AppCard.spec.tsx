@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { TooltipProvider } from '@cockpit-app/shared-react-ui';
 import { AppCard } from './AppCard';
 import { ForwardRefExoticComponent, RefAttributes } from 'react';
 import { LucideProps } from 'lucide-react';
@@ -39,5 +40,36 @@ describe('AppCard', () => {
     );
     const link = screen.getByRole('link');
     expect(link).toHaveAttribute('href', '/test-url');
+  });
+
+  it('renders disabled state without tooltip text', () => {
+    render(
+      <AppCard
+        title="Disabled App"
+        description="Disabled app."
+        url="/disabled"
+        Icon={DummyIcon}
+        disabled={true}
+      />,
+    );
+    expect(screen.getByText('Disabled App')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+  });
+
+  it('renders disabled state with tooltip text', () => {
+    render(
+      <TooltipProvider>
+        <AppCard
+          title="Disabled App"
+          description="Disabled app."
+          url="/disabled"
+          Icon={DummyIcon}
+          disabled={true}
+          disabledTooltipText="Coming soon"
+        />
+      </TooltipProvider>,
+    );
+    expect(screen.getByText('Disabled App')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
   });
 });
