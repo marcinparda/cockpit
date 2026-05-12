@@ -11,6 +11,7 @@ export const environments = {
   twodoUrl: 'https://twodo.parda.me',
   actualUrl: 'https://budget.parda.me',
   brainUrl: 'http://localhost:8384/',
+  storybookUrl: 'https://storybook.parda.me',
   apiUrl: 'http://localhost:8000',
   mode: mode.development,
 };

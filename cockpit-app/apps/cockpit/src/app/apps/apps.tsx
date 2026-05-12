@@ -7,6 +7,7 @@ import {
   User,
   Bot,
   Brain,
+  BookOpen,
 } from 'lucide-react';
 import { environments } from '@cockpit-app/shared-utils';
 import {
@@ -68,6 +69,15 @@ const ALL_APPS = [
     Icon: Database,
     feature: 'redis_store',
     action: 'read',
+  },
+  {
+    name: 'Storybook',
+    description: 'UI component library documentation and visual testing.',
+    url: environments.storybookUrl,
+    Icon: BookOpen,
+    feature: null,
+    action: null,
+    adminOnly: true,
   },
 ];
 
