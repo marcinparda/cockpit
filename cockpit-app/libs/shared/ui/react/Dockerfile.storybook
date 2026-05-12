@@ -1,6 +1,6 @@
 FROM nginx:alpine
 
-COPY dist/storybook/react-ui /usr/share/nginx/html
+COPY libs/shared/ui/react/storybook-static /usr/share/nginx/html
 
 COPY libs/shared/ui/react/nginx/storybook.conf /etc/nginx/conf.d/default.conf
 
