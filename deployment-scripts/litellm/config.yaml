@@ -1,0 +1,31 @@
+# LiteLLM Proxy Config (no DB, config-file only)
+# Docs: https://docs.litellm.ai/docs/proxy/configs
+
+model_list:
+  # Anthropic models — passthrough for Claude Code / Kiro (Pro subscription via OAuth)
+  - model_name: "claude-sonnet-4-20250514"
+    litellm_params:
+      model: anthropic/claude-sonnet-4-20250514
+
+  - model_name: "claude-3-5-sonnet-20241022"
+    litellm_params:
+      model: anthropic/claude-3-5-sonnet-20241022
+
+  - model_name: "claude-3-5-haiku-20241022"
+    litellm_params:
+      model: anthropic/claude-3-5-haiku-20241022
+
+  # OpenRouter models — for Hermes, Open WebUI, general use
+  - model_name: "openrouter/*"
+    litellm_params:
+      model: "openrouter/*"
+      api_key: os.environ/OPENROUTER_API_KEY
+
+litellm_settings:
+  drop_params: true
+  success_callback: ["langfuse"]
+  failure_callback: ["langfuse"]
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY
+  forward_client_headers_to_llm_api: true  # Forwards OAuth token to Anthropic for Pro/Max subscriptions

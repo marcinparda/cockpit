@@ -63,7 +63,15 @@ cockpit-api (FastAPI)
     └── External APIs:
         ├── Vikunja (task management)
         ├── Actual Budget (finance)
-        └── OpenAI (AI/LLM features)
+        └── LiteLLM proxy → OpenRouter (AI/LLM features)
+
+Claude Code / Kiro (dev tools)
+    │  OAuth passthrough
+    ▼
+LiteLLM proxy (port 4000)
+    ├── Anthropic API (Claude models)
+    ├── OpenRouter (other models)
+    └── Langfuse Cloud (observability)
 ```
 
 **Type Safety Bridge**: API → OpenAPI spec → `make app-update-types` → `@cockpit-app/api-types` → all frontend apps
@@ -73,7 +81,9 @@ cockpit-api (FastAPI)
 |---------|----------|---------|
 | Vikunja | REST API | Task management |
 | Actual Budget | SQLite/HTTP | Personal finance |
-| OpenAI | REST API | AI/LLM features (agent app) |
+| LiteLLM | REST API (proxy) | Unified LLM gateway (routes to Anthropic/OpenRouter) |
+| Langfuse Cloud | REST API | LLM observability, tracing, cost tracking |
+| OpenRouter | REST API | Multi-model LLM provider (via LiteLLM) |
 | Redis | TCP | Caching, sessions, rate limiting |
 | MCP Server | stdio/HTTP | Model Context Protocol (AI tooling) |
 

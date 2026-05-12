@@ -17,7 +17,7 @@ The AI agent layer (MCP server + OpenAI integration) enables natural language in
 ## Goals (Active)
 1. **Add features to existing apps** — Extend cockpit, CV, store, and agent apps with new capabilities
 2. **Improve test coverage** — Write unit tests for backend services and frontend components; integrate coverage reporting in CI
-3. **Improve observability** — Add structured logging (JSON), error tracking, and production monitoring
+3. **Improve observability** — LiteLLM proxy + Langfuse Cloud for full AI/LLM observability; structured logging (JSON) and error tracking for application layer
 4. **Stabilize and maintain** — Keep the platform reliable; harden error handling; document environment setup
 
 ## Evolution

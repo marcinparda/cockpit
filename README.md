@@ -27,6 +27,7 @@ Personal agent platform — self-hosted on Raspberry Pi (arm64).
 | API dev commands (run, migrate, test) | [`cockpit-api/docs/DEVELOPMENT_COMMANDS.md`](cockpit-api/docs/DEVELOPMENT_COMMANDS.md) |
 | MCP tools & resources                 | [`cockpit-api/docs/MCP_SERVER.md`](cockpit-api/docs/MCP_SERVER.md)                     |
 | Upstream API specs (Vikunja, Actual)  | [`cockpit-api/docs/UPSTREAM_APIS.md`](cockpit-api/docs/UPSTREAM_APIS.md)               |
+| LLM proxy & observability             | [`docs/LITELLM_SETUP.md`](docs/LITELLM_SETUP.md)                                      |
 | App architecture & lib layout         | [`cockpit-app/docs/ARCHITECTURE.md`](cockpit-app/docs/ARCHITECTURE.md)                 |
 | CI/CD pipelines                       | [`.github/`](.github/)                                                                 |
 | GitHub Secrets reference              | [`AGENTS.md`](AGENTS.md)                                                               |

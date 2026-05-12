@@ -79,6 +79,10 @@ This document describes the technology choices and rationale for Cockpit — a p
 - **Raspberry Pi** — Self-hosted production target. Docker containers managed via SSH deployment scripts.
 - **ghcr.io** — Container registry for Docker images
 
+### LLM Gateway & Observability
+- **LiteLLM** — Unified LLM proxy. Routes Claude Code/Kiro (Pro subscription OAuth passthrough) and OpenRouter traffic. Config-file only (no DB).
+- **Langfuse Cloud** — LLM observability. Receives traces from LiteLLM for cost tracking, latency analysis, and request logging. Free tier (50k observations/month).
+
 ## Development Tools
 
 ### Linting & Formatting

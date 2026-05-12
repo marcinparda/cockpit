@@ -79,6 +79,7 @@ Developer pushes to master
 ### Pipeline 3: Extras (manual only)
 
 **`deploy-extras.yml`** — `workflow_dispatch` only, deploys:
+- LiteLLM (LLM proxy gateway)
 - Hermes (AI agent gateway)
 - actual-http-api (Actual Budget HTTP wrapper)
 - Open WebUI
@@ -189,15 +190,24 @@ Deploys frontend apps. Steps (for each of `login`, `cockpit`, `cv`, `store`):
 
 ### `deploy-extras.sh`
 
-Orchestrator — calls the four sub-scripts in sequence:
+Orchestrator — calls the sub-scripts in sequence:
 ```bash
-deploy-hermes.sh → deploy-actual.sh → deploy-open-webui.sh → deploy-vikunja.sh
+deploy-litellm.sh → deploy-hermes.sh → deploy-actual.sh → deploy-open-webui.sh → deploy-vikunja.sh
 ```
+
+### `deploy-litellm.sh`
+
+Deploys LiteLLM proxy (LLM gateway):
+- Copies `litellm/config.yaml` to `~/.litellm/config.yaml`
+- Runs `docker.litellm.ai/berriai/litellm:main-stable` on port 4000, attached to `cockpit_network_prod`
+- Routes Anthropic models (OAuth passthrough for Pro subscriptions) and OpenRouter models
+- Logs all requests to Langfuse Cloud for observability
+- External access via Cloudflare Tunnel at `litellm.parda.me`
 
 ### `deploy-hermes.sh`
 
 Deploys Hermes AI agent gateway:
-- Writes `~/.hermes/config.yaml` (model: openrouter, default model configurable via `HERMES_MODEL`)
+- Writes `~/.hermes/config.yaml` (model via LiteLLM proxy at `http://litellm:4000/v1`, default model configurable via `HERMES_MODEL`)
 - Writes `~/.hermes/cli-config.yaml` (MCP server pointing to `cockpit_api_prod:8000/mcp`)
 - Runs `nousresearch/hermes-agent:latest` on port 8642, attached to `cockpit_network_prod`
 
@@ -214,7 +224,7 @@ Deploys Actual Budget HTTP API wrapper:
 Deploys Open WebUI:
 - Runs `ghcr.io/open-webui/open-webui:main` on port 4206
 - Configured with two OpenAI-compatible API backends:
-  - `https://openrouter.ai/api/v1` (external models)
+  - `http://litellm:4000/v1` (LLM proxy — routes to OpenRouter/Anthropic)
   - `http://hermes:8642/v1` (local Hermes agent, reachable via `cockpit_network_prod`)
 
 ### `deploy-vikunja.sh`
@@ -255,6 +265,7 @@ Required env vars: same as `backup.sh` (only the vars relevant to the chosen ser
 cockpit_network_prod
 ├── cockpit_api_prod  (port 8000)
 ├── cockpit_redis_prod
+├── litellm           (port 4000)
 ├── hermes            (port 8642)
 ├── open-webui        (port 4206)
 └── actual-http-api   (port 5007)
@@ -291,6 +302,7 @@ Frontend apps (no network — standalone):
 | Open WebUI data | Docker volume `open_webui_data` |
 | Brain notes | Bind mount at `$BRAIN_NOTES_PATH` (Pi filesystem path) |
 | Hermes config | Bind mount `~/.hermes` |
+| LiteLLM config | Bind mount `~/.litellm` |
 
 ---
 
@@ -310,6 +322,7 @@ Frontend apps (no network — standalone):
 | `deployment-scripts/deploy-api.sh` | Run on Pi: full API stack |
 | `deployment-scripts/deploy-apps.sh` | Run on Pi: all frontend apps |
 | `deployment-scripts/deploy-extras.sh` | Run on Pi: extras orchestrator |
+| `deployment-scripts/deploy-litellm.sh` | Run on Pi: LiteLLM proxy |
 | `deployment-scripts/deploy-hermes.sh` | Run on Pi: Hermes |
 | `deployment-scripts/deploy-actual.sh` | Run on Pi: Actual HTTP API |
 | `deployment-scripts/deploy-open-webui.sh` | Run on Pi: Open WebUI |

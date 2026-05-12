@@ -7,7 +7,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-required_vars=("OPEN_ROUTER_KEY" "HERMES_API_KEY" "MCP_API_KEY")
+required_vars=("LITELLM_MASTER_KEY" "HERMES_API_KEY" "MCP_API_KEY")
 for var in "${required_vars[@]}"; do
     if [[ -z "${!var}" ]]; then
         echo -e "${RED}Error: Required environment variable $var is not set${NC}"
@@ -27,9 +27,9 @@ echo -e "${YELLOW}Writing Hermes config...${NC}"
 mkdir -p "${HOME}/.hermes"
 cat > "${HOME}/.hermes/config.yaml" << EOF
 model:
-  default: "${HERMES_MODEL:-openai/gpt-4o-mini}"
+  default: "${HERMES_MODEL:-openrouter/openai/gpt-4o-mini}"
   provider: "auto"
-  base_url: "https://openrouter.ai/api/v1"
+  base_url: "http://litellm:4000/v1"
 EOF
 
 cat > "${HOME}/.hermes/cli-config.yaml" << EOF
@@ -52,7 +52,7 @@ docker run -d \
   -e API_SERVER_HOST=0.0.0.0 \
   -e API_SERVER_PORT=8642 \
   -e API_SERVER_KEY="${HERMES_API_KEY}" \
-  -e OPENROUTER_API_KEY="${OPEN_ROUTER_KEY}" \
+  -e OPENAI_API_KEY="${LITELLM_MASTER_KEY}" \
   nousresearch/hermes-agent:latest \
   gateway run
 

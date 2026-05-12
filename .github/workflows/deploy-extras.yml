@@ -34,8 +34,9 @@ jobs:
 
       - name: Copy deployment scripts to Pi
         run: |
-          ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "mkdir -p ~/deployment-scripts"
+          ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "mkdir -p ~/deployment-scripts/litellm"
           scp deployment-scripts/*.sh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:~/deployment-scripts/
+          scp deployment-scripts/litellm/config.yaml ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:~/deployment-scripts/litellm/
           ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "chmod +x ~/deployment-scripts/*.sh"
         shell: bash
 
@@ -52,6 +53,10 @@ jobs:
           export VIKUNJA_DB_PASSWORD='${{ secrets.VIKUNJA_DB_PASSWORD }}'
           export VIKUNJA_DB_ROOT_PASSWORD='${{ secrets.VIKUNJA_DB_ROOT_PASSWORD }}'
           export VIKUNJA_SERVICE_PUBLICURL='${{ secrets.VIKUNJA_SERVICE_PUBLICURL }}'
+          export LITELLM_MASTER_KEY='${{ secrets.LITELLM_MASTER_KEY }}'
+          export LANGFUSE_PUBLIC_KEY='${{ secrets.LANGFUSE_PUBLIC_KEY }}'
+          export LANGFUSE_SECRET_KEY='${{ secrets.LANGFUSE_SECRET_KEY }}'
+          export LANGFUSE_HOST='${{ secrets.LANGFUSE_HOST }}'
           EOF
           chmod 600 /tmp/deploy.env
           scp /tmp/deploy.env ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:/tmp/deploy.env
@@ -95,5 +100,5 @@ jobs:
         run: |
           echo "## Extras Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** Successfully deployed extras to Raspberry Pi" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployed:** Hermes, actual-http-api, Open WebUI, Vikunja" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed:** LiteLLM, Hermes, actual-http-api, Open WebUI, Vikunja" >> $GITHUB_STEP_SUMMARY
           echo "**Deployed at:** \`$(date -u)\`" >> $GITHUB_STEP_SUMMARY

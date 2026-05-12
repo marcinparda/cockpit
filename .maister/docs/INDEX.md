@@ -23,7 +23,7 @@ Self-hosted personal agent platform consolidating task management, finance, note
 Full breakdown of language choices (TypeScript 5.8, Python 3.12+), frameworks (React 19, Vue 3.5, Angular 19, FastAPI, SQLModel, Alembic), databases (PostgreSQL, Redis, SQLite), build tools (Nx 21, Vite 6, Poetry, Make), infrastructure (Docker, GitHub Actions, Raspberry Pi), linting/formatting (ESLint 9, Prettier, MyPy), and all key dependency versions.
 
 #### Architecture (`project/architecture.md`)
-Modular fullstack monorepo pattern. Backend: FastAPI with strict 3-layer service structure (router → service → repository). Frontend: Nx apps (cockpit/login/React, cv/Vue, store/Angular) with enforced unidirectional lib dependency flow (util → data-access → ui → feature). Type-safe bridge via OpenAPI-generated types. Deployment: independent Docker containers on Raspberry Pi via GitHub Actions SSH pipeline.
+Modular fullstack monorepo pattern. Backend: FastAPI with strict 3-layer service structure (router → service → repository). Frontend: Nx apps (cockpit/login/React, cv/Vue, store/Angular) with enforced unidirectional lib dependency flow (util → data-access → ui → feature). Type-safe bridge via OpenAPI-generated types. LLM gateway: LiteLLM proxy routes all AI traffic (Claude Code, Kiro, Hermes, Open WebUI) with Langfuse Cloud observability. Deployment: independent Docker containers on Raspberry Pi via GitHub Actions SSH pipeline.
 
 ---
 

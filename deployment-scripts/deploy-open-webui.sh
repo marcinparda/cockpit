@@ -7,7 +7,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-required_vars=("OPEN_ROUTER_KEY" "HERMES_API_KEY")
+required_vars=("LITELLM_MASTER_KEY" "HERMES_API_KEY")
 for var in "${required_vars[@]}"; do
     if [[ -z "${!var}" ]]; then
         echo -e "${RED}Error: Required environment variable $var is not set${NC}"
@@ -31,8 +31,8 @@ docker run -d \
   --restart always \
   -p 4206:8080 \
   -v open_webui_data:/app/backend/data \
-  -e OPENAI_API_BASE_URLS="https://openrouter.ai/api/v1;http://hermes:8642/v1" \
-  -e OPENAI_API_KEYS="${OPEN_ROUTER_KEY};${HERMES_API_KEY}" \
+  -e OPENAI_API_BASE_URLS="http://litellm:4000/v1;http://hermes:8642/v1" \
+  -e OPENAI_API_KEYS="${LITELLM_MASTER_KEY};${HERMES_API_KEY}" \
   -e ENABLE_SIGNUP=true \
   ghcr.io/open-webui/open-webui:main
 

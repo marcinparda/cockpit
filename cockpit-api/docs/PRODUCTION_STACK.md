@@ -10,6 +10,9 @@ Deployed via `./deploy-api.sh`. No compose file used in prod — containers star
 | `cockpit_db_prod`    | —    | PostgreSQL 15, internal only              |
 | `cockpit_redis_prod` | —    | Redis Stack, internal only                |
 | `actual-http-api`    | 5007 | Actual Budget HTTP wrapper                |
-| `open-webui`         | 4206 | Open WebUI, uses OpenRouter + cockpit MCP |
+| `litellm`            | 4000 | LLM proxy, routes to Anthropic/OpenRouter, logs to Langfuse Cloud |
+| `open-webui`         | 4206 | Open WebUI, uses LiteLLM + cockpit MCP    |
 
 `open-webui` connects to cockpit MCP at `http://cockpit_api_prod:8000/mcp` within `cockpit_network_prod`.
+
+`litellm` is the LLM gateway for all services. Hermes and Open WebUI route through it. External clients (Claude Code, Kiro) reach it via `https://litellm.parda.me`.

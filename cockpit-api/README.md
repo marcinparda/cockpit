@@ -65,6 +65,7 @@ Raspberry Pi
 ├── cockpit_db_prod       — PostgreSQL 15
 ├── cockpit_redis_prod    — Redis Stack
 ├── actual-http-api       — Actual Budget HTTP wrapper, port 5007
+├── litellm               — LLM proxy (Anthropic/OpenRouter → Langfuse), port 4000
 ├── open-webui            — Open WebUI, port 4206
 └── vikunja               — Task manager (external, vikunja_default network)
 ```
@@ -82,7 +83,7 @@ Open WebUI connects to this MCP endpoint so AI models can call cockpit tools dir
 ### Open WebUI
 
 - **Port**: 4206
-- **LLM backend**: OpenRouter (`OPEN_ROUTER_KEY`)
+- **LLM backend**: LiteLLM proxy (`http://litellm:4000/v1`)
 - **MCP**: connected to cockpit `/mcp` endpoint
 
 ### Deploying
