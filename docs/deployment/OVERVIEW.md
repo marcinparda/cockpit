@@ -225,6 +225,18 @@ Deploys Vikunja task management stack:
 - Waits for MariaDB ready (`mysqladmin ping`)
 - Starts Vikunja on port 3456 with bind-mount at `~/vikunja/files`
 
+### `backup.sh`
+
+Weekly backup of all databases and data. Triggered by `scheduled-backup.yml` (cron: Sunday 3 AM UTC). Steps:
+1. PostgreSQL full dump (`pg_dumpall`) → `~/backups/postgres_<date>.sql.gz`
+2. Redis snapshot (`BGSAVE` + copy `.rdb`) → `~/backups/redis_<date>.rdb.gz`
+3. Vikunja MariaDB dump (`mysqldump`) → `~/backups/vikunja_db_<date>.sql.gz`
+4. Vikunja files archive → `~/backups/vikunja_files_<date>.tar.gz`
+5. Brain notes archive → `~/backups/brain_notes_<date>.tar.gz`
+6. Deletes backups older than 28 days
+
+Required env vars: `DB_USER`, `DB_PASSWORD`, `REDIS_PASSWORD`, `VIKUNJA_DB_USER`, `VIKUNJA_DB_PASSWORD`, `VIKUNJA_DB_NAME`, `BRAIN_NOTES_PATH`
+
 ---
 
 ## Docker Network Topology
@@ -292,3 +304,5 @@ Frontend apps (no network — standalone):
 | `deployment-scripts/deploy-actual.sh` | Run on Pi: Actual HTTP API |
 | `deployment-scripts/deploy-open-webui.sh` | Run on Pi: Open WebUI |
 | `deployment-scripts/deploy-vikunja.sh` | Run on Pi: Vikunja + MariaDB |
+| `deployment-scripts/backup.sh` | Run on Pi: weekly backup of all DBs and data |
+| `.github/workflows/scheduled-backup.yml` | Weekly cron: SSH to Pi and run backup |

@@ -1,0 +1,57 @@
+name: Weekly Backup
+
+on:
+  schedule:
+    - cron: '0 3 * * 0' # Every Sunday at 3 AM UTC
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Cloudflared
+        uses: AnimMouse/setup-cloudflared@v2
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.RASPBERRY_PI_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          cat <<EOF > ~/.ssh/config
+          Host ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}
+            User ${{ secrets.RASPBERRY_PI_USERNAME }}
+            IdentityFile ~/.ssh/id_ed25519
+            ProxyCommand cloudflared access ssh --hostname %h
+            StrictHostKeyChecking no
+            ServerAliveInterval 30
+            ServerAliveCountMax 5
+          EOF
+          chmod 600 ~/.ssh/config
+        shell: bash
+
+      - name: Copy backup script to Pi
+        run: |
+          ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "mkdir -p ~/deployment-scripts"
+          scp deployment-scripts/backup.sh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:~/deployment-scripts/backup.sh
+          ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "chmod +x ~/deployment-scripts/backup.sh"
+        shell: bash
+
+      - name: Run backup
+        run: |
+          ssh ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }} "
+            export DB_USER='${{ secrets.DB_USER }}'
+            export DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+            export DB_NAME='${{ secrets.DB_NAME }}'
+            export REDIS_PASSWORD='${{ secrets.REDIS_PASSWORD }}'
+            export VIKUNJA_DB_USER='${{ secrets.VIKUNJA_DB_USER }}'
+            export VIKUNJA_DB_PASSWORD='${{ secrets.VIKUNJA_DB_PASSWORD }}'
+            export VIKUNJA_DB_NAME='${{ secrets.VIKUNJA_DB_NAME }}'
+            export BRAIN_NOTES_PATH='${{ secrets.BRAIN_NOTES_PATH }}'
+            ~/deployment-scripts/backup.sh
+          "
+        shell: bash

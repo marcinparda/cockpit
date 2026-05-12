@@ -95,7 +95,8 @@ GitHub Actions
     │
     ├── PR: lint + typecheck + test
     ├── Merge to main: build Docker image → push to ghcr.io
-    └── Manual trigger: SSH to Raspberry Pi → docker pull + restart
+    ├── Manual trigger: SSH to Raspberry Pi → docker pull + restart
+    └── Weekly cron: SSH to Pi → backup all DBs + data to ~/backups/
 ```
 
 - Each app is an independent Docker container
