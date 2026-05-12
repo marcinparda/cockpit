@@ -20,3 +20,10 @@
 - Name files with ISO date: `<service>_YYYY-MM-DD_HHMM.<ext>.gz`
 - Log success/failure per step; don't abort entire script on single service failure
 - Secrets come from GitHub Actions secrets, passed as env vars over SSH
+
+### Restore Procedure
+- Script: `deployment-scripts/restore.sh <service>`
+- Restores one service at a time: `postgres`, `redis`, `vikunja-db`, `vikunja-files`, `brain`
+- Always prompts for confirmation before overwriting data
+- Automatically picks the latest backup file from `~/backups/`
+- Requires the same env vars as `backup.sh` (only those relevant to the chosen service)

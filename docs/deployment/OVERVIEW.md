@@ -237,6 +237,16 @@ Weekly backup of all databases and data. Triggered by `scheduled-backup.yml` (cr
 
 Required env vars: `DB_USER`, `DB_PASSWORD`, `REDIS_PASSWORD`, `VIKUNJA_DB_USER`, `VIKUNJA_DB_PASSWORD`, `VIKUNJA_DB_NAME`, `BRAIN_NOTES_PATH`
 
+### `restore.sh`
+
+Restores a single service from its latest backup. Interactive — prompts for confirmation before overwriting.
+
+Usage: `~/deployment-scripts/restore.sh <service>`
+
+Services: `postgres`, `redis`, `vikunja-db`, `vikunja-files`, `brain`
+
+Required env vars: same as `backup.sh` (only the vars relevant to the chosen service).
+
 ---
 
 ## Docker Network Topology
@@ -305,4 +315,5 @@ Frontend apps (no network — standalone):
 | `deployment-scripts/deploy-open-webui.sh` | Run on Pi: Open WebUI |
 | `deployment-scripts/deploy-vikunja.sh` | Run on Pi: Vikunja + MariaDB |
 | `deployment-scripts/backup.sh` | Run on Pi: weekly backup of all DBs and data |
+| `deployment-scripts/restore.sh` | Run on Pi: restore a single service from latest backup |
 | `.github/workflows/scheduled-backup.yml` | Weekly cron: SSH to Pi and run backup |
