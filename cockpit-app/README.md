@@ -9,6 +9,10 @@ A multi-framework monorepo built with Nx showcasing modern web development acros
 - **[Login System](apps/login/README.md)** - React (✅ **Deployment Ready**)
 - **[CV Portfolio](apps/cv/README.md)** - React + Redis store (✅ **Deployment Ready**)
 
+### Component Documentation
+
+- **Storybook** - UI component library docs for `@cockpit-app/shared-react-ui` (port 4207)
+
 ## 🔗 External Services (Raspberry Pi)
 
 Self-hosted services running on Raspberry Pi via Docker. Not part of this codebase — see READMEs for API integration reference.
@@ -115,6 +119,9 @@ nx run-many -t lint
 
 # Type check all projects
 nx run-many -t typecheck
+
+# Storybook (react-ui component docs)
+nx run react-ui:storybook
 ```
 
 ## Testing Strategy

@@ -34,7 +34,8 @@
       "@cockpit-app/shared-react-ui": ["libs/shared/ui/react/src/index.ts"],
       "@cockpit-app/shared-utils": ["libs/shared/utils/src/index.ts"]
     },
-    "rootDir": "."
+    "rootDir": ".",
+    "skipLibCheck": true
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,

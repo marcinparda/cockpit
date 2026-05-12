@@ -158,3 +158,12 @@ Each app has `apps/{name}/Dockerfile`:
 Images pushed to `ghcr.io/{owner}/cockpit-{appname}:{sha}` and `:latest`.
 
 CI uses `nx affected` — only changed apps rebuild on each push to `master`.
+
+## Storybook
+
+Component documentation for `@cockpit-app/shared-react-ui` via Storybook 8.
+
+- Config: `libs/shared/ui/react/.storybook/`
+- Run: `npx nx run react-ui:storybook`
+- Build: `npx nx run react-ui:build-storybook` → `dist/storybook/react-ui`
+- Deployed as `cockpit-storybook` container on port **4207**

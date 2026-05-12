@@ -178,6 +178,22 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build Storybook
+        run: npx nx run react-ui:build-storybook
+
+      - name: Build and push Docker image for storybook
+        uses: docker/build-push-action@v6
+        with:
+          context: ./cockpit-app
+          file: ./cockpit-app/libs/shared/ui/react/Dockerfile.storybook
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}-storybook:latest
+            ghcr.io/${{ github.repository }}-storybook:${{ github.sha }}
+          platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
 
   deploy-to-raspberry:
     needs: [validate-types, build-test-and-push]

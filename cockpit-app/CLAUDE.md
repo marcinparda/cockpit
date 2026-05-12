@@ -14,6 +14,13 @@ CockpitApp is a multi-application monorepo built with Nx that includes several w
 
 **For app structure, lib layout, auth flow, state management, build system, or deployment — read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) first.**
 
+## Storybook
+
+- `npx nx run react-ui:storybook` — dev server for `@cockpit-app/shared-react-ui` components
+- `npx nx run react-ui:build-storybook` — static build → `dist/storybook/react-ui`
+- Deployed as `cockpit-storybook` container on port **4207**
+- Config: `libs/shared/ui/react/.storybook/`
+
 ## API Integration Pattern
 
 The codebase uses a centralized API types system:

@@ -5,7 +5,7 @@ Personal agent platform — self-hosted on Raspberry Pi (arm64).
 | Project                        | Stack                                           | What                                                                   |
 | ------------------------------ | ----------------------------------------------- | ---------------------------------------------------------------------- |
 | [`cockpit-api/`](cockpit-api/) | Python · FastAPI · PostgreSQL · Redis           | REST API + MCP server. Integrates Vikunja, Actual Budget, brain notes. |
-| [`cockpit-app/`](cockpit-app/) | Nx · React 19 · Angular 19 · Tailwind · PrimeNG | Multi-app frontend monorepo (login, cockpit, cv, store).               |
+| [`cockpit-app/`](cockpit-app/) | Nx · React 19 · Angular 19 · Tailwind · PrimeNG | Multi-app frontend monorepo (login, cockpit, cv, store). Storybook for UI docs. |
 
 ## Architecture at a Glance
 
@@ -39,18 +39,6 @@ Root Makefile orchestrates both projects:
 make install          # install deps for API + App
 make run              # start API (docker, detached) + all frontend apps
 make test             # run all tests
-
-# API
-make api-up           # docker compose up (attached)
-make api-down         # stop containers
-make api-migrate      # alembic upgrade head
-make api-migration m="description"  # generate new migration
-make api-test-cov     # pytest with coverage
-
-# App
-make app-run          # start all frontend apps
-make app-update-types # regenerate OpenAPI types from live API
-make app-lint         # build all (type-check)
 ```
 
 Full API dev commands: [`cockpit-api/docs/DEVELOPMENT_COMMANDS.md`](cockpit-api/docs/DEVELOPMENT_COMMANDS.md)
