@@ -1,4 +1,5 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { getCVData, putCVData } from './cvStoreApi';
 
 const { mockGetRequest, mockPutRequest } = vi.hoisted(() => ({
   mockGetRequest: vi.fn(),
@@ -11,8 +12,6 @@ vi.mock('@cockpit-app/common-shared-data-access', () => ({
     putRequest: mockPutRequest,
   },
 }));
-
-import { getCVData, putCVData } from './cvStoreApi';
 
 const mockEnvelope = {
   meta: { key: 'k', type: 't', version: 1, created_at: '', updated_at: '', tags: [] },

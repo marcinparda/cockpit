@@ -63,7 +63,6 @@ describe('AchievementsEditor', () => {
   it('calls setCVData when remove button is clicked', () => {
     const setCVData = vi.fn();
     render(<AchievementsEditor cvData={baseCVData} setCVData={setCVData} />);
-    const removeBtn = screen.getAllByRole('button').find((b) => b.querySelector('svg'));
     const allBtns = screen.getAllByRole('button');
     // Remove button is the last button in the item (trash icon)
     fireEvent.click(allBtns[allBtns.length - 1]);

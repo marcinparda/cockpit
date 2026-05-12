@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { LoginForm } from './LoginForm';
+import * as dataAccess from '@cockpit-app/common-shared-data-access';
 
 vi.mock('@cockpit-app/common-shared-data-access', () => ({
   login: vi.fn(),
@@ -32,8 +33,6 @@ vi.mock('@cockpit-app/shared-react-ui', () => ({
     </button>
   ),
 }));
-
-import * as dataAccess from '@cockpit-app/common-shared-data-access';
 
 describe('LoginForm', () => {
   const mockLogin = dataAccess.login as ReturnType<typeof vi.fn>;

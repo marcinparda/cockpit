@@ -3,14 +3,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { usePresets } from './usePresets';
+import { fetchRegistry, saveRegistry } from '../services/presetApi';
 
 vi.mock('../services/presetApi', () => ({
   fetchRegistry: vi.fn(),
   saveRegistry: vi.fn(),
   clonePresetSections: vi.fn(),
 }));
-
-import { fetchRegistry, saveRegistry } from '../services/presetApi';
 
 // jsdom doesn't implement replaceState fully — stub it
 Object.defineProperty(window, 'location', {

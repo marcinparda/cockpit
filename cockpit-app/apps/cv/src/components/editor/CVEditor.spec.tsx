@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
+import { CVEditor } from './CVEditor';
 
 const mockSelectPreset = vi.fn();
 const mockClearDirty = vi.fn();
@@ -58,8 +59,6 @@ vi.mock('react-resizable-panels', () => ({
   Group: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Separator: () => <div />,
 }));
-
-import { CVEditor } from './CVEditor';
 
 describe('CVEditor', () => {
   it('renders without crashing', () => {

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { useCVData } from './useCVData';
+import { getCVData, putCVData } from '../services/cvStoreApi';
 
 vi.mock('../services/cvStoreApi', () => ({
   getCVData: vi.fn(),
@@ -16,8 +17,6 @@ vi.mock('../services/presetApi', () => ({
   saveRegistry: vi.fn(),
   clonePresetSections: vi.fn(),
 }));
-
-import { getCVData, putCVData } from '../services/cvStoreApi';
 
 function createWrapper() {
   const queryClient = new QueryClient({
