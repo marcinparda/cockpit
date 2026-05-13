@@ -49,8 +49,9 @@ const ALL_APPS = [
       'Track your expenses and manage your budget effectively with your team. Powered by Actual.',
     url: environments.actualUrl,
     Icon: DollarSign,
-    feature: 'actual_budget',
-    action: 'read',
+    feature: null,
+    action: null,
+    adminOnly: true,
   },
   {
     name: 'CV',

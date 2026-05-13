@@ -83,6 +83,7 @@ describe('AppsPage', () => {
     const cards = screen.getAllByTestId('app-card');
     const titles = cards.map((c) => c.textContent);
     expect(titles).toContain('Agent');
+    expect(titles).toContain('Actual budget');
     expect(titles).toContain('CV');
     expect(titles).toContain('Storybook');
   });

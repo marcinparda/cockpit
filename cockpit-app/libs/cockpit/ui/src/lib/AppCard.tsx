@@ -69,7 +69,7 @@ export function AppCard({
   }
 
   return (
-    <a href={url} className="cursor-pointer">
+    <a href={url} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
       {cardContent}
     </a>
   );
