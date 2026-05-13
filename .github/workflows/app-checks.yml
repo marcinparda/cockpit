@@ -26,6 +26,32 @@ jobs:
           cache: 'npm'
           cache-dependency-path: cockpit-app/package-lock.json
 
+      - name: Validate exact package versions
+        # Must run from repo root — find targets cockpit-app/ explicitly (job default is cockpit-app)
+        working-directory: .
+        run: |
+          found=0
+          while IFS= read -r pkg_file; do
+            matches=$(grep -nE '": "[\^~><=*x]' "$pkg_file" 2>/dev/null || true)
+            if [ -n "$matches" ]; then
+              while IFS= read -r line; do
+                specifier=$(echo "$line" | grep -oE '"[\^~><=*x][^"]*"' | head -1)
+                if [ -n "$specifier" ]; then
+                  echo "$pkg_file: $specifier"
+                else
+                  echo "$pkg_file: $line"
+                fi
+              done <<< "$matches"
+              found=1
+            fi
+          done < <(find cockpit-app -name package.json \
+            -not -path '*/node_modules/*' \
+            -not -path '*/dist/*')
+          if [ $found -eq 1 ]; then
+            echo "Error: range specifiers found in package.json files. Use exact versions only."
+            exit 1
+          fi
+
       - name: Install dependencies
         run: npm ci
 

@@ -2,22 +2,37 @@
 # Docs: https://docs.litellm.ai/docs/proxy/configs
 
 model_list:
-  # Anthropic models — passthrough for Claude Code / Kiro (Pro subscription via OAuth)
+  # Anthropic models via OAuth passthrough — Claude Code / Kiro only
   - model_name: "claude-sonnet-4-20250514"
     litellm_params:
       model: anthropic/claude-sonnet-4-20250514
 
+  # Anthropic models via OpenRouter — Open WebUI and other clients
   - model_name: "claude-sonnet-4-6"
     litellm_params:
-      model: anthropic/claude-sonnet-4-20250514
+      model: "openrouter/anthropic/claude-sonnet-4.6"
+      api_key: os.environ/OPENROUTER_API_KEY
 
   - model_name: "claude-3-5-sonnet-20241022"
     litellm_params:
-      model: anthropic/claude-3-5-sonnet-20241022
+      model: "openrouter/anthropic/claude-3.5-sonnet"
+      api_key: os.environ/OPENROUTER_API_KEY
 
   - model_name: "claude-3-5-haiku-20241022"
     litellm_params:
-      model: anthropic/claude-3-5-haiku-20241022
+      model: "openrouter/anthropic/claude-haiku-4.5"
+      api_key: os.environ/OPENROUTER_API_KEY
+
+  # Named OpenRouter models
+  - model_name: "nousresearch/hermes-3-llama-3.1-70b"
+    litellm_params:
+      model: "openrouter/nousresearch/hermes-3-llama-3.1-70b"
+      api_key: os.environ/OPENROUTER_API_KEY
+
+  - model_name: "nousresearch/hermes-4-70b"
+    litellm_params:
+      model: "openrouter/nousresearch/hermes-3-llama-3.1-70b"
+      api_key: os.environ/OPENROUTER_API_KEY
 
   # OpenRouter models — for Hermes, Open WebUI, general use
   - model_name: "openrouter/*"

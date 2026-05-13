@@ -1,0 +1,83 @@
+orchestrator:
+  started_phase: phase-1
+  completed_phases: [phase-1, phase-2, phase-5, phase-6, phase-7, phase-8, phase-10, phase-11, phase-14]
+  failed_phases: []
+  auto_fix_attempts:
+    phase-1: 0
+    phase-2: 0
+    phase-5: 0
+    phase-7: 0
+    phase-8: 0
+    phase-11: 0
+  options:
+    spec_audit_enabled: true
+    skip_test_suite: true
+    e2e_enabled: false
+    user_docs_enabled: false
+    code_review_enabled: true
+    pragmatic_review_enabled: true
+    reality_check_enabled: true
+    production_check_enabled: true
+  created: "2026-05-13T00:00:00Z"
+  updated: "2026-05-13T00:00:00Z"
+  task_path: .maister/tasks/development/2026-05-13-locked-package-json-versions
+  task_ids:
+    phase-1: 1
+    phase-2: 2
+    phase-5: 3
+    phase-6: 4
+    phase-7: 5
+    phase-8: 6
+    phase-10: 7
+    phase-11: 8
+    phase-14: 9
+
+task:
+  title: Enforce locked versions in package.json
+  description: "Enforce rule to keep only locked versions in package.json (no *,^ etc)"
+  status: completed
+  tags: []
+  priority: medium
+
+task_context:
+  risk_level: low-medium
+  clarifications_resolved: null
+  scope_expanded: null
+  architecture_decision: null
+  task_characteristics:
+    has_reproducible_defect: false
+    modifies_existing_code: true
+    creates_new_entities: true
+    involves_data_operations: false
+    ui_heavy: false
+  research_reference:
+    path: null
+    research_question: null
+    research_type: null
+    confidence_level: null
+  phase_summaries:
+    research: {summary: null, key_findings: [], recommended_approach: null}
+    codebase_analysis: {key_files: [], primary_language: null, summary: null}
+    clarifications: []
+    gap_analysis: {integration_points: [cockpit-app/.npmrc, app-checks.yml, 8 package.json files], summary: "112 non-exact specifiers across 5 package.json files; no .npmrc, no CI gate. Three-layer fix: .npmrc save-exact, migrate existing specifiers, add CI grep gate."}
+    scope_clarifications: {scope_expanded: null, summary: null}
+    ui_mockups: {components_designed: [], summary: null}
+    specification: {summary: null}
+    architecture_decision: {decision: null, summary: null}
+
+project_context:
+  project_doc_paths:
+    - .maister/docs/project/vision.md
+    - .maister/docs/project/tech-stack.md
+    - .maister/docs/project/architecture.md
+
+verification_context:
+  last_status: passed_with_issues
+  issues_found: [orphaned-test-script, grep-misses-x-wildcard, empty-specifier-echo, set-e-conflict, test-mutates-source, working-dir-undocumented]
+  fixes_applied:
+    - "Deleted .github/scripts/test-validate-pkg-versions.sh (orphaned artifact, fixes issues 1/4/5)"
+    - "Extended grep pattern [\^~><=*x] to catch x-wildcard"
+    - "Added guard for empty $specifier, falls back to raw $line"
+    - "Added comment on working-directory: . override"
+  decisions_made: [fix-all-fixable]
+  reverify_count: 1
