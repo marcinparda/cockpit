@@ -105,40 +105,44 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const timestamp = '${{ steps.branch-info.outputs.timestamp }}';
+            const trigger = '${{ github.event_name }}' === 'schedule' ? 'Scheduled daily check' : 'Manual workflow dispatch';
+            const body = [
+              '## 🤖 Automated API Types Update',
+              '',
+              'This PR was automatically created because **type drift** was detected during the scheduled check.',
+              '',
+              '### 📋 Summary',
+              '- **Source**: Remote OpenAPI specification at `https://api.parda.me/openapi.json`',
+              '- **Trigger**: ' + trigger,
+              '',
+              '### 🔍 What Changed',
+              'The remote OpenAPI specification has been updated, and this PR brings our local types in sync with those changes.',
+              '',
+              '### ✅ Verification',
+              '- [x] Types fetched from remote OpenAPI spec',
+              '- [x] TypeScript compilation successful',
+              '- [x] All type libraries lint and build correctly',
+              '',
+              '### 🚀 Next Steps',
+              '1. Review the changes in this PR',
+              '2. Test any affected applications',
+              '3. Merge when ready',
+              '',
+              '---',
+              '*This PR was created automatically by the Scheduled Type Drift Check workflow.*'
+            ].join('\n');
+
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: '🔄 Auto-update API types - ${{ steps.branch-info.outputs.timestamp }}',
+              title: '🔄 Auto-update API types - ' + timestamp,
               head: '${{ steps.branch-info.outputs.branch-name }}',
               base: 'master',
-              body: `## 🤖 Automated API Types Update
-
-            This PR was automatically created because **type drift** was detected during the scheduled check.
-
-            ### 📋 Summary
-            - **Source**: Remote OpenAPI specification at \`https://api.parda.me/openapi.json\`
-            - **Updated**: \`$(date -u '+%Y-%m-%d %H:%M:%S UTC')\`
-            - **Trigger**: ${{ github.event_name == 'schedule' && 'Scheduled daily check' || 'Manual workflow dispatch' }}
-
-            ### 🔍 What Changed
-            The remote OpenAPI specification has been updated, and this PR brings our local types in sync with those changes.
-
-            ### ✅ Verification
-            - [x] Types fetched from remote OpenAPI spec
-            - [x] TypeScript compilation successful
-            - [x] All type libraries lint and build correctly
-
-            ### 🚀 Next Steps
-            1. Review the changes in this PR
-            2. Test any affected applications
-            3. Merge when ready
-
-            ---
-            *This PR was created automatically by the Scheduled Type Drift Check workflow.*
-            `
+              body: body
             });
 
-            console.log(\`Pull request created: #\${pr.number}\`);
+            console.log('Pull request created: #' + pr.number);
 
       - name: Summary
         run: |
