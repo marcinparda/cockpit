@@ -31,7 +31,7 @@ export function AppCard({
 }: AppCardProps) {
   const cardContent = (
     <Card
-      className={`bg-background h-[175px] w-[350px] transition-all ${
+      className={`bg-background h-[175px] w-full transition-all ${
         disabled
           ? 'cursor-not-allowed opacity-50 grayscale'
           : 'hover:bg-muted cursor-pointer'
@@ -69,7 +69,12 @@ export function AppCard({
   }
 
   return (
-    <a href={url} target="_blank" rel="noopener noreferrer" className="cursor-pointer">
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="cursor-pointer"
+    >
       {cardContent}
     </a>
   );

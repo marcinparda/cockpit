@@ -1,4 +1,4 @@
-import { Label, Input, Button } from '@cockpit-app/shared-react-ui';
+import { Label, Input, Button, ThemeToggle } from '@cockpit-app/shared-react-ui';
 import { cn } from '@cockpit-app/shared-utils';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
@@ -27,9 +27,12 @@ export function LoginForm({
 
   return (
     <div
-      className={cn('flex h-screen items-center justify-center', className)}
+      className={cn('relative flex h-screen items-center justify-center', className)}
       {...props}
     >
+      <div className="absolute top-4 left-4 z-10">
+        <ThemeToggle />
+      </div>
       <div className="flex h-full w-full">
         <div className="flex w-full items-center justify-center lg:w-1/2">
         <div className="outline-border/40 outline-offset-0.5 dark:outline-border/80 relative flex w-full max-w-sm flex-col items-center p-8 outline-0 sm:outline-2">

@@ -32,6 +32,7 @@ vi.mock('@cockpit-app/shared-react-ui', () => ({
       {children}
     </button>
   ),
+  ThemeToggle: () => <div data-testid="theme-toggle" />,
 }));
 
 describe('LoginForm', () => {

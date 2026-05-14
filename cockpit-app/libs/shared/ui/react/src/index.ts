@@ -9,3 +9,4 @@ export * from './lib/Skeleton/Skeleton';
 export * from './lib/Badge/Badge';
 export * from './lib/Separator/Separator';
 export * from './lib/Tooltip/Tooltip';
+export * from './lib/ThemeToggle/ThemeToggle';

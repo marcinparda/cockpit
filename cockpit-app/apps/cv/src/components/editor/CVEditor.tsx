@@ -8,6 +8,7 @@ import { CVEditorPanel } from './CVEditorPanel';
 import { NewPresetModal } from '../NewPresetModal';
 import { UnsavedChangesDialog } from '../UnsavedChangesDialog';
 import { Preset } from '../../types/preset.types';
+import { ThemeToggle } from '@cockpit-app/shared-react-ui';
 
 export function CVEditor() {
   const {
@@ -62,14 +63,17 @@ export function CVEditor() {
 
   if (isLoading || presetsLoading) {
     return (
-      <div className="h-screen w-full bg-slate-50 flex items-center justify-center">
-        <div className="text-slate-400 text-sm">Loading...</div>
+      <div className="h-screen w-full bg-background flex items-center justify-center">
+        <div className="text-muted-foreground text-sm">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen w-full bg-slate-50">
+    <div className="h-screen w-full bg-background">
+      <div className="fixed top-2 right-2 z-10 print:hidden">
+        <ThemeToggle />
+      </div>
       <Group orientation="horizontal">
         <Panel defaultSize={50} minSize={30} className="print:hidden">
           <CVEditorPanel

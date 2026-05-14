@@ -1,5 +1,4 @@
 import { AppCard } from '@cockpit-app/cockpit-ui';
-import { TypographyH1, TypographyP } from '@cockpit-app/shared-react-ui';
 import {
   CheckSquare,
   Database,
@@ -97,29 +96,19 @@ export default function AppsPage() {
     );
   });
 
+  if (isLoading) return null;
+
   return (
-    <div>
-      <div className="mb-4">
-        <TypographyH1>Your apps</TypographyH1>
-      </div>
-      <div className="mb-4">
-        <TypographyP>
-          Here are the list of all cockpit apps that you have access to:
-        </TypographyP>
-      </div>
-      <div className="flex flex-wrap items-center gap-4">
-        {isLoading
-          ? null
-          : visibleApps.map((project) => (
-              <AppCard
-                key={project.name}
-                title={project.name}
-                description={project.description}
-                url={project.url}
-                Icon={project.Icon}
-              />
-            ))}
-      </div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {visibleApps.map((project) => (
+        <AppCard
+          key={project.name}
+          title={project.name}
+          description={project.description}
+          url={project.url}
+          Icon={project.Icon}
+        />
+      ))}
     </div>
   );
 }

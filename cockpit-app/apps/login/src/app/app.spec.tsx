@@ -6,6 +6,11 @@ import { vi, describe, beforeEach, it, expect } from 'vitest';
 
 vi.mock('@cockpit-app/common-shared-data-access');
 
+vi.mock('@cockpit-app/shared-react-ui', async (importOriginal) => {
+  const actual = await importOriginal<Record<string, unknown>>();
+  return { ...actual, ThemeToggle: () => <div data-testid="theme-toggle" /> };
+});
+
 const mockIsLoggedIn = auth.isLoggedIn as unknown as ReturnType<typeof vi.fn>;
 
 const mockReplace = vi.fn();
@@ -32,6 +37,6 @@ describe('App', () => {
     const { findByText } = render(<App />);
 
     // Check for a unique heading in the login page
-    expect(await findByText('Login to your account')).toBeInTheDocument();
+    expect(await findByText('Login to Cockpit')).toBeInTheDocument();
   });
 });
