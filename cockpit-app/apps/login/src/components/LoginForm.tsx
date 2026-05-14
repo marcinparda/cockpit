@@ -8,7 +8,7 @@ import { environments } from '@cockpit-app/shared-utils';
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<'form'>) {
+}: React.ComponentProps<'div'>) {
   const [state, formAction] = useActionState(
     async (_prevState: unknown, formData: FormData) => {
       const email = formData.get('email') as string;
@@ -26,52 +26,70 @@ export function LoginForm({
   const { pending } = useFormStatus();
 
   return (
-    <form
-      className={cn('flex flex-col gap-6', className)}
-      action={formAction}
+    <div
+      className={cn('flex h-screen items-center justify-center', className)}
       {...props}
     >
-      <div className="flex flex-col items-center gap-2 text-center">
-        <h1 className="text-2xl font-bold">Login to your account</h1>
-        <p className="text-muted-foreground text-sm text-balance">
-          Enter your email below to login to your account
-        </p>
-      </div>
-      <div className="grid gap-6">
-        <div className="grid gap-3">
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="m@example.com"
-            required
-            disabled={pending}
-            autoComplete="username"
+      <div className="flex h-full w-full">
+        <div className="flex w-full items-center justify-center lg:w-1/2">
+        <div className="outline-border/40 outline-offset-0.5 dark:outline-border/80 relative flex w-full max-w-sm flex-col items-center p-8 outline-0 sm:outline-2">
+          {/* Decorative border lines */}
+          <div className="absolute inset-x-0 top-0 w-[calc(100%+4rem)] -translate-x-8 border-t max-sm:hidden" />
+          <div className="absolute inset-x-0 bottom-0 w-[calc(100%+4rem)] -translate-x-8 border-b max-sm:hidden" />
+          <div className="absolute inset-y-0 left-0 h-[calc(100%+4rem)] -translate-y-8 border-s max-sm:hidden" />
+          <div className="absolute inset-y-0 right-0 h-[calc(100%+4rem)] -translate-y-8 border-e max-sm:hidden" />
+          <div className="absolute inset-x-0 -top-1 w-[calc(100%+3rem)] -translate-x-6 border-t max-sm:hidden" />
+          <div className="absolute inset-x-0 -bottom-1 w-[calc(100%+3rem)] -translate-x-6 border-b max-sm:hidden" />
+          <div className="absolute inset-y-0 -left-1 h-[calc(100%+3rem)] -translate-y-6 border-s max-sm:hidden" />
+          <div className="absolute inset-y-0 -right-1 h-[calc(100%+3rem)] -translate-y-6 border-e max-sm:hidden" />
+
+          <p className="mt-4 text-xl font-medium">Login to Cockpit</p>
+
+          <form className="mt-8 w-full space-y-4" action={formAction}>
+            <div className="flex w-full flex-col gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Email"
+                required
+                disabled={pending}
+                autoComplete="username"
+              />
+            </div>
+            <div className="flex w-full flex-col gap-2">
+              <Label htmlFor="password">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="Password"
+                required
+                disabled={pending}
+                autoComplete="current-password"
+              />
+            </div>
+            <Button type="submit" className="mt-4 w-full" disabled={pending}>
+              {pending ? 'Logging in...' : 'Login'}
+            </Button>
+            {state.error && (
+              <div className="text-center text-sm text-red-500">
+                {state.error}
+              </div>
+            )}
+          </form>
+        </div>
+        </div>
+
+        <div className="bg-muted relative hidden w-1/2 border-l lg:block">
+          <img
+            alt=""
+            className="absolute inset-0 size-full object-cover dark:grayscale"
+            src="/login-bg.png"
           />
         </div>
-        <div className="grid gap-3">
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            required
-            disabled={pending}
-            autoComplete="current-password"
-          />
-        </div>
-        <Button type="submit" className="w-full" disabled={pending}>
-          {pending ? 'Logging in...' : 'Login'}
-        </Button>
-        {state.error && (
-          <div className="text-center text-sm text-red-500">{state.error}</div>
-        )}
-        {state.success && (
-          <div className="text-center text-sm text-green-600">
-            Login successful!
-          </div>
-        )}
       </div>
-    </form>
+    </div>
   );
 }

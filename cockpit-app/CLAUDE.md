@@ -14,6 +14,13 @@ CockpitApp is a multi-application monorepo built with Nx that includes several w
 
 **For app structure, lib layout, auth flow, state management, build system, or deployment — read [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) first.**
 
+## UI Design System
+
+- **Component primitives**: `@cockpit-app/shared-react-ui` — shadcn/ui-style, Radix UI + Tailwind + CVA. See [`libs/shared/ui/react/README.md`](libs/shared/ui/react/README.md) for how to add components.
+- **Page-level blocks**: Sourced from [shadcnui-blocks](https://www.shadcnui-blocks.com/blocks) — inspect the preview HTML (use Playwright or devtools), then adapt in app code using primitives from the shared lib.
+- **Dark mode**: System preference detected in `index.html` via `prefers-color-scheme`, applied as `.dark` class. All components use CSS variables that swap in `.dark`.
+- **Tailwind CSS v4**: CSS-native config in each app's `styles.css` — no `tailwind.config.js`.
+
 ## Storybook
 
 - `npx nx run react-ui:storybook` — dev server for `@cockpit-app/shared-react-ui` components

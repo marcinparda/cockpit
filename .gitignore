@@ -13,3 +13,4 @@ cockpit-app/.nx/cache/
 
 .claude
 .mypy_cache
+.playwright-mcp

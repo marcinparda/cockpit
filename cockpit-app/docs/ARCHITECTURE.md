@@ -140,7 +140,31 @@ Cookie-based sessions with refresh token:
 
 **React apps**: Tailwind CSS v4 via `@tailwindcss/vite` plugin — no `tailwind.config.js`, config is CSS-native. Design tokens as CSS custom properties in `:root` / `.dark`. Radix UI primitives + `cn()` utility.
 
-**Angular store**: PrimeNG 19 with Aura theme preset. Global CSS + `primeicons.css`.
+**Angular store**: PrimeNG 19 with Aura theme preset. Global CSS + `primeicons.css`. *(Will be migrated to React + shadcn.)*
+
+## UI Design System
+
+All React apps use **shadcn/ui-style components** built on Radix UI primitives + Tailwind CSS + CVA (class-variance-authority).
+
+### Component source
+
+- **Primitives** (`@cockpit-app/shared-react-ui`): Button, Input, Label, Card, etc. — adapted from [shadcn/ui](https://ui.shadcn.com) to fit the monorepo structure.
+- **Page-level blocks**: Sourced from [shadcnui-blocks](https://www.shadcnui-blocks.com/blocks) — browse categories (authentication, hero, pricing, etc.), copy the structure, and adapt to project needs.
+
+### Design tokens
+
+Each app defines its own CSS variables in `styles.css` using oklch colors:
+
+```css
+:root { --background: oklch(1 0 0); --primary: oklch(0.205 0 0); ... }
+.dark { --background: oklch(0.145 0 0); --primary: oklch(0.985 0 0); ... }
+```
+
+Dark mode: detected via `prefers-color-scheme` in `index.html`, applied as `.dark` class on `<html>`.
+
+### Adding a new component to `@cockpit-app/shared-react-ui`
+
+See [`libs/shared/ui/react/README.md`](../libs/shared/ui/react/README.md).
 
 Nx 21 with plugins: `@nx/vite`, `@nx/eslint`, `@nx/playwright`, `@nx/react/router-plugin`.
 
