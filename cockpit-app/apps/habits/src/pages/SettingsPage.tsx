@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSettings, useUpdateSettings } from '../api/hooks/useSettings';
 import { SETTINGS_ENDPOINTS } from '../api/endpoints';
 import { environments } from '@cockpit-app/shared-utils';
+import { ThemeToggle } from '@cockpit-app/shared-react-ui';
 
 async function fetchVapidPublicKey(): Promise<string> {
   const response = await fetch(`${environments.apiUrl}${SETTINGS_ENDPOINTS.VAPID_PUBLIC_KEY}`, {
@@ -88,7 +89,10 @@ export default function SettingsPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Settings</h1>
+        <ThemeToggle />
+      </div>
 
       <section aria-labelledby="notifications-heading">
         <h2 id="notifications-heading" className="text-lg font-semibold mb-4">
