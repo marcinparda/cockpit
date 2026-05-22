@@ -30,7 +30,7 @@ The backend follows a strict 3-layer pattern per service. The frontend enforces 
   - `apps/cockpit/` — React 19: main dashboard (tasks, budget, notes, agent)
   - `apps/login/` — React 19: authentication flow
   - `apps/cv/` — Vue 3.5: CV/portfolio site
-  - `apps/store/` — Angular 19: commerce/content app
+  - `apps/store/` — React 19: commerce/content app (same pattern as cockpit — Vite + TanStack Query + shadcn/ui + Tailwind CSS v4)
 - **Lib Layer Hierarchy** (strict, enforced by ESLint):
   ```
   util  →  data-access  →  ui  →  feature
@@ -38,7 +38,7 @@ The backend follows a strict 3-layer pattern per service. The frontend enforces 
 - **Shared Libraries** (`libs/shared/`):
   - `types/` — `@cockpit-app/api-types`: OpenAPI-generated TypeScript types
   - `data-access/` — React Query hooks, API service clients
-  - `ui/` — Shared React component library
+  - `ui/react/` — Shared React component library (`@cockpit-app/shared-react-ui`): shadcn/ui-style primitives (Select, AlertDialog, Toaster, etc.) using Radix UI + CVA + Tailwind
   - `feature/` — Shared feature modules
   - `utils/` — Pure utility functions
 - **Cockpit-specific** (`libs/cockpit/`): Dashboard-specific UI components
@@ -54,7 +54,7 @@ The backend follows a strict 3-layer pattern per service. The frontend enforces 
 Browser App
     │
     ▼
-cockpit-app (React/Vue/Angular)
+cockpit-app (React/Vue)
     │  HTTP REST (JWT)
     ▼
 cockpit-api (FastAPI)

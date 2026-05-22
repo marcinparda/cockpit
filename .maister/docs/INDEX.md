@@ -20,10 +20,10 @@ Located in `.maister/docs/project/`
 Self-hosted personal agent platform consolidating task management, finance, notes, CV, and AI workflows into a unified dashboard on a Raspberry Pi. Single-user. Active goals: extend existing apps, improve test coverage, improve observability, stabilize production.
 
 #### Technology Stack (`project/tech-stack.md`)
-Full breakdown of language choices (TypeScript 5.8, Python 3.12+), frameworks (React 19, Vue 3.5, Angular 19, FastAPI, SQLModel, Alembic), databases (PostgreSQL, Redis, SQLite), build tools (Nx 21, Vite 6, Poetry, Make), infrastructure (Docker, GitHub Actions, Raspberry Pi), linting/formatting (ESLint 9, Prettier, MyPy), and all key dependency versions.
+Full breakdown of language choices (TypeScript 5.8, Python 3.12+), frameworks (React 19, Vue 3.5, FastAPI, SQLModel, Alembic), databases (PostgreSQL, Redis, SQLite), build tools (Nx 21, Vite 6, Poetry, Make), infrastructure (Docker, GitHub Actions, Raspberry Pi), linting/formatting (ESLint 9, Prettier, MyPy), and all key dependency versions.
 
 #### Architecture (`project/architecture.md`)
-Modular fullstack monorepo pattern. Backend: FastAPI with strict 3-layer service structure (router → service → repository). Frontend: Nx apps (cockpit/login/React, cv/Vue, store/Angular) with enforced unidirectional lib dependency flow (util → data-access → ui → feature). Type-safe bridge via OpenAPI-generated types. LLM gateway: LiteLLM proxy routes all AI traffic (Claude Code, Kiro, Hermes, Open WebUI) with Langfuse Cloud observability. Deployment: independent Docker containers on Raspberry Pi via GitHub Actions SSH pipeline.
+Modular fullstack monorepo pattern. Backend: FastAPI with strict 3-layer service structure (router → service → repository). Frontend: Nx apps (cockpit/login/store/React 19, cv/Vue 3.5) with enforced unidirectional lib dependency flow (util → data-access → ui → feature). Shared React UI primitives in libs/shared/ui/react/ (Select, AlertDialog, Toaster via shadcn/ui + Radix UI). Type-safe bridge via OpenAPI-generated types. LLM gateway: LiteLLM proxy routes all AI traffic (Claude Code, Kiro, Hermes, Open WebUI) with Langfuse Cloud observability. Deployment: independent Docker containers on Raspberry Pi via GitHub Actions SSH pipeline.
 
 ---
 

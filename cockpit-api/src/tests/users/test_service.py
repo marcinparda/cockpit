@@ -138,3 +138,17 @@ class TestGenerateTemporaryPassword:
 
     def test_unique(self):
         assert service.generate_temporary_password() != service.generate_temporary_password()
+
+
+class TestUserModel:
+    def test_repr_returns_readable_string(self):
+        """User.__repr__ returns a string with id, email, is_active."""
+        from src.services.users.models import User
+        import uuid as _uuid
+        user = MagicMock(spec=User)
+        user.id = _uuid.UUID("00000000-0000-0000-0000-000000000001")
+        user.email = "test@example.com"
+        user.is_active = True
+        result = User.__repr__(user)
+        assert "User" in result
+        assert "test@example.com" in result

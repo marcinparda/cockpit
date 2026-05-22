@@ -7,8 +7,8 @@ This document describes the technology choices and rationale for Cockpit — a p
 
 ### TypeScript / JavaScript (5.8 / ES2024)
 - **Usage**: ~65% of codebase
-- **Rationale**: Type-safe frontend across React, Vue, and Angular apps; shared API types generated from OpenAPI spec ensure frontend-backend consistency
-- **Key Features Used**: Strict mode, path aliases, decorators (Angular), template literals, async/await
+- **Rationale**: Type-safe frontend across React and Vue apps; shared API types generated from OpenAPI spec ensure frontend-backend consistency
+- **Key Features Used**: Strict mode, path aliases, template literals, async/await
 
 ### Python (3.12+)
 - **Usage**: ~35% of codebase
@@ -18,9 +18,8 @@ This document describes the technology choices and rationale for Cockpit — a p
 ## Frameworks
 
 ### Frontend
-- **React 19** — Main cockpit dashboard and login app. Latest concurrent features.
+- **React 19** — Main cockpit dashboard, login, and store apps. Latest concurrent features, TanStack Query for server state, shadcn/ui + Tailwind CSS v4.
 - **Vue 3.5** — CV/portfolio app. Composition API with Pinia state management.
-- **Angular 19** — Store app. Component-based with standalone components.
 - **Nx 21** — Monorepo orchestrator. Enforces module boundaries, manages build caching, runs affected targets.
 
 ### Backend
@@ -58,7 +57,7 @@ This document describes the technology choices and rationale for Cockpit — a p
 |------|-------|---------|
 | **npm** | Frontend | Package management, script runner |
 | **Poetry** | Backend | Python dependency management with lock file |
-| **Vite 6** | Frontend | Primary bundler (all apps except Angular) |
+| **Vite 6** | Frontend | Primary bundler (all apps) |
 | **Nx 21** | Frontend | Build orchestration, caching, affected detection |
 | **Make** | Root | Unified task runner delegating to both sub-projects |
 
@@ -102,7 +101,6 @@ This document describes the technology choices and rationale for Cockpit — a p
 |---------|---------|------|
 | react | 19 | UI framework |
 | vue | 3.5 | UI framework |
-| @angular/core | 19 | UI framework |
 | @tanstack/react-query | 5.83 | Server state management |
 | pinia | 3 | Vue state management |
 | tailwindcss | 4.1 | Utility CSS |

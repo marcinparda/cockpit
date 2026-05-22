@@ -31,3 +31,16 @@ class TestGetUserPermission:
     async def test_returns_none(self, mock_db):
         with patch("src.services.authorization.user_permissions.service.repository.get_user_permission", AsyncMock(return_value=None)):
             assert await service.get_user_permission(mock_db, uuid.uuid4(), uuid.uuid4()) is None
+
+
+class TestUserPermissionModel:
+    def test_repr_returns_readable_string(self):
+        """UserPermission.__repr__ returns a string with id, user_id, permission_id."""
+        from src.services.authorization.user_permissions.models import UserPermission
+        import uuid as _uuid
+        perm = MagicMock(spec=UserPermission)
+        perm.id = _uuid.UUID("00000000-0000-0000-0000-000000000001")
+        perm.user_id = _uuid.UUID("00000000-0000-0000-0000-000000000002")
+        perm.permission_id = _uuid.UUID("00000000-0000-0000-0000-000000000003")
+        result = UserPermission.__repr__(perm)
+        assert "UserPermission" in result

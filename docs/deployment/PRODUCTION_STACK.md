@@ -15,6 +15,7 @@ Deployed via SSH through Cloudflare Tunnel. No docker-compose in prod — raw `d
 | `cockpit`            | 4203 | `ghcr.io/marcinparda/cockpit-cockpit:latest` |
 | `cv`                 | 4204 | `ghcr.io/marcinparda/cockpit-cv:latest`      |
 | `store`              | 4205 | `ghcr.io/marcinparda/cockpit-store:latest`   |
+| `habits`             | 4208 | `ghcr.io/marcinparda/cockpit-habits:latest`  |
 | `storybook`          | 4207 | `ghcr.io/marcinparda/cockpit-storybook:latest` |
 | `vikunja`            | 3456 | `vikunja/vikunja:latest`                     |
 | `vikunja-db`         | —    | MariaDB 10 (internal, `vikunja_default` net) |

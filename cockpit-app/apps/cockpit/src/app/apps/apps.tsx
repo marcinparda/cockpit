@@ -7,6 +7,7 @@ import {
   Bot,
   Brain,
   BookOpen,
+  Activity,
 } from 'lucide-react';
 import { environments } from '@cockpit-app/shared-utils';
 import {
@@ -68,6 +69,15 @@ const ALL_APPS = [
     url: environments.storeUrl,
     Icon: Database,
     feature: 'redis_store',
+    action: 'read',
+  },
+  {
+    name: 'Habits',
+    description:
+      'Track your daily habits with streaks, graphs, and push reminders.',
+    url: environments.habitsUrl,
+    Icon: Activity,
+    feature: 'habits',
     action: 'read',
   },
   {

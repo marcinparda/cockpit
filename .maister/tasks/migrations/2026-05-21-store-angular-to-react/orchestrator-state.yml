@@ -1,0 +1,83 @@
+orchestrator:
+  started_phase: analyze-current-state
+  completed_phases: [analyze-current-state, plan-target-state, migration-requirements-spec, implementation-planning, migration-execution, documentation]
+  failed_phases: []
+
+  auto_fix_attempts:
+    phase-1: 0
+    phase-2: 0
+    phase-3: 0
+    phase-4: 0
+    phase-5: 0
+    phase-6: 0
+
+  options:
+    docs_enabled: false
+
+  created: "2026-05-21T00:00:00Z"
+  updated: "2026-05-21T00:00:00Z"
+  task_path: .maister/tasks/migrations/2026-05-21-store-angular-to-react
+
+  task_ids:
+    phase-1: "1"
+    phase-2: "2"
+    phase-3: "3"
+    phase-4: "4"
+    phase-5: "5"
+    phase-6: "6"
+    phase-7: "7"
+    phase-8: "8"
+
+task:
+  title: "Rewrite store app from Angular to React"
+  description: |
+    Rewrite the store app (cockpit-app/apps/store/) from Angular to React.
+    Use shadcn/ui blocks matching existing page layout/structure.
+    Auth: cookie-based with credentials: 'include'.
+    API types: @cockpit-app/api-types.
+    After rewrite: update cockpit-app/CLAUDE.md, .maister/docs/project/ docs,
+    root CLAUDE.md if needed, and deployment docs.
+  status: completed
+  tags: [migration, angular, react, store, frontend]
+  priority: high
+
+migration_context:
+  migration_type: "code"
+  current_system:
+    description: "Angular 19 store app in Nx monorepo"
+    technologies: [Angular 19, TypeScript, @angular-devkit/build-angular]
+  target_system:
+    description: "React 19 store app in Nx monorepo"
+    technologies: [React 19, TypeScript, Vite 6, shadcn/ui, TanStack Query, Tailwind CSS v4]
+  migration_strategy:
+    approach: "big-bang"
+    phases: []
+  risk_level: low-medium
+  breaking_changes: []
+  rollback_plan_created: true
+  dual_run_configured: false
+
+  phase_summaries:
+    current_state_analysis: "Angular store app is a single-page Redis browser (1 page, 3 active components, 0 consumers). All auth/fetch/UI React primitives already exist in monorepo shared libs. Gaps: @monaco-editor/react npm package, 3 shadcn/ui components, build config replacement."
+    gap_analysis: "14 gaps identified. Big-bang migration recommended (0 consumers, 1 page). Missing: @monaco-editor/react + sonner + radix-select/alert-dialog packages; Select/AlertDialog/Toaster shadcn components. Key technical note: MonacoEditor needs useImperativeHandle to expose getValue() for EntryPanel. StoreToolbar unused - delete it."
+    specification: "Big-bang React rewrite. 7 new files in store app (main.tsx, providers, app.tsx, StoreBrowserPage, KeyList, EntryPanel, MonacoEditor). 3 new shadcn/ui components in shared lib (Select, AlertDialog, Toaster). Store API layer: endpoints.ts + schemas.ts + api.ts + hooks.ts. Install @monaco-editor/react + sonner + radix primitives. Remove Angular+PrimeNG packages. Tests at >=80% coverage."
+    implementation: "53 tests pass (89% statements, 81% branches, 82% functions). React store app complete: MonacoEditor/KeyList/EntryPanel/StoreBrowserPage + API layer. Angular files deleted. packages removed. Docs updated. nx build store clean."
+
+project_context:
+  project_doc_paths:
+    - .maister/docs/project/vision.md
+    - .maister/docs/project/tech-stack.md
+    - .maister/docs/project/architecture.md
+
+external_research:
+  performed: false
+  category: null
+  breaking_changes: []
+  migration_guide_url: null
+
+verification_context:
+  last_status: null
+  issues_found: []
+  fixes_applied: []
+  decisions_made: []
+  reverify_count: 0

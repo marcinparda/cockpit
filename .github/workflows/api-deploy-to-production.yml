@@ -75,6 +75,8 @@ jobs:
           export MCP_API_KEY='${{ secrets.MCP_API_KEY }}'
           export HERMES_API_KEY='${{ secrets.HERMES_API_KEY }}'
           export OAUTH_SERVER_URL='${{ secrets.OAUTH_SERVER_URL }}'
+          export VAPID_PRIVATE_KEY='${{ secrets.VAPID_PRIVATE_KEY }}'
+          export VAPID_PUBLIC_KEY='${{ secrets.VAPID_PUBLIC_KEY }}'
           EOF
           chmod 600 /tmp/deploy.env
           scp /tmp/deploy.env ${{ secrets.CLOUDFLARE_TUNNEL_DOMAIN }}:/tmp/deploy.env

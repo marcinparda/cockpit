@@ -1,0 +1,101 @@
+orchestrator:
+  started_phase: "Phase 1: Codebase Analysis & Clarifications"
+  completed_phases:
+    - "phase-1"
+    - "phase-2"
+    - "phase-4"
+    - "phase-5"
+    - "phase-6"
+    - "phase-7"
+    - "phase-8"
+    - "phase-10"
+    - "phase-11"
+    - "phase-12"
+    - "phase-13"
+    - "phase-14"
+  failed_phases: []
+  auto_fix_attempts:
+    phase-1: 0
+    phase-2: 0
+    phase-3: 0
+    phase-4: 0
+    phase-5: 0
+    phase-6: 0
+    phase-7: 0
+    phase-8: 0
+    phase-9: 0
+    phase-10: 0
+    phase-11: 0
+    phase-12: 0
+    phase-13: 0
+    phase-14: 0
+  options:
+    spec_audit_enabled: true
+    skip_test_suite: true
+    e2e_enabled: true
+    user_docs_enabled: true
+    code_review_enabled: true
+    pragmatic_review_enabled: true
+    reality_check_enabled: true
+    production_check_enabled: true
+  created: "2026-05-21T00:00:00Z"
+  updated: "2026-05-22T00:00:00Z"
+  task_path: ".maister/tasks/development/2026-05-21-habit-tracker-app"
+  task_ids:
+    phase-1: "1"
+    phase-2: "2"
+    phase-4: "3"
+    phase-5: "4"
+    phase-6: "5"
+    phase-7: "6"
+    phase-8: "7"
+    phase-10: "8"
+    phase-11: "9"
+    phase-12: "10"
+    phase-13: "11"
+    phase-14: "12"
+
+task:
+  title: "Habit Tracker App (habits.parda.me)"
+  description: |
+    Build a new habit tracker app in the cockpit-app Nx monorepo at apps/habits.
+    React 19 + Vite 6 + Tailwind CSS v4 + shadcn/ui frontend.
+    FastAPI backend service in cockpit-api/src/services/habits/.
+    3 habit types: boolean (one-tap), numeric (popup with target), text diary (modal).
+    Daylio-style icon grid today view, forgiving streak model (soft/hard/freeze),
+    per-habit graphs, stats screen, preset library, multi-user (existing users table),
+    browser push notifications, mobile-first deployment at habits.parda.me.
+    Also: habits card added to cockpit Apps/Services grid.
+  status: completed
+  tags: ["greenfield", "react", "habits", "frontend", "backend", "fullstack"]
+  priority: medium
+
+task_context:
+  risk_level: medium
+  clarifications_resolved: true
+  scope_expanded: true
+  architecture_decision: "3-layer FastAPI service + React 19 Nx app, inline data-access"
+  task_characteristics:
+    has_reproducible_defect: false
+    modifies_existing_code: true
+    creates_new_entities: true
+    involves_data_operations: true
+    ui_heavy: true
+  scope_decisions:
+    port: 4208
+    pywebpush: add_to_pyproject
+    scheduler_pattern: standalone_push_notification_service
+    presets_auth: require_auth
+    best_streak: denormalized_column
+    cockpit_card: include_in_scope
+    recharts_version: "3.8.1"
+    icon_system: lucide_react
+    drag_scope: habits_tab_only_patch_per_item
+    vapid_delivery: get_endpoint
+
+verification_context:
+  last_status: passed_with_issues
+  issues_found: 16
+  fixes_applied: 16
+  decisions_made: ["fix_all_fixable"]
+  reverify_count: 1

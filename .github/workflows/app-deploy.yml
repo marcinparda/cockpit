@@ -178,6 +178,29 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Check if habits build output exists
+        id: habits_exists
+        run: |
+          if [ -d "dist/apps/habits" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Build and push Docker image for habits
+        if: steps.habits_exists.outputs.exists == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./cockpit-app
+          file: ./cockpit-app/apps/habits/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}-habits:latest
+            ghcr.io/${{ github.repository }}-habits:${{ github.sha }}
+          platforms: linux/arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
       - name: Build Storybook
         run: npx nx run react-ui:build-storybook
 

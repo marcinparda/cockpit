@@ -9,6 +9,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from src.core.config import settings
 from src.services.authentication.tokens import token_cleanup_service
+from src.services.habits import push_notification_service
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,8 @@ class TaskScheduler:
             # Register token cleanup task if enabled
             if settings.TOKEN_CLEANUP_ENABLED:
                 await self._register_token_cleanup_task()
+
+            await self._register_habits_push_task()
 
             self.scheduler.start()
             self._running = True
@@ -95,6 +98,41 @@ class TaskScheduler:
             logger.error(
                 f"Failed to register token cleanup task: {str(e)}", exc_info=True)
             raise
+
+    async def _register_habits_push_task(self) -> None:
+        """Register the per-minute habits push notification task."""
+        if not self.scheduler:
+            raise RuntimeError("Scheduler not initialized")
+
+        try:
+            self.scheduler.add_job(
+                func=self._habits_push_job,
+                trigger=CronTrigger(minute="*"),
+                id="habits_push_notifications",
+                name="Habits Push Notifications",
+                max_instances=1,
+                coalesce=True,
+                misfire_grace_time=30,
+            )
+            logger.info("Habits push notification task registered (every minute)")
+        except Exception as e:
+            logger.error(
+                f"Failed to register habits push task: {str(e)}", exc_info=True
+            )
+            raise
+
+    async def _habits_push_job(self) -> None:
+        """Execute the habits push notification job."""
+        from src.core.database import async_session_maker
+
+        logger.debug("Running habits push notification job")
+        try:
+            async with async_session_maker() as db:
+                await push_notification_service.send_due_push_notifications(db)
+        except Exception as e:
+            logger.error(
+                f"Habits push notification job error: {str(e)}", exc_info=True
+            )
 
     async def _token_cleanup_job(self) -> None:
         """Execute the token cleanup job."""

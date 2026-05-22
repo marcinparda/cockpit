@@ -6,4 +6,6 @@ API: `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `DB_NAME`, `DB_PORT`, `CORS_ORIGINS`, 
 
 Extras: `OPEN_ROUTER_KEY`, `HERMES_API_KEY`, `MCP_API_KEY`, `ACTUAL_HTTP_API_KEY`, `VIKUNJA_DB_NAME`, `VIKUNJA_DB_USER`, `VIKUNJA_DB_PASSWORD`, `VIKUNJA_DB_ROOT_PASSWORD`, `LITELLM_MASTER_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST`
 
-App: `ENVIRONMENTS` (full environments.ts content)
+Habits (push notifications): `VAPID_PRIVATE_KEY`, `VAPID_PUBLIC_KEY` — generate with `py-vapid`: `python3 -c "from py_vapid import Vapid; v=Vapid(); v.generate_keys(); print('PRIVATE:', v.private_pem().decode()); print('PUBLIC:', v.public_key)"`
+
+App: `ENVIRONMENTS` (full environments.ts content) — must include `habitsUrl: 'https://habits.parda.me'`

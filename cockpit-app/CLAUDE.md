@@ -35,10 +35,18 @@ The codebase uses a centralized API types system:
 1. OpenAPI specification is fetched from the live API (`https://api.parda.me/openapi.json`)
 2. TypeScript interfaces are generated using `openapi-typescript`
 3. Generated types to `@cockpit-app/api-types` are used across all applications for type-safe API calls
-4. Each app handles API calls through their respective data access patterns (React Query for React, custom services for Vue)
+4. Each app handles API calls through their respective data access patterns (React Query for React and store apps, custom services for Vue)
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
+
+## App Frameworks
+
+- **cockpit** — React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4
+- **login** — React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4
+- **habits** — React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 (port 4208, habits.parda.me)
+- **store** — React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 (same pattern as cockpit)
+- **cv** — Vue 3.5 + Vite + Pinia
 
 ## General Guidelines for working with Nx
 

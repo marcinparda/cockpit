@@ -137,3 +137,22 @@ class TestManualTokenCleanup:
         with patch("src.services.authentication.tokens.token_cleanup_service.get_cleanup_statistics", AsyncMock(side_effect=Exception("err"))):
             result = await service.manual_token_cleanup(dry_run=True)
         assert result["success"] is False
+
+
+class TestDailyCleanupEdgeCases:
+    async def test_raises_when_cleanup_operation_fails(self):
+        from datetime import datetime, timezone as tz
+        health = {"healthy": True, "checks": {}}
+        cleanup_fail = {"success": False, "error": "DB timeout", "total_deleted": 0, "duration": 0.0, "end_time": datetime.now(tz.utc), "start_time": datetime.now(tz.utc), "expired_cleanup": {}, "revoked_cleanup": {}}
+        with patch("src.services.authentication.tokens.token_cleanup_service.validate_cleanup_health", AsyncMock(return_value=health)), \
+             patch("src.services.authentication.tokens.token_cleanup_service.comprehensive_token_cleanup", AsyncMock(return_value=cleanup_fail)):
+            result = await service.daily_token_cleanup_task()
+        assert result["success"] is False
+
+    async def test_partial_cleanup_when_only_one_flag_set(self):
+        """cleanup_expired=True, cleanup_revoked=False → else branch (line 347) still calls comprehensive."""
+        from datetime import datetime, timezone as tz
+        cleanup = {"success": True, "total_deleted": 2, "end_time": datetime.now(tz.utc), "start_time": datetime.now(tz.utc), "duration": 0.0}
+        with patch("src.services.authentication.tokens.token_cleanup_service.comprehensive_token_cleanup", AsyncMock(return_value=cleanup)):
+            result = await service.manual_token_cleanup(cleanup_expired=True, cleanup_revoked=False, dry_run=False)
+        assert result["success"] is True

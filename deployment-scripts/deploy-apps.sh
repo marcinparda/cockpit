@@ -25,6 +25,7 @@ declare -A apps=(
   [cv]="4204"
   [store]="4205"
   [storybook]="4207"
+  [habits]="4208"
 )
 
 for app in "${!apps[@]}"; do

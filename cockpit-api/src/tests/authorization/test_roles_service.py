@@ -44,3 +44,9 @@ class TestGetUserRolesById:
             result = await service.get_user_roles_by_id(mock_db, mock_user.id)
         assert len(result) == 1
         assert result[0] is mock_role
+
+    async def test_returns_empty_list_when_user_has_no_role_id(self, mock_db, mock_user):
+        mock_user.role_id = None
+        with patch("src.services.authorization.roles.service.users_service.get_user_by_id", AsyncMock(return_value=mock_user)):
+            result = await service.get_user_roles_by_id(mock_db, mock_user.id)
+        assert result == []

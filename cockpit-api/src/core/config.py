@@ -66,6 +66,10 @@ class Settings(BaseSettings):
     BRAIN_NOTES_PATH: str = "/data/notes"
     BRAIN_GIT_REMOTE: str = ""
 
+    # VAPID Settings (Web Push notifications)
+    VAPID_PRIVATE_KEY: str = ""
+    VAPID_PUBLIC_KEY: str = ""
+
     # Environment Detection
     ENVIRONMENT: str = "development"  # production, development, test
 

@@ -112,3 +112,25 @@ class TestListCategories:
     async def test_returns_unique_categories(self, mock_redis):
         with patch("src.services.redis_store.service.repository.list_keys", AsyncMock(return_value=["p:c1:k", "p:c2:k"])):
             assert sorted(await service.list_categories(mock_redis, "p")) == ["c1", "c2"]
+
+    async def test_returns_base_directly_when_prefix_is_base(self, mock_redis):
+        base = _envelope("base:c:k", {"base": True})
+        with patch("src.services.redis_store.service.repository.get_key", AsyncMock(return_value=base)):
+            result = await service.resolve_key(mock_redis, "base", "c", "k")
+        assert result is base
+
+    async def test_replaces_base_data_when_override_is_non_dict(self, mock_redis):
+        base = _envelope("base:c:k", {"a": 1})
+        ov = _envelope("ov:c:k", "scalar_value")
+        async def _get(client, key):
+            return base if "base" in key else ov
+        with patch("src.services.redis_store.service.repository.get_key", _get):
+            result = await service.resolve_key(mock_redis, "ov", "c", "k")
+        assert result.data == "scalar_value"
+
+    async def test_replaces_non_dict_existing_data(self, mock_redis):
+        existing = _envelope("p:c:k", "old_scalar")
+        with patch("src.services.redis_store.service.repository.get_key", AsyncMock(return_value=existing)), \
+             patch("src.services.redis_store.service.repository.set_key", AsyncMock()):
+            result = await service.patch_key(mock_redis, "p", "c", "k", StoreKeyPatch(data={"new": True}))
+        assert result.data == {"new": True}

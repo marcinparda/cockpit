@@ -1,0 +1,9 @@
+{
+  "name": "habits",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/habits/src",
+  "projectType": "application",
+  "tags": ["scope:habits", "type:app"],
+  "// targets": "to see all targets run: nx show project habits --web",
+  "targets": {}
+}

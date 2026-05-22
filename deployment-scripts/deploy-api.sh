@@ -39,6 +39,8 @@ required_vars=(
     "MCP_API_KEY"
     "HERMES_API_KEY"
     "OAUTH_SERVER_URL"
+    "VAPID_PRIVATE_KEY"
+    "VAPID_PUBLIC_KEY"
 )
 
 echo -e "${YELLOW}Checking environment variables...${NC}"
@@ -138,6 +140,8 @@ docker run -d \
   -e MCP_API_KEY="${MCP_API_KEY}" \
   -e OAUTH_SERVER_URL="${OAUTH_SERVER_URL}" \
   -e HERMES_CONFIG_PATH="/opt/hermes/cli-config.yaml" \
+  -e VAPID_PRIVATE_KEY="${VAPID_PRIVATE_KEY}" \
+  -e VAPID_PUBLIC_KEY="${VAPID_PUBLIC_KEY}" \
   -v "${BRAIN_NOTES_PATH}:${BRAIN_NOTES_PATH}" \
   -v "${HOME}/.hermes:/opt/hermes" \
   -v /var/run/docker.sock:/var/run/docker.sock \
