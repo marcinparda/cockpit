@@ -7,6 +7,7 @@ Deployed via SSH through Cloudflare Tunnel. No docker-compose in prod — raw `d
 | `cockpit_api_prod`   | 8000 | `ghcr.io/marcinparda/cockpit:latest`         |
 | `cockpit_db_prod`    | —    | PostgreSQL 15 (internal)                     |
 | `cockpit_redis_prod` | —    | Redis Stack (internal)                       |
+| `actual`             | 5006 | `actualbudget/actual-server:latest`          |
 | `actual-http-api`    | 5007 | Actual Budget HTTP wrapper                   |
 | `litellm`            | 4000 | LiteLLM proxy (routes to Anthropic/OpenRouter, logs to Langfuse Cloud) |
 | `open-webui`         | 4206 | Open WebUI                                   |

@@ -12,6 +12,9 @@ bash "${SCRIPT_DIR}/deploy-litellm.sh"
 echo "=== Deploying Hermes ==="
 bash "${SCRIPT_DIR}/deploy-hermes.sh"
 
+echo "=== Deploying actual (server) ==="
+bash "${SCRIPT_DIR}/deploy-actual-server.sh"
+
 echo "=== Deploying actual-http-api ==="
 bash "${SCRIPT_DIR}/deploy-actual.sh"
 

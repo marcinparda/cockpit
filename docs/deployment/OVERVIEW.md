@@ -192,7 +192,7 @@ Deploys frontend apps. Steps (for each of `login`, `cockpit`, `cv`, `store`):
 
 Orchestrator — calls the sub-scripts in sequence:
 ```bash
-deploy-litellm.sh → deploy-hermes.sh → deploy-actual.sh → deploy-open-webui.sh → deploy-vikunja.sh
+deploy-litellm.sh → deploy-hermes.sh → deploy-actual-server.sh → deploy-actual.sh → deploy-open-webui.sh → deploy-vikunja.sh
 ```
 
 ### `deploy-litellm.sh`
@@ -211,11 +211,18 @@ Deploys Hermes AI agent gateway:
 - Writes `~/.hermes/cli-config.yaml` (MCP server pointing to `cockpit_api_prod:8000/mcp`)
 - Runs `nousresearch/hermes-agent:latest` on port 8642, attached to `cockpit_network_prod`
 
+### `deploy-actual-server.sh`
+
+Deploys Actual Budget server:
+- Creates `actual_network` Docker network and `actual_data` volume
+- Runs `actualbudget/actual-server:latest` (container name `actual`) on port 5006, attached to `actual_network`
+- Sets server login password non-interactively from `ACTUAL_SERVER_PASSWORD` via internal reset-password script
+
 ### `deploy-actual.sh`
 
 Deploys Actual Budget HTTP API wrapper:
-- Creates `actual_network` Docker network
-- Connects existing `actual` container (Actual Budget server) to `actual_network`
+- Creates `actual_network` Docker network (if not already created)
+- Connects `actual` container (Actual Budget server) to `actual_network`
 - Runs `jhonderson/actual-http-api:latest` on port 5007
 - Connects to both `actual_network` and `cockpit_network_prod` (so API can reach it)
 
@@ -298,6 +305,7 @@ Frontend apps (no network — standalone):
 | Redis data | Docker volume `cockpit-api_cockpit_redis_data_prod` |
 | Vikunja DB | Bind mount `~/vikunja/db` |
 | Vikunja file attachments | Bind mount `~/vikunja/files` |
+| Actual server data | Docker volume `actual_data` |
 | Actual HTTP API data | Docker volume `actual_http_api_data` |
 | Open WebUI data | Docker volume `open_webui_data` |
 | Brain notes | Bind mount at `$BRAIN_NOTES_PATH` (Pi filesystem path) |
@@ -324,6 +332,7 @@ Frontend apps (no network — standalone):
 | `deployment-scripts/deploy-extras.sh` | Run on Pi: extras orchestrator |
 | `deployment-scripts/deploy-litellm.sh` | Run on Pi: LiteLLM proxy |
 | `deployment-scripts/deploy-hermes.sh` | Run on Pi: Hermes |
+| `deployment-scripts/deploy-actual-server.sh` | Run on Pi: Actual Budget server |
 | `deployment-scripts/deploy-actual.sh` | Run on Pi: Actual HTTP API |
 | `deployment-scripts/deploy-open-webui.sh` | Run on Pi: Open WebUI |
 | `deployment-scripts/deploy-vikunja.sh` | Run on Pi: Vikunja + MariaDB |
