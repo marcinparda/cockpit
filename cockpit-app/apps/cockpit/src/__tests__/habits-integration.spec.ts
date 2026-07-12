@@ -1,12 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync } from 'fs';
 import { resolve } from 'path';
+import { environments } from '@cockpit-app/shared-utils';
 
 describe('Habits integration', () => {
-  it('environments.ts exports habitsUrl', async () => {
-    const { environments } = await import(
-      '@cockpit-app/shared-utils'
-    );
+  it('environments.ts exports habitsUrl', () => {
     expect(environments).toHaveProperty('habitsUrl');
     expect(typeof environments.habitsUrl).toBe('string');
     expect(environments.habitsUrl.length).toBeGreaterThan(0);

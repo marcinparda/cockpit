@@ -128,7 +128,6 @@ describe('StoreBrowserPage', () => {
     render(<StoreBrowserPage />);
 
     await act(async () => {
-      (capturedKeyListProps.onSaved as ((e: StoreEnvelope) => void) | undefined);
       // onSaved is passed to EntryPanel, but panel is only shown when panelVisible=true.
       // Trigger onCreate first so EntryPanel renders.
       (capturedKeyListProps.onCreate as (ctx?: { prefix: string; category: string }) => void)();

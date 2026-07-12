@@ -41,7 +41,7 @@ describe('KeyList', () => {
   });
 
   it('shows Skeleton while prefixes are loading', async () => {
-    mockGetStorePrefixes.mockReturnValue(new Promise(() => {}));
+    mockGetStorePrefixes.mockReturnValue(new Promise(() => undefined));
 
     render(<KeyList {...defaultProps()} />);
 

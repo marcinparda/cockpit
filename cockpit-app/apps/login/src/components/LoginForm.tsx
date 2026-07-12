@@ -81,6 +81,11 @@ export function LoginForm({
                 {state.error}
               </div>
             )}
+            {state.success && (
+              <div className="text-center text-sm text-green-500">
+                Login successful!
+              </div>
+            )}
           </form>
         </div>
         </div>
