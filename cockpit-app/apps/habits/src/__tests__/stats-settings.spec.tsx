@@ -52,7 +52,7 @@ describe('StatsPage', () => {
   beforeEach(() => {
     vi.mocked(useStatsModule.useStatsToday).mockReturnValue({
       isLoading: false,
-      data: { completion_percentage: 75, completed: 3, total: 4 },
+      data: { completion_pct: 75, completed: 3, total: 4 },
       error: null,
     } as any);
 
@@ -95,8 +95,8 @@ describe('StatsPage', () => {
     vi.mocked(useStatsModule.useStatsStreaks).mockReturnValue({
       isLoading: false,
       data: [
-        { habit_id: 'h1', habit_name: 'Run', current_streak: 7 },
-        { habit_id: 'h2', habit_name: 'Meditate', current_streak: 3 },
+        { id: 'h1', name: 'Run', current_streak: 7 },
+        { id: 'h2', name: 'Meditate', current_streak: 3 },
       ],
       error: null,
     } as any);
@@ -142,13 +142,13 @@ describe('SettingsPage', () => {
   const mockMutate = vi.fn();
 
   beforeEach(() => {
-    // notification_enabled: true so clicking disables it — calls mutate synchronously
+    // notifications_enabled: true so clicking disables it — calls mutate synchronously
     vi.mocked(useSettingsModule.useSettings).mockReturnValue({
       isLoading: false,
       data: {
         id: 'settings-1',
         user_id: 'user-1',
-        notification_enabled: true,
+        notifications_enabled: true,
         week_start_day: 0,
       },
       error: null,
@@ -167,7 +167,7 @@ describe('SettingsPage', () => {
     fireEvent.click(toggle);
 
     expect(mockMutate).toHaveBeenCalledWith({
-      notification_enabled: false,
+      notifications_enabled: false,
       push_subscription: null,
     });
   });
@@ -178,7 +178,7 @@ describe('SettingsPage', () => {
       data: {
         id: 'settings-1',
         user_id: 'user-1',
-        notification_enabled: false,
+        notifications_enabled: false,
         week_start_day: 0,
       },
       error: null,
@@ -217,7 +217,7 @@ describe('SettingsPage', () => {
     // Wait for the async flow to complete
     await screen.findByTestId('push-toggle');
     expect(mockMutate).toHaveBeenCalledWith(
-      expect.objectContaining({ notification_enabled: true }),
+      expect.objectContaining({ notifications_enabled: true }),
     );
   });
 
@@ -239,7 +239,7 @@ describe('SettingsPage', () => {
       data: {
         id: 'settings-1',
         user_id: 'user-1',
-        notification_enabled: false,
+        notifications_enabled: false,
         week_start_day: 0,
       },
       error: null,

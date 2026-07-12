@@ -73,9 +73,9 @@ export default function HabitDetailPage() {
   const { data: habit, isLoading: habitLoading } = useHabit(habitId);
   const { data: entries = [], isLoading: entriesLoading } = useHabitEntries(habitId, dateRange);
   const { data: streak } = useHabitStreak(habitId);
-  const { createFreeze } = useFreezeMutations();
+  const { createFreeze, freezesThisMonth } = useFreezeMutations();
 
-  const remainingFreezes = MAX_FREEZES_PER_MONTH; // TODO: count from API
+  const remainingFreezes = MAX_FREEZES_PER_MONTH - freezesThisMonth;
 
   if (habitLoading) {
     return (

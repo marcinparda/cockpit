@@ -92,7 +92,7 @@ describe('HabitCreationSheet', () => {
           id: 'preset-1',
           name: 'Daily Exercise',
           description: 'Exercise every day',
-          category: 'Health',
+          category_key: 'health',
           frequency: 'daily',
           target_value: 30,
           unit: 'minutes',

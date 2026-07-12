@@ -152,7 +152,7 @@ describe('TodayPage', () => {
         id: 'h1',
         type: 'numeric' as const,
         is_active: true,
-        todayEntry: { id: 'e1', habit_id: 'h1', logged_at: today, boolean_value: null, numeric_value: 5, text_value: null },
+        today_entry: { id: 'e1', habit_id: 'h1', logged_at: today, boolean_value: null, numeric_value: 5, text_value: null },
       },
     ];
     vi.mocked(useHabitsModule.useHabits).mockReturnValue({
@@ -175,7 +175,7 @@ describe('TodayPage', () => {
         id: 'h1',
         type: 'text' as const,
         is_active: true,
-        todayEntry: { id: 'e1', habit_id: 'h1', logged_at: today, boolean_value: null, numeric_value: null, text_value: 'Great day' },
+        today_entry: { id: 'e1', habit_id: 'h1', logged_at: today, boolean_value: null, numeric_value: null, text_value: 'Great day' },
       },
     ];
     vi.mocked(useHabitsModule.useHabits).mockReturnValue({
@@ -196,7 +196,7 @@ describe('TodayPage', () => {
         id: 'h1',
         type: 'numeric' as const,
         is_active: true,
-        todayEntry: null,
+        today_entry: null,
       },
     ];
     vi.mocked(useHabitsModule.useHabits).mockReturnValue({
@@ -220,13 +220,13 @@ describe('TodayPage', () => {
       {
         ...baseHabit,
         id: 'h1',
-        todayEntry: { id: 'e1', habit_id: 'h1', logged_at: today, boolean_value: true },
+        today_entry: { id: 'e1', habit_id: 'h1', logged_at: today, boolean_value: true },
       },
       {
         ...baseHabit,
         id: 'h2',
         name: 'Meditate',
-        todayEntry: { id: 'e2', habit_id: 'h2', logged_at: today, boolean_value: true },
+        today_entry: { id: 'e2', habit_id: 'h2', logged_at: today, boolean_value: true },
       },
     ];
     vi.mocked(useHabitsModule.useHabits).mockReturnValue({

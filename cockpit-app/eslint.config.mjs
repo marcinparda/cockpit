@@ -64,6 +64,10 @@ export default [
               sourceTag: 'scope:store',
               onlyDependOnLibsWithTags: ['scope:shared'],
             },
+            {
+              sourceTag: 'scope:habits',
+              onlyDependOnLibsWithTags: ['scope:shared'],
+            },
           ],
         },
       ],

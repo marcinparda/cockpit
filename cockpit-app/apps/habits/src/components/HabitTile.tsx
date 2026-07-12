@@ -79,6 +79,14 @@ export function HabitTile({
         aria-hidden="true"
         className={completed ? 'opacity-60' : ''}
       />
+      {habit.streak_mode !== 'none' && habit.current_streak > 0 && (
+        <span
+          data-testid="streak-badge"
+          className="absolute left-1 top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-white/30 px-1 text-[10px] font-semibold leading-none"
+        >
+          {habit.current_streak}
+        </span>
+      )}
       {completed && (
         <span
           data-testid="checkmark"
