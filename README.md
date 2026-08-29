@@ -5,15 +5,15 @@ Personal agent platform — self-hosted on Raspberry Pi (arm64).
 | Project                        | Stack                                           | What                                                                   |
 | ------------------------------ | ----------------------------------------------- | ---------------------------------------------------------------------- |
 | [`cockpit-api/`](cockpit-api/) | Python · FastAPI · PostgreSQL · Redis           | REST API + MCP server. Integrates Vikunja, Actual Budget, brain notes. |
-| [`cockpit-app/`](cockpit-app/) | Nx · React 19 · Angular 19 · Tailwind · PrimeNG | Multi-app frontend monorepo (login, cockpit, cv, store). Storybook for UI docs. |
+| [`cockpit-app/`](cockpit-app/) | Nx · React 19 · Vue 3.5 · Tailwind · shadcn/ui | Multi-app frontend monorepo (login, cockpit, cv, store, habits). Storybook for UI docs. |
 
 ## Architecture at a Glance
 
 **API** — Modular monolith, layered per service: `router → service → repository`. Async SQLAlchemy, Alembic migrations, RBAC permissions.
-→ [`cockpit-api/docs/ARCHITECTURE.md`](cockpit-api/docs/ARCHITECTURE.md)
+→ [`docs/backend/ARCHITECTURE.md`](docs/backend/ARCHITECTURE.md)
 
-**App** — Nx enforce-module-boundaries with strict layer direction: `types → data-access → ui → feature → app`. Cookie-based auth, TanStack Query (React), Angular signals.
-→ [`cockpit-app/docs/ARCHITECTURE.md`](cockpit-app/docs/ARCHITECTURE.md)
+**App** — Nx enforce-module-boundaries with strict layer direction: `types → data-access → ui → feature → app`. Cookie-based auth, TanStack Query.
+→ [`docs/standards/frontend/architecture.md`](docs/standards/frontend/architecture.md)
 
 **Deployment** — Docker containers on Raspberry Pi, no docker-compose in prod. nginx:alpine for apps, CI via `nx affected`.
 → [`AGENTS.md`](AGENTS.md) (prod stack & ports)
@@ -23,12 +23,12 @@ Personal agent platform — self-hosted on Raspberry Pi (arm64).
 | Topic                                 | File                                                                                   |
 | ------------------------------------- | -------------------------------------------------------------------------------------- |
 | Production containers & ports         | [`AGENTS.md`](AGENTS.md)                                                               |
-| API architecture & DB patterns        | [`cockpit-api/docs/ARCHITECTURE.md`](cockpit-api/docs/ARCHITECTURE.md)                 |
-| API dev commands (run, migrate, test) | [`cockpit-api/docs/DEVELOPMENT_COMMANDS.md`](cockpit-api/docs/DEVELOPMENT_COMMANDS.md) |
-| MCP tools & resources                 | [`cockpit-api/docs/MCP_SERVER.md`](cockpit-api/docs/MCP_SERVER.md)                     |
-| Upstream API specs (Vikunja, Actual)  | [`cockpit-api/docs/UPSTREAM_APIS.md`](cockpit-api/docs/UPSTREAM_APIS.md)               |
+| API architecture & DB patterns        | [`docs/backend/ARCHITECTURE.md`](docs/backend/ARCHITECTURE.md)                 |
+| API dev commands (run, migrate, test) | [`docs/backend/DEVELOPMENT_COMMANDS.md`](docs/backend/DEVELOPMENT_COMMANDS.md) |
+| MCP tools & resources                 | [`docs/backend/MCP_SERVER.md`](docs/backend/MCP_SERVER.md)                     |
+| Upstream API specs (Vikunja, Actual)  | [`docs/backend/UPSTREAM_APIS.md`](docs/backend/UPSTREAM_APIS.md)               |
 | LLM proxy & observability             | [`docs/LITELLM_SETUP.md`](docs/LITELLM_SETUP.md)                                      |
-| App architecture & lib layout         | [`cockpit-app/docs/ARCHITECTURE.md`](cockpit-app/docs/ARCHITECTURE.md)                 |
+| App architecture & lib layout         | [`docs/standards/frontend/architecture.md`](docs/standards/frontend/architecture.md) |
 | CI/CD pipelines                       | [`.github/`](.github/)                                                                 |
 | GitHub Secrets reference              | [`AGENTS.md`](AGENTS.md)                                                               |
 
@@ -42,7 +42,7 @@ make run              # start API (docker, detached) + all frontend apps
 make test             # run all tests
 ```
 
-Full API dev commands: [`cockpit-api/docs/DEVELOPMENT_COMMANDS.md`](cockpit-api/docs/DEVELOPMENT_COMMANDS.md)
+Full API dev commands: [`docs/backend/DEVELOPMENT_COMMANDS.md`](docs/backend/DEVELOPMENT_COMMANDS.md)
 
 ## Enforced Practices
 

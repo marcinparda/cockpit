@@ -1,23 +1,32 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for AI agents when working in `cockpit-app/`.
 
-## Project Overview
+CockpitApp is a multi-application Nx monorepo of web apps with a shared, type-safe API integration system.
 
-CockpitApp is a multi-application monorepo built with Nx that includes several web applications with a comprehensive type-safe API integration system.
+## Apps
+
+| App | Stack |
+|---|---|
+| cockpit | React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 |
+| login | React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 |
+| habits | React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 (port 4208, habits.parda.me) |
+| store | React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 (same pattern as cockpit) |
+| cv | Vue 3.5 + Vite + Pinia |
 
 ### Deployment
+See `.github/` dir.
 
-- See .github dir
+## Architecture Reference
 
-## API Integration Pattern
+For app structure, lib layout, auth flow, state management, build system, deployment, Nx dependency-flow rules, component patterns, and UI design system — see [`docs/standards/frontend/architecture.md`](../docs/standards/frontend/architecture.md) and [`components.md`](../docs/standards/frontend/components.md).
 
-The codebase uses a centralized API types system:
+## Storybook
 
-1. OpenAPI specification is fetched from the live API (`https://api.parda.me/openapi.json`)
-2. TypeScript interfaces are generated using `openapi-typescript`
-3. Generated types to `@cockpit-app/api-types` are used across all applications for type-safe API calls
-4. Each app handles API calls through their respective data access patterns (React Query for React, custom services for Vue)
+- `npx nx run react-ui:storybook` — dev server for `@cockpit-app/shared-react-ui` components
+- `npx nx run react-ui:build-storybook` — static build → `dist/storybook/react-ui`
+- Deployed as `cockpit-storybook` container on port **4207**
+- Config: `libs/shared/ui/react/.storybook/`
 
 <!-- nx configuration start-->
 <!-- Leave the start & end comments to automatically receive updates. -->
@@ -30,5 +39,6 @@ The codebase uses a centralized API types system:
 - When working in individual projects, use the `nx_project_details` mcp tool to analyze and understand the specific project structure and dependencies
 - For questions around nx configuration, best practices or if you're unsure, use the `nx_docs` tool to get relevant, up-to-date docs. Always use this instead of assuming things about nx configuration
 - If the user needs help with an Nx configuration or project graph error, use the `nx_workspace` tool to get any errors
+- To remove an Nx library, use `nx g @nx/workspace:remove --projectName=<name>` — never `rm -rf` + manual edits; the generator handles project.json, workspace graph, and tsconfig.base.json atomically
 
 <!-- nx configuration end-->
