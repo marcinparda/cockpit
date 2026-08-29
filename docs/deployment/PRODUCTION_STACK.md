@@ -10,8 +10,6 @@ Deployed via SSH through Cloudflare Tunnel. No docker-compose in prod — raw `d
 | `actual`             | 5006 | `actualbudget/actual-server:latest`          |
 | `actual-http-api`    | 5007 | Actual Budget HTTP wrapper                   |
 | `litellm`            | 4000 | LiteLLM proxy (routes to Anthropic/OpenRouter, logs to Langfuse Cloud) |
-| `open-webui`         | 4206 | Open WebUI                                   |
-| `hermes`             | 8642 | Hermes Agent gateway                         |
 | `login`              | 4202 | `ghcr.io/marcinparda/cockpit-login:latest`   |
 | `cockpit`            | 4203 | `ghcr.io/marcinparda/cockpit-cockpit:latest` |
 | `cv`                 | 4204 | `ghcr.io/marcinparda/cockpit-cv:latest`      |

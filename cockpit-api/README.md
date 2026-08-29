@@ -66,7 +66,6 @@ Raspberry Pi
 ├── cockpit_redis_prod    — Redis Stack
 ├── actual-http-api       — Actual Budget HTTP wrapper, port 5007
 ├── litellm               — LLM proxy (Anthropic/OpenRouter → Langfuse), port 4000
-├── open-webui            — Open WebUI, port 4206
 └── vikunja               — Task manager (external, vikunja_default network)
 ```
 

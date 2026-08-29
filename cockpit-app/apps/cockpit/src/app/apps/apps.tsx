@@ -4,7 +4,6 @@ import {
   Database,
   DollarSign,
   User,
-  Bot,
   Brain,
   BookOpen,
   Activity,
@@ -24,15 +23,6 @@ const ALL_APPS = [
     Icon: Brain,
     feature: 'brain',
     action: 'read',
-  },
-  {
-    name: 'Agent',
-    description: 'Talk with chatbot to manage all applications.',
-    url: environments.agentUrl,
-    Icon: Bot,
-    feature: null,
-    action: null,
-    adminOnly: true,
   },
   {
     name: 'Twodo',

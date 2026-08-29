@@ -44,7 +44,6 @@ jobs:
         run: |
           cat > /tmp/deploy.env << 'EOF'
           export OPEN_ROUTER_KEY='${{ secrets.OPEN_ROUTER_KEY }}'
-          export HERMES_API_KEY='${{ secrets.HERMES_API_KEY }}'
           export MCP_API_KEY='${{ secrets.MCP_API_KEY }}'
           export ACTUAL_HTTP_API_KEY='${{ secrets.ACTUAL_HTTP_API_KEY }}'
           export ACTUAL_SERVER_PASSWORD='${{ secrets.ACTUAL_SERVER_PASSWORD }}'
@@ -100,5 +99,5 @@ jobs:
         run: |
           echo "## Extras Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** Successfully deployed extras to Raspberry Pi" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployed:** LiteLLM, Hermes, actual, actual-http-api, Open WebUI, Vikunja" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed:** LiteLLM, actual, actual-http-api, Vikunja" >> $GITHUB_STEP_SUMMARY
           echo "**Deployed at:** \`$(date -u)\`" >> $GITHUB_STEP_SUMMARY

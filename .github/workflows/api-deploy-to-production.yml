@@ -73,7 +73,6 @@ jobs:
           export BRAIN_NOTES_PATH='${{ secrets.BRAIN_NOTES_PATH }}'
           export BRAIN_GIT_REMOTE='${{ secrets.BRAIN_GIT_REMOTE }}'
           export MCP_API_KEY='${{ secrets.MCP_API_KEY }}'
-          export HERMES_API_KEY='${{ secrets.HERMES_API_KEY }}'
           export OAUTH_SERVER_URL='${{ secrets.OAUTH_SERVER_URL }}'
           export VAPID_PRIVATE_KEY='${{ secrets.VAPID_PRIVATE_KEY }}'
           export VAPID_PUBLIC_KEY='${{ secrets.VAPID_PUBLIC_KEY }}'

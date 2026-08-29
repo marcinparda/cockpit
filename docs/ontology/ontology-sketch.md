@@ -62,7 +62,6 @@ Questions this ontology must answer:
   - Vikunja (task management)
   - Actual Budget HTTP API (personal finance)
   - LiteLLM proxy (LLM routing)
-  - Hermes agent (AI assistant, local config)
   - Git (brain notes persistence)
 
 ### Frontend
@@ -175,4 +174,3 @@ Questions this ontology must answer:
 | budget | actual_list_accounts, actual_create_account, actual_list_categories, actual_list_payees, actual_search_transactions, actual_create_transaction, actual_batch_create_transactions, actual_update_transaction, actual_delete_transaction |
 | tasks | vikunja_list_projects, vikunja_get_tasks, vikunja_create_task, vikunja_update_task, vikunja_delete_task, vikunja_assign_user_to_task, vikunja_remove_assignee, vikunja_list_users |
 | cv | search_company, get_cv_base_preset, preview_cv_preset, save_cv_preset |
-| hermes | hermes_get_model, hermes_set_model |

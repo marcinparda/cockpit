@@ -15,7 +15,6 @@ vi.mock('@cockpit-app/cockpit-ui', () => ({
 vi.mock('@cockpit-app/shared-utils', () => ({
   environments: {
     brainUrl: 'http://brain.test',
-    agentUrl: 'http://agent.test',
     twodoUrl: 'http://twodo.test',
     actualUrl: 'http://actual.test',
     cvUrl: 'http://cv.test',
@@ -69,7 +68,6 @@ describe('AppsPage', () => {
     const cards = screen.getAllByTestId('app-card');
     const titles = cards.map((c) => c.textContent);
     expect(titles).toContain('Twodo');
-    expect(titles).not.toContain('Agent');
     expect(titles).not.toContain('Storybook');
     expect(titles).not.toContain('CV');
   });
@@ -82,7 +80,6 @@ describe('AppsPage', () => {
 
     const cards = screen.getAllByTestId('app-card');
     const titles = cards.map((c) => c.textContent);
-    expect(titles).toContain('Agent');
     expect(titles).toContain('Actual budget');
     expect(titles).toContain('CV');
     expect(titles).toContain('Storybook');

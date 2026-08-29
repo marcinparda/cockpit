@@ -10,7 +10,7 @@ This repo used to run on the Maister Claude Code plugin for standards + task orc
 
 - **`AGENTS.md`** — one per module (root, `cockpit-api/`, `cockpit-app/`). Each only describes what that module *is* (purpose, stack, ports) and points to reference docs in `docs/`. Claude Code reads these natively; loaded root-first, module files pulled in only when you're working in that area.
 - **`docs/standards/`** — all "how to write code here" rules: coding style, architecture, testing, per-domain (global/frontend/backend/testing). Start at [`INDEX.md`](docs/standards/INDEX.md). This is the *only* place conventions live — module `AGENTS.md` files never duplicate this.
-- **`docs/projects/`** — per-app/service facts (not conventions). `cockpit/` covers the whole monorepo + main app (vision, tech stack, architecture); sibling folders (`cv/`, `habits/`, `login/`, `store/`, `litellm/`, `hermes/`, `actual/`, `open-webui/`, `vikunja/`) each describe one other app or external service.
+- **`docs/projects/`** — per-app/service facts (not conventions). `cockpit/` covers the whole monorepo + main app (vision, tech stack, architecture); sibling folders (`cv/`, `habits/`, `login/`, `store/`, `litellm/`, `actual/`, `vikunja/`) each describe one other app or external service.
 - **`docs/tasks/`** — history of every task worked on, spec → plan → work-log per task. Old maister-era tasks were migrated here too (see below).
 - **`docs/backend/`** — reference docs specific to `cockpit-api/` (architecture detail, MCP server, upstream API specs, dev commands).
 - **`docs/CONTRIBUTING.md`** — where new documentation belongs and how to slice it into the right folder. Read this before adding any new file under `docs/`.

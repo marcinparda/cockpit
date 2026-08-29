@@ -34,7 +34,7 @@ model_list:
       model: "openrouter/nousresearch/hermes-3-llama-3.1-70b"
       api_key: os.environ/OPENROUTER_API_KEY
 
-  # OpenRouter models — for Hermes, Open WebUI, general use
+  # OpenRouter models — general use
   - model_name: "openrouter/*"
     litellm_params:
       model: "openrouter/*"

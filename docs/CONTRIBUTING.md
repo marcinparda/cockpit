@@ -9,7 +9,7 @@ Where a new doc file goes in `docs/`, and what belongs in it. Read before adding
 | Folder | Contains | Does NOT contain |
 |---|---|---|
 | `docs/standards/` | Coding conventions, architecture rules, "how to write/add code" — global or per-domain (`global/`, `frontend/`, `backend/`, `testing/`) | Facts about a specific service/app, task history |
-| `docs/projects/<name>/` | Facts about one app/service: what it is, its purpose, ports, stack. `cockpit/` covers the whole monorepo + main app (vision, tech stack, architecture); every other app/service (`cv/`, `habits/`, `login/`, `store/`, `litellm/`, `hermes/`, `actual/`, `open-webui/`, `vikunja/`) gets its own sibling folder | Coding conventions (→ `standards/`) |
+| `docs/projects/<name>/` | Facts about one app/service: what it is, its purpose, ports, stack. `cockpit/` covers the whole monorepo + main app (vision, tech stack, architecture); every other app/service (`cv/`, `habits/`, `login/`, `store/`, `litellm/`, `actual/`, `vikunja/`) gets its own sibling folder | Coding conventions (→ `standards/`) |
 | `docs/backend/` | `cockpit-api`-specific reference docs: detailed architecture, MCP server, upstream API specs, dev commands | General backend conventions (→ `standards/backend/`) |
 | `docs/deployment/` | CI/CD, production stack, secrets — deployment mechanics that apply repo-wide | Per-app Dockerfile conventions (→ `standards/global/containers.md`) |
 | `docs/tasks/` | Per-task history: `spec.md` → `plan.md` → `work-log.md`, one folder per task | Standing conventions (→ `standards/`) |

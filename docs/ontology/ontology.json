@@ -352,15 +352,12 @@
     { "id": "mcptool:get_cv_base_preset", "type": "MCPTool", "name": "get_cv_base_preset", "group": "cv", "description": "Read all sections from base CV preset" },
     { "id": "mcptool:preview_cv_preset", "type": "MCPTool", "name": "preview_cv_preset", "group": "cv", "description": "Preview tailored CV preset without saving" },
     { "id": "mcptool:save_cv_preset", "type": "MCPTool", "name": "save_cv_preset", "group": "cv", "description": "Save confirmed CV preset to redis_store" },
-    { "id": "mcptool:hermes_get_model", "type": "MCPTool", "name": "hermes_get_model", "group": "hermes", "description": "Get current default model for Hermes agent" },
-    { "id": "mcptool:hermes_set_model", "type": "MCPTool", "name": "hermes_set_model", "group": "hermes", "description": "Set default model for Hermes agent and restart it" },
 
     { "id": "mcpresource:brain_notes", "type": "MCPResource", "name": "brain_notes", "description": "Brain notes readable as MCP resources", "uriPattern": "brain://notes/{path}" },
 
     { "id": "ext:vikunja", "type": "ExternalService", "name": "Vikunja", "type": "Task Management", "authMethod": "API token (cached in Redis)" },
     { "id": "ext:actual", "type": "ExternalService", "name": "Actual Budget HTTP API", "type": "Personal Finance", "authMethod": "X-Api-Key header" },
     { "id": "ext:litellm", "type": "ExternalService", "name": "LiteLLM Proxy", "type": "LLM Gateway", "authMethod": "Bearer token" },
-    { "id": "ext:hermes", "type": "ExternalService", "name": "Hermes Agent", "type": "AI Assistant", "authMethod": "local config file" },
     { "id": "ext:git", "type": "ExternalService", "name": "Git", "type": "Version Control", "authMethod": "SSH key" },
 
     { "id": "app:login", "type": "FrontendApp", "name": "login", "framework": "React 19", "path": "cockpit-app/apps/login", "purpose": "Authentication UI — login form and password change", "requiresAuth": false, "port": 4201 },
@@ -499,7 +496,6 @@
     { "from": "module:mcp", "rel": "CALLS", "to": "ext:vikunja" },
     { "from": "module:mcp", "rel": "CALLS", "to": "ext:actual" },
     { "from": "module:mcp", "rel": "CALLS", "to": "ext:git" },
-    { "from": "module:mcp", "rel": "CALLS", "to": "ext:hermes" },
     { "from": "module:mcp", "rel": "READS_WRITES", "to": "redis:main" },
 
     { "from": "mcp:server", "rel": "REGISTERS", "to": "mcptool:brain_search_notes" },
@@ -530,8 +526,6 @@
     { "from": "mcp:server", "rel": "REGISTERS", "to": "mcptool:get_cv_base_preset" },
     { "from": "mcp:server", "rel": "REGISTERS", "to": "mcptool:preview_cv_preset" },
     { "from": "mcp:server", "rel": "REGISTERS", "to": "mcptool:save_cv_preset" },
-    { "from": "mcp:server", "rel": "REGISTERS", "to": "mcptool:hermes_get_model" },
-    { "from": "mcp:server", "rel": "REGISTERS", "to": "mcptool:hermes_set_model" },
     { "from": "mcp:server", "rel": "REGISTERS", "to": "mcpresource:brain_notes" },
     { "from": "mcp:server", "rel": "AUTHENTICATED_VIA", "to": "auth:oauth2" },
 
@@ -562,8 +556,6 @@
     { "from": "mcptool:save_cv_preset", "rel": "CALLS_SERVICE", "to": "module:redis_store" },
     { "from": "mcptool:get_cv_base_preset", "rel": "CALLS_SERVICE", "to": "module:redis_store" },
     { "from": "mcptool:preview_cv_preset", "rel": "CALLS_SERVICE", "to": "module:redis_store" },
-    { "from": "mcptool:hermes_set_model", "rel": "CALLS_SERVICE", "to": "ext:hermes" },
-    { "from": "mcptool:hermes_get_model", "rel": "CALLS_SERVICE", "to": "ext:hermes" },
 
     { "from": "app:login", "rel": "CALLS", "to": "endpoint:post_login" },
     { "from": "app:login", "rel": "CALLS", "to": "endpoint:post_refresh" },

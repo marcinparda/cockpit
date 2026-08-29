@@ -7,9 +7,6 @@ LiteLLM proxy runs on the Raspberry Pi (port 4000), exposed via Cloudflare Tunne
 ```
 Claude Code / Kiro (local) ──→ https://litellm.parda.me ──→ Anthropic API
   (OAuth token forwarded)         (logs to Langfuse)
-
-Hermes (Pi container)       ──→ http://litellm:4000      ──→ OpenRouter
-Open WebUI (Pi container)   ──→ http://litellm:4000      ──→ OpenRouter
                                        │
                                        └──→ Langfuse Cloud (traces)
 ```
@@ -67,4 +64,4 @@ Then use Claude Code normally — check Langfuse Cloud, traces should appear wit
 | `LANGFUSE_SECRET_KEY` | `sk-lf-...` from Langfuse Cloud project settings |
 | `LANGFUSE_HOST` | `https://cloud.langfuse.com` |
 
-Note: `OPEN_ROUTER_KEY` is already a secret — LiteLLM uses it for Hermes/Open WebUI traffic.
+Note: `OPEN_ROUTER_KEY` is already a secret — LiteLLM uses it for OpenRouter traffic.

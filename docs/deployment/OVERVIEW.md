@@ -80,9 +80,7 @@ Developer pushes to master
 
 **`deploy-extras.yml`** — `workflow_dispatch` only, deploys:
 - LiteLLM (LLM proxy gateway)
-- Hermes (AI agent gateway)
 - actual-http-api (Actual Budget HTTP wrapper)
-- Open WebUI
 - Vikunja (task management)
 
 ---
@@ -169,8 +167,6 @@ Deploys the full API stack. Steps:
 9. Starts PostgreSQL 15, waits for health check to pass
 10. Starts API container with all env vars injected, mounts:
     - `$BRAIN_NOTES_PATH` (brain notes directory on Pi filesystem)
-    - `~/.hermes` → `/opt/hermes` (Hermes config)
-    - `/var/run/docker.sock` (API can manage Docker containers)
 11. Connects `cockpit_api_prod` to `vikunja_default` and `actual_network` (cross-network service discovery)
 12. Polls `http://localhost:8000/health` up to 30 times (3s intervals)
 13. Verifies all three containers are running
@@ -192,7 +188,7 @@ Deploys frontend apps. Steps (for each of `login`, `cockpit`, `cv`, `store`):
 
 Orchestrator — calls the sub-scripts in sequence:
 ```bash
-deploy-litellm.sh → deploy-hermes.sh → deploy-actual-server.sh → deploy-actual.sh → deploy-open-webui.sh → deploy-vikunja.sh
+deploy-litellm.sh → deploy-actual-server.sh → deploy-actual.sh → deploy-vikunja.sh
 ```
 
 ### `deploy-litellm.sh`
@@ -203,13 +199,6 @@ Deploys LiteLLM proxy (LLM gateway):
 - Routes Anthropic models (OAuth passthrough for Pro subscriptions) and OpenRouter models
 - Logs all requests to Langfuse Cloud for observability
 - External access via Cloudflare Tunnel at `litellm.parda.me`
-
-### `deploy-hermes.sh`
-
-Deploys Hermes AI agent gateway:
-- Writes `~/.hermes/config.yaml` (model via LiteLLM proxy at `http://litellm:4000/v1`, default model configurable via `HERMES_MODEL`)
-- Writes `~/.hermes/cli-config.yaml` (MCP server pointing to `cockpit_api_prod:8000/mcp`)
-- Runs `nousresearch/hermes-agent:latest` on port 8642, attached to `cockpit_network_prod`
 
 ### `deploy-actual-server.sh`
 
@@ -225,14 +214,6 @@ Deploys Actual Budget HTTP API wrapper:
 - Connects `actual` container (Actual Budget server) to `actual_network`
 - Runs `jhonderson/actual-http-api:latest` on port 5007
 - Connects to both `actual_network` and `cockpit_network_prod` (so API can reach it)
-
-### `deploy-open-webui.sh`
-
-Deploys Open WebUI:
-- Runs `ghcr.io/open-webui/open-webui:main` on port 4206
-- Configured with two OpenAI-compatible API backends:
-  - `http://litellm:4000/v1` (LLM proxy — routes to OpenRouter/Anthropic)
-  - `http://hermes:8642/v1` (local Hermes agent, reachable via `cockpit_network_prod`)
 
 ### `deploy-vikunja.sh`
 
@@ -273,8 +254,6 @@ cockpit_network_prod
 ├── cockpit_api_prod  (port 8000)
 ├── cockpit_redis_prod
 ├── litellm           (port 4000)
-├── hermes            (port 8642)
-├── open-webui        (port 4206)
 └── actual-http-api   (port 5007)
         │
         └── also on actual_network
@@ -307,9 +286,7 @@ Frontend apps (no network — standalone):
 | Vikunja file attachments | Bind mount `~/vikunja/files` |
 | Actual server data | Docker volume `actual_data` |
 | Actual HTTP API data | Docker volume `actual_http_api_data` |
-| Open WebUI data | Docker volume `open_webui_data` |
 | Brain notes | Bind mount at `$BRAIN_NOTES_PATH` (Pi filesystem path) |
-| Hermes config | Bind mount `~/.hermes` |
 | LiteLLM config | Bind mount `~/.litellm` |
 
 ---
@@ -331,10 +308,8 @@ Frontend apps (no network — standalone):
 | `deployment-scripts/deploy-apps.sh` | Run on Pi: all frontend apps |
 | `deployment-scripts/deploy-extras.sh` | Run on Pi: extras orchestrator |
 | `deployment-scripts/deploy-litellm.sh` | Run on Pi: LiteLLM proxy |
-| `deployment-scripts/deploy-hermes.sh` | Run on Pi: Hermes |
 | `deployment-scripts/deploy-actual-server.sh` | Run on Pi: Actual Budget server |
 | `deployment-scripts/deploy-actual.sh` | Run on Pi: Actual HTTP API |
-| `deployment-scripts/deploy-open-webui.sh` | Run on Pi: Open WebUI |
 | `deployment-scripts/deploy-vikunja.sh` | Run on Pi: Vikunja + MariaDB |
 | `deployment-scripts/backup.sh` | Run on Pi: weekly backup of all DBs and data |
 | `deployment-scripts/restore.sh` | Run on Pi: restore a single service from latest backup |
