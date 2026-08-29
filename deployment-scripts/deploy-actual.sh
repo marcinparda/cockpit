@@ -34,7 +34,7 @@ docker run -d \
   -v actual_http_api_data:/data \
   -e API_KEY="${ACTUAL_HTTP_API_KEY}" \
   -e ACTUAL_DATA_DIR=/data \
-  -e ACTUAL_SERVER_URL=http://actual \
+  -e ACTUAL_SERVER_URL=http://actual:5006 \
   -e ACTUAL_SERVER_PASSWORD="${ACTUAL_SERVER_PASSWORD}" \
   jhonderson/actual-http-api:latest
 
