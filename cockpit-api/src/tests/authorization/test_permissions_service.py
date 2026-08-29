@@ -25,6 +25,21 @@ class TestHasUserPermission:
              patch("src.services.authorization.permissions.service.repository.get_feature_by_name", AsyncMock(return_value=None)):
             assert await service.has_user_permission(mock_db, mock_user.id, Features.USERS, Actions.READ) is False
 
+    async def test_returns_false_when_action_not_found(self, mock_db, mock_user):
+        mock_user.role.name = "User"
+        with patch("src.services.authorization.permissions.service.users_repository.get_user_by_id", AsyncMock(return_value=mock_user)), \
+             patch("src.services.authorization.permissions.service.repository.get_feature_by_name", AsyncMock(return_value=MagicMock())), \
+             patch("src.services.authorization.permissions.service.repository.get_action_by_name", AsyncMock(return_value=None)):
+            assert await service.has_user_permission(mock_db, mock_user.id, Features.USERS, Actions.READ) is False
+
+    async def test_returns_false_when_permission_not_found(self, mock_db, mock_user):
+        mock_user.role.name = "User"
+        with patch("src.services.authorization.permissions.service.users_repository.get_user_by_id", AsyncMock(return_value=mock_user)), \
+             patch("src.services.authorization.permissions.service.repository.get_feature_by_name", AsyncMock(return_value=MagicMock())), \
+             patch("src.services.authorization.permissions.service.repository.get_action_by_name", AsyncMock(return_value=MagicMock())), \
+             patch("src.services.authorization.permissions.service.repository.get_permission_by_feature_action", AsyncMock(return_value=None)):
+            assert await service.has_user_permission(mock_db, mock_user.id, Features.USERS, Actions.READ) is False
+
     async def test_returns_true_when_permission_exists(self, mock_db, mock_user):
         mock_user.role.name = "User"
         with patch("src.services.authorization.permissions.service.users_repository.get_user_by_id", AsyncMock(return_value=mock_user)), \
@@ -33,6 +48,23 @@ class TestHasUserPermission:
              patch("src.services.authorization.permissions.service.repository.get_permission_by_feature_action", AsyncMock(return_value=MagicMock())), \
              patch("src.services.authorization.permissions.service.user_permissions_repository.get_user_permission_by_user_and_permission", AsyncMock(return_value=MagicMock())):
             assert await service.has_user_permission(mock_db, mock_user.id, Features.USERS, Actions.READ) is True
+
+
+class TestPassthroughLookups:
+    async def test_get_feature_by_name(self, mock_db):
+        feature = MagicMock()
+        with patch("src.services.authorization.permissions.service.repository.get_feature_by_name", AsyncMock(return_value=feature)):
+            assert await service.get_feature_by_name(mock_db, "USERS") is feature
+
+    async def test_get_action_by_name(self, mock_db):
+        action = MagicMock()
+        with patch("src.services.authorization.permissions.service.repository.get_action_by_name", AsyncMock(return_value=action)):
+            assert await service.get_action_by_name(mock_db, "READ") is action
+
+    async def test_get_permission_by_feature_action(self, mock_db):
+        permission = MagicMock()
+        with patch("src.services.authorization.permissions.service.repository.get_permission_by_feature_action", AsyncMock(return_value=permission)):
+            assert await service.get_permission_by_feature_action(mock_db, uuid.uuid4(), uuid.uuid4()) is permission
 
 
 class TestGetUserPermissions:
