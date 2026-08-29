@@ -5,6 +5,7 @@ on:
     branches: [master]
     paths:
       - 'cockpit-app/**'
+  workflow_dispatch:
 
 jobs:
   validate-types:
