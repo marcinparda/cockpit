@@ -17,6 +17,22 @@ CockpitApp is a multi-application Nx monorepo of web apps with a shared, type-sa
 ### Deployment
 See `.github/` dir.
 
+## Test Coverage Check (required before handover)
+
+Before handing a task off for commit/push, run coverage for every affected app and confirm thresholds pass:
+
+```
+npx nx test <app> --coverage
+```
+
+Each app's `vite.config.mts` enforces per-metric thresholds (lines/functions/branches/statements — see `test.coverage.thresholds`). If any metric is below threshold:
+
+1. Find the lowest-covered files: `npx vitest run --config apps/<app>/vite.config.mts --coverage --coverage.reporter=json-summary`, then inspect `coverage/apps/<app>/coverage-summary.json`.
+2. Add tests for the lowest-coverage files/functions first — biggest threshold gain per test.
+3. Re-run until all metrics pass.
+
+Do not commit/push with failing coverage thresholds.
+
 ## Architecture Reference
 
 For app structure, lib layout, auth flow, state management, build system, deployment, Nx dependency-flow rules, component patterns, and UI design system — see [`docs/standards/frontend/architecture.md`](../docs/standards/frontend/architecture.md) and [`components.md`](../docs/standards/frontend/components.md).

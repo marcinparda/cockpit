@@ -32,6 +32,10 @@ For models, migrations, permissions, import conventions, or full architecture de
 
 **If you need to add or modify MCP tools or resources — read [`docs/backend/MCP_SERVER.md`](../docs/backend/MCP_SERVER.md) first.**
 
+## Authentication
+
+**If you need to work on login, sessions, or cookie/bearer auth — read [`docs/backend/COOKIE_AUTH.md`](../docs/backend/COOKIE_AUTH.md) first.**
+
 ## Production Stack
 
 **If you need to understand prod containers, ports, or networking — read [`docs/backend/PRODUCTION_STACK.md`](../docs/backend/PRODUCTION_STACK.md) first.**
