@@ -656,6 +656,334 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/presets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Presets
+         * @description List all preset habit templates.
+         */
+        get: operations["list_presets_api_v1_presets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/stats/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Today Stats
+         * @description Today's habit completion stats.
+         */
+        get: operations["get_today_stats_api_v1_habits_stats_today_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/stats/weekly": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Weekly Stats
+         * @description Weekly bar chart data (last 7 days).
+         */
+        get: operations["get_weekly_stats_api_v1_habits_stats_weekly_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/stats/streaks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Streak Ranking
+         * @description Streak ranking — top habits by current_streak desc.
+         */
+        get: operations["get_streak_ranking_api_v1_habits_stats_streaks_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/stats/monthly-highlights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Monthly Highlights
+         * @description Monthly highlights.
+         */
+        get: operations["get_monthly_highlights_api_v1_habits_stats_monthly_highlights_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/settings/vapid-public-key": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Vapid Public Key
+         * @description Return the VAPID public key for Web Push registration.
+         */
+        get: operations["get_vapid_public_key_api_v1_habits_settings_vapid_public_key_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Settings
+         * @description Get current user's push notification settings.
+         */
+        get: operations["get_settings_api_v1_habits_settings_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Settings
+         * @description Update push subscription / notifications_enabled.
+         */
+        patch: operations["update_settings_api_v1_habits_settings_patch"];
+        trace?: never;
+    };
+    "/api/v1/habits/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Categories
+         * @description List habit categories.
+         */
+        get: operations["list_categories_api_v1_habits_categories_get"];
+        put?: never;
+        /**
+         * Create Category
+         * @description Create a new habit category.
+         */
+        post: operations["create_category_api_v1_habits_categories_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/categories/{category_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Category
+         * @description Delete a habit category.
+         */
+        delete: operations["delete_category_api_v1_habits_categories__category_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Category
+         * @description Update a habit category.
+         */
+        patch: operations["update_category_api_v1_habits_categories__category_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/habits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Habits
+         * @description List habits for the current user.
+         */
+        get: operations["list_habits_api_v1_habits_get"];
+        put?: never;
+        /**
+         * Create Habit
+         * @description Create a new habit.
+         */
+        post: operations["create_habit_api_v1_habits_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/{habit_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Habit
+         * @description Get a single habit.
+         */
+        get: operations["get_habit_api_v1_habits__habit_id__get"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Habit
+         * @description Delete a habit.
+         */
+        delete: operations["delete_habit_api_v1_habits__habit_id__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update Habit
+         * @description Partially update a habit.
+         */
+        patch: operations["update_habit_api_v1_habits__habit_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/habits/{habit_id}/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Entries
+         * @description List entries for a habit.
+         */
+        get: operations["list_entries_api_v1_habits__habit_id__entries_get"];
+        put?: never;
+        /**
+         * Upsert Entry
+         * @description Upsert a habit entry for a given date.
+         */
+        post: operations["upsert_entry_api_v1_habits__habit_id__entries_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/{habit_id}/entries/{entry_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Entry
+         * @description Delete a habit entry.
+         */
+        delete: operations["delete_entry_api_v1_habits__habit_id__entries__entry_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/{habit_id}/streak": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Streak
+         * @description Get current streak for a habit.
+         */
+        get: operations["get_streak_api_v1_habits__habit_id__streak_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/habits/{habit_id}/freezes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Freeze
+         * @description Apply a streak freeze for a specific date.
+         */
+        post: operations["create_freeze_api_v1_habits__habit_id__freezes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/": {
         parameters: {
             query?: never;
@@ -836,6 +1164,225 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HabitCategoryCreate */
+        HabitCategoryCreate: {
+            /** Name */
+            name: string;
+            /** Color */
+            color?: string | null;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+        };
+        /** HabitCategoryResponse */
+        HabitCategoryResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Name */
+            name: string;
+            /** Color */
+            color?: string | null;
+            /** Sort Order */
+            sort_order: number;
+        };
+        /** HabitCreate */
+        HabitCreate: {
+            /** Name */
+            name: string;
+            /** Icon */
+            icon: string;
+            /** Type */
+            type: string;
+            /** Color */
+            color?: string | null;
+            /**
+             * Frequency Type
+             * @default daily
+             */
+            frequency_type: string;
+            /** Frequency Value */
+            frequency_value?: number | null;
+            /** Target Value */
+            target_value?: number | null;
+            /** Target Unit */
+            target_unit?: string | null;
+            /**
+             * Streak Mode
+             * @default soft
+             */
+            streak_mode: string;
+            /** Reminder Time */
+            reminder_time?: string | null;
+            /** Timezone */
+            timezone?: string | null;
+            /** Category Id */
+            category_id?: string | null;
+            /**
+             * Sort Order
+             * @default 0
+             */
+            sort_order: number;
+        };
+        /** HabitEntryCreate */
+        HabitEntryCreate: {
+            /**
+             * Logged At
+             * Format: date
+             */
+            logged_at: string;
+            /** Boolean Value */
+            boolean_value?: boolean | null;
+            /** Numeric Value */
+            numeric_value?: number | null;
+            /** Numeric Unit */
+            numeric_unit?: string | null;
+            /** Text Value */
+            text_value?: string | null;
+        };
+        /** HabitEntryResponse */
+        HabitEntryResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Habit Id
+             * Format: uuid
+             */
+            habit_id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Logged At
+             * Format: date
+             */
+            logged_at: string;
+            /** Boolean Value */
+            boolean_value?: boolean | null;
+            /** Numeric Value */
+            numeric_value?: number | null;
+            /** Numeric Unit */
+            numeric_unit?: string | null;
+            /** Text Value */
+            text_value?: string | null;
+        };
+        /** HabitResponse */
+        HabitResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Name */
+            name: string;
+            /** Icon */
+            icon: string;
+            /** Type */
+            type: string;
+            /** Color */
+            color?: string | null;
+            /** Frequency Type */
+            frequency_type: string;
+            /** Frequency Value */
+            frequency_value?: number | null;
+            /** Target Value */
+            target_value?: number | null;
+            /** Target Unit */
+            target_unit?: string | null;
+            /** Streak Mode */
+            streak_mode: string;
+            /** Reminder Time */
+            reminder_time?: string | null;
+            /** Timezone */
+            timezone?: string | null;
+            /** Category Id */
+            category_id?: string | null;
+            /** Is Archived */
+            is_archived: boolean;
+            /** Sort Order */
+            sort_order: number;
+            /** Best Streak */
+            best_streak: number;
+            /**
+             * Current Streak
+             * @default 0
+             */
+            current_streak: number;
+            /** Category Name */
+            category_name?: string | null;
+            today_entry?: components["schemas"]["HabitEntryResponse"] | null;
+        };
+        /** HabitStreakFreezeResponse */
+        HabitStreakFreezeResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Habit Id
+             * Format: uuid
+             */
+            habit_id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /**
+             * Freeze Date
+             * Format: date
+             */
+            freeze_date: string;
+        };
+        /** HabitUpdate */
+        HabitUpdate: {
+            /** Name */
+            name?: string | null;
+            /** Icon */
+            icon?: string | null;
+            /** Color */
+            color?: string | null;
+            /** Frequency Type */
+            frequency_type?: string | null;
+            /** Frequency Value */
+            frequency_value?: number | null;
+            /** Target Value */
+            target_value?: number | null;
+            /** Target Unit */
+            target_unit?: string | null;
+            /** Streak Mode */
+            streak_mode?: string | null;
+            /** Reminder Time */
+            reminder_time?: string | null;
+            /** Timezone */
+            timezone?: string | null;
+            /** Category Id */
+            category_id?: string | null;
+            /** Is Archived */
+            is_archived?: boolean | null;
+            /** Sort Order */
+            sort_order?: number | null;
         };
         /**
          * HealthCheckResponse
@@ -1075,6 +1622,32 @@ export interface components {
             feature?: components["schemas"]["Feature"] | null;
             action?: components["schemas"]["Action"] | null;
         };
+        /** PresetHabitResponse */
+        PresetHabitResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Icon */
+            icon: string;
+            /** Type */
+            type: string;
+            /** Category Key */
+            category_key: string;
+            /** Color */
+            color?: string | null;
+            /** Default Frequency Type */
+            default_frequency_type: string;
+            /** Default Target Value */
+            default_target_value?: number | null;
+            /** Default Target Unit */
+            default_target_unit?: string | null;
+            /** Sort Order */
+            sort_order: number;
+        };
         /** ProtectedResourceMetadata */
         ProtectedResourceMetadata: {
             /** Resource */
@@ -1175,6 +1748,15 @@ export interface components {
              */
             tags: string[];
         };
+        /** StreakResponse */
+        StreakResponse: {
+            /** Current Streak */
+            current_streak: number;
+            /** Best Streak */
+            best_streak: number;
+            /** Last Period Completed */
+            last_period_completed: boolean;
+        };
         /** TokenResponse */
         TokenResponse: {
             /** Access Token */
@@ -1264,6 +1846,34 @@ export interface components {
              * Format: uuid
              */
             role_id: string;
+        };
+        /** UserHabitSettingsResponse */
+        UserHabitSettingsResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * User Id
+             * Format: uuid
+             */
+            user_id: string;
+            /** Push Subscription */
+            push_subscription?: {
+                [key: string]: unknown;
+            } | null;
+            /** Notifications Enabled */
+            notifications_enabled: boolean;
+        };
+        /** UserHabitSettingsUpdate */
+        UserHabitSettingsUpdate: {
+            /** Push Subscription */
+            push_subscription?: {
+                [key: string]: unknown;
+            } | null;
+            /** Notifications Enabled */
+            notifications_enabled?: boolean | null;
         };
         /**
          * UserInfoResponse
@@ -1363,6 +1973,11 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** VapidPublicKeyResponse */
+        VapidPublicKeyResponse: {
+            /** Public Key */
+            public_key: string;
         };
         /** UserRole */
         src__services__authorization__roles__models__UserRole: {
@@ -2849,6 +3464,735 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_presets_api_v1_presets_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PresetHabitResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_today_stats_api_v1_habits_stats_today_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_weekly_stats_api_v1_habits_stats_weekly_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_streak_ranking_api_v1_habits_stats_streaks_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_monthly_highlights_api_v1_habits_stats_monthly_highlights_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_vapid_public_key_api_v1_habits_settings_vapid_public_key_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VapidPublicKeyResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_settings_api_v1_habits_settings_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserHabitSettingsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_settings_api_v1_habits_settings_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserHabitSettingsUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserHabitSettingsResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_categories_api_v1_habits_categories_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitCategoryResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_category_api_v1_habits_categories_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HabitCategoryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitCategoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_category_api_v1_habits_categories__category_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_category_api_v1_habits_categories__category_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HabitCategoryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitCategoryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_habits_api_v1_habits_get: {
+        parameters: {
+            query?: {
+                /** @description Filter: 'false' (default), 'true', or 'all' */
+                archived?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_habit_api_v1_habits_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HabitCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_habit_api_v1_habits__habit_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                habit_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_habit_api_v1_habits__habit_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                habit_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_habit_api_v1_habits__habit_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                habit_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HabitUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_entries_api_v1_habits__habit_id__entries_get: {
+        parameters: {
+            query?: {
+                from_date?: string | null;
+                to_date?: string | null;
+            };
+            header?: never;
+            path: {
+                habit_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitEntryResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upsert_entry_api_v1_habits__habit_id__entries_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                habit_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HabitEntryCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitEntryResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_entry_api_v1_habits__habit_id__entries__entry_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                habit_id: string;
+                entry_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_streak_api_v1_habits__habit_id__streak_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                habit_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreakResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_freeze_api_v1_habits__habit_id__freezes_post: {
+        parameters: {
+            query: {
+                freeze_date: string;
+            };
+            header?: never;
+            path: {
+                habit_id: string;
+            };
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitStreakFreezeResponse"];
                 };
             };
             /** @description Validation Error */
