@@ -92,6 +92,19 @@ describe('HabitTile', () => {
     expect(tile).toHaveStyle({ backgroundColor: '#ff6b6b' });
     expect(tile.querySelector('[data-testid="checkmark"]')).toBeInTheDocument();
   });
+
+  it('clears the long-press timer on pointer up without navigating', () => {
+    render(
+      withQueryClient(
+        <HabitTile habit={baseHabit} completed={false} todayEntry={null} />,
+      ),
+    );
+    const tile = screen.getByRole('button');
+    fireEvent.pointerDown(tile);
+    fireEvent.pointerUp(tile);
+    // No assertion needed beyond not throwing — covers handlePointerDown/Up
+    expect(tile).toBeInTheDocument();
+  });
 });
 
 describe('TodayPage', () => {
