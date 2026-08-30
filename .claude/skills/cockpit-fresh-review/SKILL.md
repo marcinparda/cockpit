@@ -1,5 +1,5 @@
 ---
-name: fresh-review
+name: cockpit-fresh-review
 description: Review a diff/branch against a task's spec.md and plan.md, run in a clean session with no prior implementation context. Appends findings to work-log.md. Use after implementation, before merge/QA.
 ---
 

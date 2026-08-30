@@ -1,11 +1,11 @@
 ---
-name: grill-me
-description: Interrogate requirements for a new feature/fix/task before any planning or code. Produces spec.md in a new .ai/docs/tasks/ folder. Use at the start of any non-trivial task, before plan-slices.
+name: cockpit-grill-me
+description: Interrogate requirements for a new feature/fix/task before any planning or code. Produces spec.md in a new .ai/docs/tasks/ folder. Use at the start of any non-trivial task, before cockpit-plan-slices.
 ---
 
 # Grill Me
 
-Purpose: expose hidden decisions and align on a shared design concept *before* a plan or any code exists. Do not skip to planning or implementation from this skill — that's `plan-slices`.
+Purpose: expose hidden decisions and align on a shared design concept *before* a plan or any code exists. Do not skip to planning or implementation from this skill — that's `cockpit-plan-slices`.
 
 ## Process
 
@@ -37,4 +37,4 @@ Determine task type (`development`, `migration`, `product-design`, or similar) a
 
 This is a destination marker, not a rigid contract — expect it to need small updates as implementation reveals things. Don't over-polish it.
 
-Next step: hand off to `plan-slices` with this spec.md.
+Next step: hand off to `cockpit-plan-slices` with this spec.md.

@@ -200,6 +200,8 @@ Deploys LiteLLM proxy (LLM gateway):
 - Logs all requests to Langfuse Cloud for observability
 - External access via Cloudflare Tunnel at `litellm.parda.me`
 
+Full setup detail (architecture, auth, Langfuse, local dev): [`docs/projects/litellm/SETUP.md`](../projects/litellm/SETUP.md).
+
 ### `deploy-actual-server.sh`
 
 Deploys Actual Budget server:

@@ -7,23 +7,11 @@ Personal agent platform. Two projects:
 
 ## Makefile
 
-Root `Makefile` wraps both projects. Key targets:
-
-- `make run` — start API (detached) + all apps
-- `make api-*` — delegates to `cockpit-api/Makefile` (up, down, restart, logs, migrate, test)
-- `make app-*` — delegates to `cockpit-app/` npm scripts (run, build, test, update-types)
-- `make install` / `make test` — run both projects
-
-### Deployment
-
-- [docs/deployment/OVERVIEW.md](docs/deployment/OVERVIEW.md) — end-to-end deployment: pipelines, SSH mechanism, scripts, Docker networks, data persistence
-- [docs/deployment/PRODUCTION_STACK.md](docs/deployment/PRODUCTION_STACK.md) — containers, ports, images, data volumes on Raspberry Pi
-- [docs/deployment/CICD.md](docs/deployment/CICD.md) — pipelines quick-reference
-- [docs/deployment/GITHUB_SECRETS.md](docs/deployment/GITHUB_SECRETS.md) — all required GitHub secrets by category
+Root `Makefile` wraps both projects. Read it when you need to run some commands.
 
 ## Documentation
 
-All docs live under [`docs/`](docs/) — one tree, no per-module doc folders. Read [`docs/standards/INDEX.md`](docs/standards/INDEX.md) before starting any task: it indexes coding standards/conventions (global, frontend, backend, testing) and project docs (vision, tech stack, architecture). See [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for where new documentation belongs and how to slice it into the right folder.
+All docs live under [`docs/`](docs/). See [`docs/AGENTS.md`](docs/AGENTS.md) for high-level map of what's inside (standards, projects, backend, deployment, tasks, ontology) and [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for where new documentation belongs and how to slice it into the right folder. Use the `cockpit-read-docs` skill to find and read the docs relevant to the job at hand before acting.
 
 Module `AGENTS.md` files (this file, `cockpit-api/AGENTS.md`, `cockpit-app/AGENTS.md`) only describe what each module _is_ — its purpose, frameworks, ports, and pointers into `docs/`. All coding conventions and "how to write code here" rules live in `docs/standards/` — check there first, don't duplicate rules per-module.
 
@@ -32,3 +20,5 @@ If you notice a recurring pattern, fix, or convention during implementation that
 ## AI Workflow
 
 New/returning to this repo? Read [`onboarding.md`](onboarding.md) — explains the AI SDLC, available skills, and task workflow. Task history lives in [`docs/tasks/`](docs/tasks/). (Must-read for agents)
+
+Skills: `cockpit-read-docs`, `cockpit-grill-me`, `cockpit-plan-slices`, `cockpit-fresh-review`, `cockpit-develop-feature`, `cockpit-fix-bug` — all under `cockpit-` prefix.
