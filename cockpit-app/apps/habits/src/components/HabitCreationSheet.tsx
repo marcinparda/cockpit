@@ -5,17 +5,7 @@ import { useHabitMutations } from '../api/hooks/useHabitMutations';
 import { useCategories } from '../api/hooks/useCategories';
 import { usePresets } from '../api/hooks/usePresets';
 import { IconPicker } from './IconPicker';
-
-const COLORS = [
-  '#ef4444',
-  '#f97316',
-  '#eab308',
-  '#22c55e',
-  '#3b82f6',
-  '#8b5cf6',
-  '#ec4899',
-  '#6b7280',
-];
+import { HABIT_COLORS } from '../colors';
 
 interface HabitCreationSheetProps {
   onClose: () => void;
@@ -236,8 +226,8 @@ export function HabitCreationSheet({ onClose, editHabit }: HabitCreationSheetPro
               {/* Color */}
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-medium">Color</span>
-                <div className="flex gap-2">
-                  {COLORS.map((c) => (
+                <div className="flex flex-wrap gap-2">
+                  {HABIT_COLORS.map((c) => (
                     <button
                       key={c}
                       type="button"

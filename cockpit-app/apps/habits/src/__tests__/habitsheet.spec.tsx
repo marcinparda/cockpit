@@ -9,6 +9,7 @@ vi.mock('../api/hooks/useEntryMutations', () => ({
 
 import * as useEntryMutationsModule from '../api/hooks/useEntryMutations';
 import { HabitSheet } from '../components/HabitSheet';
+import { createHabitMock } from '../mocks/habit';
 
 function makeQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -20,23 +21,17 @@ function withQueryClient(ui: React.ReactElement) {
 
 const mockUpsertMutate = vi.fn();
 
-const baseHabit = {
+const baseHabit = createHabitMock({
   id: 'habit-numeric-1',
   name: 'Drink Water',
   icon: 'droplet',
   color: '#0ea5e9',
-  type: 'numeric' as const,
-  streak_mode: 'soft' as const,
+  type: 'numeric',
   current_streak: 0,
-  frequency: 'daily',
-  is_active: true,
-  category_id: null,
-  sort_order: 0,
-  is_archived: false,
   best_streak: 0,
   target_value: 8,
   unit: 'glasses',
-};
+});
 
 describe('HabitSheet', () => {
   beforeEach(() => {

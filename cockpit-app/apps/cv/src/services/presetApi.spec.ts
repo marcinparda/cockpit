@@ -1,5 +1,7 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { fetchRegistry, saveRegistry, fetchPresetSection, savePresetSection } from './presetApi';
+import { createEnvelopeMock } from '../mocks/envelope';
+import { createPresetMock } from '../mocks/preset';
 
 const { mockGetRequest, mockPutRequest } = vi.hoisted(() => ({
   mockGetRequest: vi.fn(),
@@ -13,10 +15,9 @@ vi.mock('@cockpit-app/common-shared-data-access', () => ({
   },
 }));
 
-const mockEnvelope = {
-  meta: { key: 'k', type: 't', version: 1, created_at: '', updated_at: '', tags: [] },
-  data: [{ id: 'preset-1', label: 'Preset 1', archived: false, created_at: '2024-01-01' }],
-};
+const mockEnvelope = createEnvelopeMock({
+  data: [createPresetMock({ id: 'preset-1', label: 'Preset 1', created_at: '2024-01-01' })],
+});
 
 describe('presetApi', () => {
   beforeEach(() => {

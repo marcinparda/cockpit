@@ -1,25 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { SummaryEditor } from './SummaryEditor';
-import type { CVData } from '../../../types/cv.types';
+import { createCVDataMock } from '../../../mocks/cvData';
 
-const baseCVData: CVData = {
-  header: {
-    name: '',
-    title: '',
-    phone: '',
-    email: '',
-    linkedin: { url: '' },
-    location: '',
-  },
+const baseCVData = createCVDataMock({
   summary: ['First paragraph.', 'Second paragraph.'],
-  skills: [],
-  achievements: [],
-  experience: [],
-  education: [],
-  personalProjects: [],
-  courses: [],
-};
+});
 
 describe('SummaryEditor', () => {
   it('renders a textarea for each summary paragraph', () => {

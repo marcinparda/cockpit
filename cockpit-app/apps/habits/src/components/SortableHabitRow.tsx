@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Habit } from '../api/schemas';
 import { HABIT_ICONS } from '../icons/index';
+import { truncateName } from '../utils/text';
 
 interface SortableHabitRowProps {
   habit: Habit;
@@ -61,7 +62,9 @@ export function SortableHabitRow({ habit, onEdit, onArchive }: SortableHabitRowP
         className="flex min-w-0 flex-1 flex-col text-left hover:underline"
         aria-label={`View stats for ${habit.name}`}
       >
-        <span className="truncate font-medium">{habit.name}</span>
+        <span className="truncate font-medium" title={habit.name}>
+          {truncateName(habit.name)}
+        </span>
         {habit.category_name && (
           <span className="text-xs text-gray-500">{habit.category_name}</span>
         )}

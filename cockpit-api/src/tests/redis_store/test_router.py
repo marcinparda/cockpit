@@ -1,14 +1,9 @@
 """Unit tests for redis_store router."""
-from datetime import datetime, timezone
 from unittest.mock import AsyncMock, patch
 
 from src.services.redis_store import router
-from src.services.redis_store.schemas import StoreEnvelope, StoreKeyCreate, StoreKeyPatch, StoreMeta
-
-
-def _envelope(key: str, data: dict) -> StoreEnvelope:
-    now = datetime.now(timezone.utc)
-    return StoreEnvelope(meta=StoreMeta(key=key, type="json", version=1, created_at=now, updated_at=now, tags=[]), data=data)
+from src.services.redis_store.schemas import StoreKeyCreate, StoreKeyPatch
+from src.tests.factories import make_store_envelope as _envelope
 
 
 class TestListPrefixes:

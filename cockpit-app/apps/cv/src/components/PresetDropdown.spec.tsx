@@ -2,9 +2,10 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { PresetDropdown } from './PresetDropdown';
 import type { Preset } from '../types/preset.types';
+import { createPresetMock } from '../mocks/preset';
 
 const presets: Preset[] = [
-  { id: 'senior-fe', label: 'Senior Frontend', description: '', created_at: '2024-01-01T00:00:00Z', archived: false },
+  createPresetMock({ id: 'senior-fe', label: 'Senior Frontend' }),
 ];
 
 const defaultProps = {

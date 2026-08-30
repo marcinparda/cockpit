@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { HeaderEditor } from './HeaderEditor';
-import type { CVData } from '../../../types/cv.types';
+import { createCVDataMock } from '../../../mocks/cvData';
 
-const baseCVData: CVData = {
+const baseCVData = createCVDataMock({
   header: {
     name: 'Jane Doe',
     title: 'Engineer',
@@ -12,14 +12,7 @@ const baseCVData: CVData = {
     linkedin: { url: 'linkedin.com/in/jane', text: 'jane' },
     location: 'Krakow',
   },
-  summary: [],
-  skills: [],
-  achievements: [],
-  experience: [],
-  education: [],
-  personalProjects: [],
-  courses: [],
-};
+});
 
 describe('HeaderEditor', () => {
   it('renders inputs for all header fields', () => {

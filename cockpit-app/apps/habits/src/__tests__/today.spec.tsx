@@ -20,6 +20,7 @@ import { HabitTile } from '../components/HabitTile';
 import TodayPage from '../pages/TodayPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import { createHabitMock } from '../mocks/habit';
 
 function makeQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -33,21 +34,7 @@ function withQueryClient(ui: React.ReactElement) {
   );
 }
 
-const baseHabit = {
-  id: 'habit-1',
-  name: 'Morning Run',
-  icon: 'Running',
-  color: '#ff6b6b',
-  type: 'boolean' as const,
-  streak_mode: 'soft' as const,
-  current_streak: 3,
-  frequency: 'daily',
-  is_active: true,
-  category_id: null,
-  sort_order: 0,
-  is_archived: false,
-  best_streak: 5,
-};
+const baseHabit = createHabitMock({ id: 'habit-1' });
 
 describe('HabitTile', () => {
   it('renders with habit.color as border when uncompleted', () => {
@@ -91,6 +78,28 @@ describe('HabitTile', () => {
     const tile = screen.getByRole('button');
     expect(tile).toHaveStyle({ backgroundColor: '#ff6b6b' });
     expect(tile.querySelector('[data-testid="checkmark"]')).toBeInTheDocument();
+  });
+
+  it('renders short names unchanged', () => {
+    render(
+      withQueryClient(
+        <HabitTile habit={baseHabit} completed={false} todayEntry={null} />,
+      ),
+    );
+    expect(screen.getByText('Morning Run')).toBeInTheDocument();
+  });
+
+  it('truncates names over 50 chars and keeps full name in title attribute', () => {
+    const longName = 'a'.repeat(60);
+    const longHabit = { ...baseHabit, name: longName };
+    render(
+      withQueryClient(
+        <HabitTile habit={longHabit} completed={false} todayEntry={null} />,
+      ),
+    );
+    const expected = `${'a'.repeat(50)}…`;
+    expect(screen.getByText(expected)).toBeInTheDocument();
+    expect(screen.getByText(expected)).toHaveAttribute('title', longName);
   });
 
   it('clears the long-press timer on pointer up without navigating', () => {

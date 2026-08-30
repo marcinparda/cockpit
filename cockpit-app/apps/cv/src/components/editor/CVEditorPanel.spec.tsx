@@ -1,26 +1,12 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { CVEditorPanel } from './CVEditorPanel';
-import type { CVData } from '../../types/cv.types';
 import type { Preset } from '../../types/preset.types';
+import { createCVDataMock } from '../../mocks/cvData';
 
-const mockCVData: CVData = {
-  header: {
-    name: 'Test',
-    title: 'Dev',
-    phone: '',
-    email: '',
-    linkedin: { url: '' },
-    location: '',
-  },
-  summary: [],
-  skills: [],
-  achievements: [],
-  experience: [],
-  education: [],
-  personalProjects: [],
-  courses: [],
-};
+const mockCVData = createCVDataMock({
+  header: { name: 'Test', title: 'Dev', phone: '', email: '', linkedin: { url: '' }, location: '' },
+});
 
 const defaultProps = {
   cvData: mockCVData,

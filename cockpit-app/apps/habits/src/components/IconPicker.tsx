@@ -8,7 +8,7 @@ interface IconPickerProps {
 export function IconPicker({ selected, onSelect }: IconPickerProps) {
   return (
     <div
-      className="flex gap-2 overflow-x-auto pb-2"
+      className="flex flex-wrap gap-2 pb-2"
       role="group"
       aria-label="Select habit icon"
     >

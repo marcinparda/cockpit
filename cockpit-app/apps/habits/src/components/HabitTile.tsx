@@ -4,6 +4,7 @@ import { Check, Star } from 'lucide-react';
 import { Habit } from '../api/schemas';
 import { useEntryMutations } from '../api/hooks/useEntryMutations';
 import { HABIT_ICONS } from '../icons';
+import { truncateName } from '../utils/text';
 
 interface HabitTileProps {
   habit: Habit;
@@ -95,8 +96,11 @@ export function HabitTile({
           <Check size={12} className="text-white" aria-hidden="true" />
         </span>
       )}
-      <span className="w-full truncate px-1 text-center text-[12px] leading-tight">
-        {habit.name}
+      <span
+        className="w-full break-words px-1 text-center text-[12px] leading-tight"
+        title={habit.name}
+      >
+        {truncateName(habit.name)}
       </span>
       {habit.type === 'numeric' && todayEntry?.numeric_value != null && (
         <span className="text-[10px] font-semibold leading-none" style={{ color: completed ? 'white' : (habit.color ?? '#6b7280') }}>

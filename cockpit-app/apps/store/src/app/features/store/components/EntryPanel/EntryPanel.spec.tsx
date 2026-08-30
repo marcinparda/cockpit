@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import EntryPanel from './EntryPanel';
 import type { StoreEnvelope } from '../../api/schemas';
+import { createStoreEnvelopeMock } from '../../../../../mocks/storeEnvelope';
 
 vi.mock('../MonacoEditor/MonacoEditor', () => ({
   default: React.forwardRef(
@@ -37,17 +38,7 @@ vi.mock('../../api/hooks', () => ({
   })),
 }));
 
-const sampleEnvelope: StoreEnvelope = {
-  meta: {
-    key: 'myprefix:mycategory:mykey',
-    type: 'object',
-    version: 1,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-    tags: ['tagA', 'tagB'],
-  },
-  data: { hello: 'world' },
-};
+const sampleEnvelope: StoreEnvelope = createStoreEnvelopeMock();
 
 function defaultViewProps() {
   return {

@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { CVEditor } from './CVEditor';
+import { createCVDataMock } from '../../mocks/cvData';
 
 const mockSelectPreset = vi.fn();
 const mockClearDirty = vi.fn();
@@ -11,23 +12,9 @@ let mockIsDirty = false;
 let mockIsLoading = false;
 let mockPresetsLoading = false;
 
-const mockCVData = {
-  header: {
-    name: 'Test User',
-    title: 'Dev',
-    phone: '',
-    email: '',
-    linkedin: { url: '' },
-    location: '',
-  },
-  summary: [],
-  skills: [],
-  achievements: [],
-  experience: [],
-  education: [],
-  personalProjects: [],
-  courses: [],
-};
+const mockCVData = createCVDataMock({
+  header: { name: 'Test User', title: 'Dev', phone: '', email: '', linkedin: { url: '' }, location: '' },
+});
 
 vi.mock('../../hooks/useCVData', () => ({
   useCVData: () => ({

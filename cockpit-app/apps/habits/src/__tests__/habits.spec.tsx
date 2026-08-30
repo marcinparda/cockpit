@@ -38,6 +38,7 @@ import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { SortableHabitRow } from '../components/SortableHabitRow';
 import HabitsPage from '../pages/HabitsPage';
 import * as useHabitsModule from '../api/hooks/useHabits';
+import { createHabitMock } from '../mocks/habit';
 
 function makeQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -51,22 +52,7 @@ function withProviders(ui: React.ReactElement) {
   );
 }
 
-const baseHabit = {
-  id: 'habit-1',
-  name: 'Morning Run',
-  icon: 'Running',
-  color: '#ff6b6b',
-  type: 'boolean' as const,
-  streak_mode: 'soft' as const,
-  current_streak: 3,
-  frequency: 'daily',
-  is_active: true,
-  category_id: null,
-  category_name: undefined,
-  sort_order: 0,
-  is_archived: false,
-  best_streak: 5,
-};
+const baseHabit = createHabitMock({ id: 'habit-1' });
 
 // Test 1: HabitCreationSheet Quick Add form validation
 describe('HabitCreationSheet', () => {
@@ -246,15 +232,14 @@ describe('HabitCreationSheet edit mode', () => {
       updateSortOrder: { mutate: vi.fn(), isPending: false },
     } as any);
 
-    const editHabit = {
-      ...baseHabit,
+    const editHabit = createHabitMock({
       id: 'edit-habit-1',
-      type: 'boolean' as const,
+      type: 'boolean',
       category_id: null,
       category_name: undefined,
       target_value: undefined,
       unit: undefined,
-    };
+    });
     const onClose = vi.fn();
     render(withProviders(<HabitCreationSheet onClose={onClose} editHabit={editHabit} />));
 

@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { CVPreview } from './CVPreview';
-import type { CVData } from '../../types/cv.types';
+import { createCVDataMock } from '../../mocks/cvData';
 
 vi.mock('react-to-print', () => ({
   useReactToPrint: () => vi.fn(),
 }));
 
-const mockCVData: CVData = {
+const mockCVData = createCVDataMock({
   header: {
     name: 'Preview User',
     title: 'Engineer',
@@ -18,12 +18,7 @@ const mockCVData: CVData = {
   },
   summary: ['Short summary.'],
   skills: [{ name: 'TypeScript', years: 3, description: '' }],
-  achievements: [],
-  experience: [],
-  education: [],
-  personalProjects: [],
-  courses: [],
-};
+});
 
 describe('CVPreview', () => {
   it('renders the Preview heading', () => {

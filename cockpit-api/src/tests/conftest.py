@@ -6,6 +6,8 @@ import pytest
 from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.tests.factories import make_admin_role, make_admin_user, make_role, make_user
+
 
 @pytest.fixture
 def user_id() -> uuid.UUID:
@@ -19,47 +21,31 @@ def role_id() -> uuid.UUID:
 
 @pytest.fixture
 def mock_role(role_id: uuid.UUID) -> MagicMock:
-    role = MagicMock()
-    role.id = role_id
-    role.name = "User"
-    return role
+    return make_role(id=role_id)
 
 
 @pytest.fixture
 def mock_admin_role() -> MagicMock:
-    role = MagicMock()
-    role.id = uuid.uuid4()
-    role.name = "Admin"
-    return role
+    return make_admin_role()
 
 
 @pytest.fixture
 def mock_user(user_id: uuid.UUID, mock_role: MagicMock) -> MagicMock:
-    user = MagicMock()
-    user.id = user_id
-    user.email = "test@example.com"
-    user.is_active = True
-    user.password_hash = "$2b$04$testhashedpasswordvalue1234567890"
-    user.role_id = mock_role.id
-    user.role = mock_role
-    user.password_changed = False
-    created_at = MagicMock()
-    created_at.isoformat.return_value = "2024-01-01T00:00:00"
-    user.created_at = created_at
-    return user
+    return make_user(
+        id=user_id,
+        email="test@example.com",
+        role=mock_role,
+        role_id=mock_role.id,
+    )
 
 
 @pytest.fixture
 def mock_admin_user(mock_admin_role: MagicMock) -> MagicMock:
-    user = MagicMock()
-    user.id = uuid.uuid4()
-    user.email = "admin@example.com"
-    user.is_active = True
-    user.password_hash = "$2b$04$adminhashedpasswordvalue123456789"
-    user.role_id = mock_admin_role.id
-    user.role = mock_admin_role
-    user.password_changed = False
-    return user
+    return make_admin_user(
+        email="admin@example.com",
+        role=mock_admin_role,
+        role_id=mock_admin_role.id,
+    )
 
 
 @pytest.fixture

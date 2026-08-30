@@ -15,6 +15,8 @@ vi.mock('@cockpit-app/common-shared-data-access', () => ({
 import { getStorePrefixes, createOrUpdateStoreEntry, deleteStoreEntry } from './api';
 import { storeEnvelopeSchema } from './schemas';
 import { STORE_ENDPOINTS } from './endpoints';
+import { createStoreEnvelopeMock } from '../../../../mocks/storeEnvelope';
+import { createStoreMetaMock } from '../../../../mocks/storeMeta';
 
 describe('store api', () => {
   beforeEach(() => {
@@ -37,17 +39,10 @@ describe('store api', () => {
 
   describe('storeEnvelopeSchema', () => {
     it('accepts valid envelope', () => {
-      const validEnvelope = {
-        meta: {
-          key: 'test-key',
-          type: 'json',
-          version: 1,
-          created_at: '2024-01-01T00:00:00Z',
-          updated_at: '2024-01-01T00:00:00Z',
-          tags: ['tag1'],
-        },
+      const validEnvelope = createStoreEnvelopeMock({
+        meta: createStoreMetaMock({ key: 'test-key', type: 'json', tags: ['tag1'] }),
         data: {},
-      };
+      });
       expect(() => storeEnvelopeSchema.parse(validEnvelope)).not.toThrow();
     });
 
@@ -69,17 +64,10 @@ describe('store api', () => {
 
   describe('createOrUpdateStoreEntry', () => {
     it('calls baseApi.putRequest with correct endpoint and body', async () => {
-      const envelope = {
-        meta: {
-          key: 'mykey',
-          type: 'json',
-          version: 1,
-          created_at: '2024-01-01T00:00:00Z',
-          updated_at: '2024-01-01T00:00:00Z',
-          tags: [],
-        },
+      const envelope = createStoreEnvelopeMock({
+        meta: createStoreMetaMock({ key: 'mykey', type: 'json', tags: [] }),
         data: { value: 42 },
-      };
+      });
       mockBaseApi.putRequest.mockResolvedValue(envelope);
       const body = { type: 'json', data: { value: 42 } };
       await createOrUpdateStoreEntry('prefix1', 'cat1', 'key1', body);
@@ -130,17 +118,10 @@ describe('store api', () => {
 
   describe('getStoreEntry', () => {
     it('calls baseApi.getRequest with entry endpoint', async () => {
-      const envelope = {
-        meta: {
-          key: 'p:c:k',
-          type: 'object',
-          version: 1,
-          created_at: '2024-01-01T00:00:00Z',
-          updated_at: '2024-01-01T00:00:00Z',
-          tags: [],
-        },
+      const envelope = createStoreEnvelopeMock({
+        meta: createStoreMetaMock({ key: 'p:c:k', tags: [] }),
         data: {},
-      };
+      });
       mockBaseApi.getRequest.mockResolvedValue(envelope);
       const { getStoreEntry } = await import('./api');
       const result = await getStoreEntry('p', 'c', 'k');
@@ -154,17 +135,10 @@ describe('store api', () => {
 
   describe('resolveStoreEntry', () => {
     it('calls baseApi.getRequest with resolve endpoint', async () => {
-      const envelope = {
-        meta: {
-          key: 'p:c:k',
-          type: 'object',
-          version: 1,
-          created_at: '2024-01-01T00:00:00Z',
-          updated_at: '2024-01-01T00:00:00Z',
-          tags: [],
-        },
+      const envelope = createStoreEnvelopeMock({
+        meta: createStoreMetaMock({ key: 'p:c:k', tags: [] }),
         data: {},
-      };
+      });
       mockBaseApi.getRequest.mockResolvedValue(envelope);
       const { resolveStoreEntry } = await import('./api');
       const result = await resolveStoreEntry('p', 'c', 'k');

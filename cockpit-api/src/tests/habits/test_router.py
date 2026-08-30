@@ -5,6 +5,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from httpx import AsyncClient, ASGITransport
 
+from src.tests.factories import make_habit, make_habit_entry
+
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -83,23 +85,14 @@ class TestEntryUpsert:
         user_id = uuid.uuid4()
         logged_at = date(2026, 5, 21)
 
-        mock_habit = MagicMock()
-        mock_habit.id = habit_id
-        mock_habit.user_id = user_id
-        mock_habit.type = "boolean"
-        mock_habit.best_streak = 0
-        mock_habit.streak_mode = "soft"
-        mock_habit.frequency_type = "daily"
-        mock_habit.frequency_value = None
+        mock_habit = make_habit(id=habit_id, user_id=user_id)
 
-        mock_entry = MagicMock()
-        mock_entry.id = uuid.uuid4()
-        mock_entry.habit_id = habit_id
-        mock_entry.user_id = user_id
-        mock_entry.logged_at = logged_at
-        mock_entry.boolean_value = True
-        mock_entry.numeric_value = None
-        mock_entry.text_value = None
+        mock_entry = make_habit_entry(
+            habit_id=habit_id,
+            user_id=user_id,
+            logged_at=logged_at,
+            boolean_value=True,
+        )
 
         with (
             patch("src.services.habits.service.repository.get_habit_by_id", AsyncMock(return_value=mock_habit)),
@@ -133,9 +126,7 @@ class TestFreezeQuota:
         user_id = uuid.uuid4()
         freeze_date = date(2026, 5, 21)
 
-        mock_habit = MagicMock()
-        mock_habit.id = habit_id
-        mock_habit.user_id = user_id
+        mock_habit = make_habit(id=habit_id, user_id=user_id)
 
         mock_freeze = MagicMock()
         mock_freeze.id = uuid.uuid4()
@@ -159,9 +150,7 @@ class TestFreezeQuota:
         user_id = uuid.uuid4()
         freeze_date = date(2026, 5, 21)
 
-        mock_habit = MagicMock()
-        mock_habit.id = habit_id
-        mock_habit.user_id = user_id
+        mock_habit = make_habit(id=habit_id, user_id=user_id)
 
         with (
             patch("src.services.habits.service.repository.get_habit_by_id", AsyncMock(return_value=mock_habit)),
@@ -187,10 +176,7 @@ class TestTypeValidation:
         user_id = uuid.uuid4()
         logged_at = date(2026, 5, 21)
 
-        mock_habit = MagicMock()
-        mock_habit.id = habit_id
-        mock_habit.user_id = user_id
-        mock_habit.type = "boolean"
+        mock_habit = make_habit(id=habit_id, user_id=user_id, type="boolean")
 
         with patch("src.services.habits.service.repository.get_habit_by_id", AsyncMock(return_value=mock_habit)):
             with pytest.raises(HTTPException) as exc_info:

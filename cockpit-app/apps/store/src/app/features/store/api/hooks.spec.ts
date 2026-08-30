@@ -28,6 +28,8 @@ import {
   useCreateOrUpdateStoreEntry,
   useDeleteStoreEntry,
 } from './hooks';
+import { createStoreEnvelopeMock } from '../../../../mocks/storeEnvelope';
+import { createStoreMetaMock } from '../../../../mocks/storeMeta';
 
 const mockGetStorePrefixes = getStorePrefixes as ReturnType<typeof vi.fn>;
 const mockGetStoreCategories = getStoreCategories as ReturnType<typeof vi.fn>;
@@ -92,17 +94,10 @@ describe('store hooks', () => {
   });
 
   it('useStoreEntry: fetches entry when all params are non-empty', async () => {
-    const envelope = {
-      meta: {
-        key: 'p:c:k',
-        type: 'object',
-        version: 1,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        tags: [],
-      },
+    const envelope = createStoreEnvelopeMock({
+      meta: createStoreMetaMock({ key: 'p:c:k', tags: [] }),
       data: {},
-    };
+    });
     mockGetStoreEntry.mockResolvedValue(envelope);
 
     const { result } = renderHook(() => useStoreEntry('p', 'c', 'k'), {
@@ -114,17 +109,10 @@ describe('store hooks', () => {
   });
 
   it('useCreateOrUpdateStoreEntry: calls createOrUpdateStoreEntry with correct args', async () => {
-    const envelope = {
-      meta: {
-        key: 'p:c:k',
-        type: 'object',
-        version: 1,
-        created_at: '2024-01-01T00:00:00Z',
-        updated_at: '2024-01-01T00:00:00Z',
-        tags: [],
-      },
+    const envelope = createStoreEnvelopeMock({
+      meta: createStoreMetaMock({ key: 'p:c:k', tags: [] }),
       data: { val: 1 },
-    };
+    });
     mockCreateOrUpdateStoreEntry.mockResolvedValue(envelope);
 
     const { result } = renderHook(() => useCreateOrUpdateStoreEntry(), {

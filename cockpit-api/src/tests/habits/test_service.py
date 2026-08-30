@@ -7,6 +7,7 @@ import pytest
 from fastapi import HTTPException
 
 from src.services.habits import service
+from src.tests.factories import make_habit as _make_habit_factory
 
 
 # ---------------------------------------------------------------------------
@@ -14,15 +15,7 @@ from src.services.habits import service
 # ---------------------------------------------------------------------------
 
 def _make_habit(habit_id: uuid.UUID, user_id: uuid.UUID, habit_type: str = "boolean") -> MagicMock:
-    habit = MagicMock()
-    habit.id = habit_id
-    habit.user_id = user_id
-    habit.type = habit_type
-    habit.best_streak = 0
-    habit.streak_mode = "soft"
-    habit.frequency_type = "daily"
-    habit.frequency_value = None
-    return habit
+    return _make_habit_factory(id=habit_id, user_id=user_id, type=habit_type)
 
 
 # ---------------------------------------------------------------------------

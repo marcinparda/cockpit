@@ -1,8 +1,9 @@
 """Integration tests for authentication endpoints."""
-import uuid
 from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from httpx import AsyncClient, ASGITransport
+
+from src.tests.factories import make_user
 
 
 @pytest.fixture
@@ -31,11 +32,7 @@ async def auth_client(auth_app):
 class TestLoginEndpoint:
     async def test_returns_200_on_valid_credentials(self, auth_client):
         client, _ = auth_client
-        mock_user = MagicMock()
-        mock_user.id = uuid.uuid4()
-        mock_user.email = "u@e.com"
-        mock_user.is_active = True
-        mock_user.password_hash = "$2b$04$x"
+        mock_user = make_user(email="u@e.com", password_hash="$2b$04$x")
         with patch("src.services.authentication.sessions.service.users_service.get_user_by_email", AsyncMock(return_value=mock_user)), \
              patch("src.services.authentication.sessions.service.passwords_service.verify_password", return_value=True), \
              patch("src.services.authentication.tokens.service.repository.create_access_token_record", AsyncMock(return_value=MagicMock())), \
@@ -51,11 +48,7 @@ class TestLoginEndpoint:
 
     async def test_sets_access_token_cookie(self, auth_client):
         client, _ = auth_client
-        mock_user = MagicMock()
-        mock_user.id = uuid.uuid4()
-        mock_user.email = "u@e.com"
-        mock_user.is_active = True
-        mock_user.password_hash = "$2b$04$x"
+        mock_user = make_user(email="u@e.com", password_hash="$2b$04$x")
         with patch("src.services.authentication.sessions.service.users_service.get_user_by_email", AsyncMock(return_value=mock_user)), \
              patch("src.services.authentication.sessions.service.passwords_service.verify_password", return_value=True), \
              patch("src.services.authentication.tokens.service.repository.create_access_token_record", AsyncMock(return_value=MagicMock())), \
@@ -81,12 +74,7 @@ class TestMeEndpoint:
         client, _ = auth_client
         from src.main import app
         from src.services.authentication.dependencies import get_current_user
-        mock_user = MagicMock()
-        mock_user.id = uuid.uuid4()
-        mock_user.email = "me@e.com"
-        mock_user.is_active = True
-        mock_user.password_changed = False
-        mock_user.created_at.isoformat.return_value = "2024-01-01T00:00:00"
+        mock_user = make_user(email="me@e.com")
         app.dependency_overrides[get_current_user] = lambda: mock_user
         try:
             response = await client.get("/api/v1/authentication/sessions/me")

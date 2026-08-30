@@ -47,6 +47,7 @@ import * as useFreezeMutationsModule from '../api/hooks/useFreezeMutations';
 import { HeatmapCalendar } from '../components/HeatmapCalendar';
 import { LineBarChart } from '../components/LineBarChart';
 import HabitDetailPage from '../pages/HabitDetailPage';
+import { createHabitMock } from '../mocks/habit';
 
 function makeQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -64,33 +65,25 @@ function withProviders(ui: React.ReactElement, habitId = 'habit-1') {
   );
 }
 
-const mockBooleanHabit = {
+const mockBooleanHabit = createHabitMock({
   id: 'habit-1',
-  name: 'Morning Run',
-  icon: 'Running',
   color: '#22c55e',
-  type: 'boolean' as const,
-  streak_mode: 'soft' as const,
   current_streak: 5,
   best_streak: 10,
-  frequency: 'daily',
-  is_active: true,
-  is_archived: false,
-  sort_order: 0,
-};
+});
 
-const mockNumericHabit = {
+const mockNumericHabit = createHabitMock({
   ...mockBooleanHabit,
   id: 'habit-2',
-  type: 'numeric' as const,
+  type: 'numeric',
   target_value: 30,
-};
+});
 
-const mockTextHabit = {
+const mockTextHabit = createHabitMock({
   ...mockBooleanHabit,
   id: 'habit-3',
-  type: 'text' as const,
-};
+  type: 'text',
+});
 
 describe('HeatmapCalendar', () => {
   it('renders correct number of cells for a 12-week range', () => {

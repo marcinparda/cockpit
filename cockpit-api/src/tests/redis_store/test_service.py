@@ -1,15 +1,10 @@
 """Unit tests for redis_store service."""
-from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastapi import HTTPException
 from src.services.redis_store import service
-from src.services.redis_store.schemas import StoreEnvelope, StoreKeyCreate, StoreKeyPatch, StoreMeta
-
-
-def _envelope(key: str, data: dict, version: int = 1) -> StoreEnvelope:
-    now = datetime.now(timezone.utc)
-    return StoreEnvelope(meta=StoreMeta(key=key, type="json", version=version, created_at=now, updated_at=now, tags=[]), data=data)
+from src.services.redis_store.schemas import StoreKeyCreate, StoreKeyPatch
+from src.tests.factories import make_store_envelope as _envelope
 
 
 class TestBuildRedisKey:

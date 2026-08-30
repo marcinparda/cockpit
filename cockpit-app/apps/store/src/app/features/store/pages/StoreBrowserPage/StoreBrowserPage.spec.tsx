@@ -3,6 +3,8 @@ import { render, screen, act } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import StoreBrowserPage from './StoreBrowserPage';
 import type { StoreEnvelope } from '../../api/schemas';
+import { createStoreEnvelopeMock } from '../../../../../mocks/storeEnvelope';
+import { createStoreMetaMock } from '../../../../../mocks/storeMeta';
 
 vi.mock('@cockpit-app/shared-react-data-access', () => ({
   useUser: vi.fn(),
@@ -65,17 +67,10 @@ function authenticatedUser() {
   mockUseUser.mockReturnValue({ isLoading: false, data: { id: '1', email: 'test@test.com' } });
 }
 
-const sampleEnvelope: StoreEnvelope = {
-  meta: {
-    key: 'pfx:cat:mykey',
-    type: 'object',
-    version: 1,
-    created_at: '2024-01-01T00:00:00Z',
-    updated_at: '2024-01-01T00:00:00Z',
-    tags: [],
-  },
+const sampleEnvelope: StoreEnvelope = createStoreEnvelopeMock({
+  meta: createStoreMetaMock({ key: 'pfx:cat:mykey', tags: [] }),
   data: {},
-};
+});
 
 describe('StoreBrowserPage', () => {
   beforeEach(() => {

@@ -9,14 +9,15 @@ vi.mock('../api/hooks/useCategories', () => ({
 
 import * as useCategoriesModule from '../api/hooks/useCategories';
 import { ManageCategoriesSheet } from '../components/ManageCategoriesSheet';
+import { createCategoryMock } from '../mocks/category';
 
 const mockCreateMutate = vi.fn();
 const mockUpdateMutate = vi.fn();
 const mockDeleteMutate = vi.fn();
 
 const categories = [
-  { id: 'cat-1', name: 'Health', color: '#22c55e' },
-  { id: 'cat-2', name: 'Work', color: null },
+  createCategoryMock({ id: 'cat-1', name: 'Health', color: '#22c55e' }),
+  createCategoryMock({ id: 'cat-2', name: 'Work', color: null }),
 ];
 
 describe('ManageCategoriesSheet', () => {

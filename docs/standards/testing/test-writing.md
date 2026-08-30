@@ -9,6 +9,17 @@ Use descriptive names explaining what's tested and expected (`shouldReturnErrorW
 ### Mock External Dependencies
 Isolate tests by mocking databases, APIs, and external services.
 
+### Mock Data via Factories
+Build entity mock data with `createXMock(overrides)` factory functions, not hand-rolled literals or shared module-level objects.
+
+- One factory per entity, e.g. `mocks/habit.ts` exporting `createHabitMock`.
+- Each call returns a fresh object (no shared references) built from defaults, with `overrides` spread last so they win.
+- Use a random default id (`crypto.randomUUID()` in TS, `uuid4()` in Python) where an id field exists; everything else gets a sensible fixed default. Everything is overridable.
+- Call inline at point of use: `createHabitMock({ type: 'boolean' })`.
+- Python equivalent: a `make_x(**overrides)` function in `tests/factories.py`, same rules — fresh object per call, overrides win.
+- Existing factories: `cockpit-api/src/tests/factories.py`; `cockpit-app/apps/{habits,cv,store}/src/mocks/`.
+- For a one-off single-field override with no reuse, a plain object literal is fine — don't force a factory for it.
+
 ### Fast Execution
 Keep unit tests fast (milliseconds) so developers run them frequently.
 

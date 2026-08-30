@@ -1,25 +1,11 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { EducationEditor } from './EducationEditor';
-import type { CVData } from '../../../types/cv.types';
+import { createCVDataMock } from '../../../mocks/cvData';
 
-const baseCVData: CVData = {
-  header: {
-    name: '',
-    title: '',
-    phone: '',
-    email: '',
-    linkedin: { url: '' },
-    location: '',
-  },
-  summary: [],
-  skills: [],
-  achievements: [],
-  experience: [],
+const baseCVData = createCVDataMock({
   education: [{ degree: 'B.Sc. CS', university: 'AGH', years: '2018-2022' }],
-  personalProjects: [],
-  courses: [],
-};
+});
 
 describe('EducationEditor', () => {
   it('renders Degree, University, and Years inputs', () => {

@@ -1,5 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import { getCVData, putCVData } from './cvStoreApi';
+import { createEnvelopeMock } from '../mocks/envelope';
 
 const { mockGetRequest, mockPutRequest } = vi.hoisted(() => ({
   mockGetRequest: vi.fn(),
@@ -13,10 +14,7 @@ vi.mock('@cockpit-app/common-shared-data-access', () => ({
   },
 }));
 
-const mockEnvelope = {
-  meta: { key: 'k', type: 't', version: 1, created_at: '', updated_at: '', tags: [] },
-  data: { name: 'test' },
-};
+const mockEnvelope = createEnvelopeMock({ data: { name: 'test' } });
 
 describe('cvStoreApi', () => {
   beforeEach(() => {
@@ -44,7 +42,6 @@ describe('cvStoreApi', () => {
       header: {}, summary: {}, skills: {}, achievements: {},
       experience: {}, education: {}, personalProjects: {}, courses: {},
     } as never;
-
     await putCVData(mockCVData, 'base');
     expect(mockPutRequest).toHaveBeenCalledWith(
       expect.stringContaining('/api/v1/store/base/cv/'),
