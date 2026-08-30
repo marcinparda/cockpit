@@ -11,6 +11,7 @@ cockpit-app/dist/
 cockpit-app/tmp/
 cockpit-app/.nx/cache/
 
-.claude
+.claude/*
+!.claude/skills
 .mypy_cache
 .playwright-mcp
