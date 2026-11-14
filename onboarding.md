@@ -1,36 +1,48 @@
 # AI SDLC — Onboarding
 
-For new/returning devs (human or AI) working in this repo. Explains how AI is used here, what's available, and how to run the dev loop for a new feature/fix.
+For new/returning devs (human or AI) working in this repo. Work is tracked in **GitHub Issues** and driven by Matt Pocock's skills. No process-owning plugin, no task files in the repo. Decision record: [`docs/adr/0001-github-issues-as-work-tracker.md`](docs/adr/0001-github-issues-as-work-tracker.md).
 
-## Why this exists
+## What lives where
 
-This repo used to run on the Maister Claude Code plugin for standards + task orchestration. It's been replaced with a lightweight, repo-owned setup modeled on Matt Pocock's AI coding workflow: small composable skills instead of a process-owning framework, plain markdown instead of plugin-internal state, everything versioned in the repo instead of living in plugin config.
+| Where | What |
+|---|---|
+| GitHub Issues (`marcinparda/cockpit`) | Specs, tickets, bugs, progress, finished-work history |
+| `CONTEXT.md` (root, created lazily) | Domain glossary only, no implementation detail |
+| `docs/adr/` | Hard-to-reverse decisions that were a real trade-off |
+| `docs/standards/` | All "how to write code here" rules |
+| `docs/projects/`, `docs/backend/`, `docs/deployment/` | Facts about apps, the API, deployment |
+| `docs/agents/` | Config the skills read: issue tracker, triage labels, domain-doc layout |
+| `AGENTS.md` (root, `cockpit-api/`, `cockpit-app/`) | Pointer files: what a module is, links into `docs/` |
 
-## How AI is configured here
-
-- **`AGENTS.md`** — one per module (root, `cockpit-api/`, `cockpit-app/`). Each only describes what that module _is_ (purpose, stack, ports) and points to reference docs in `docs/`. Claude Code reads these natively; loaded root-first, module files pulled in only when you're working in that area.
-- **`docs/standards/`** — all "how to write code here" rules: coding style, architecture, testing, per-domain (global/frontend/backend/testing). Start at [`AGENTS.md`](docs/standards/AGENTS.md). This is the _only_ place conventions live — module `AGENTS.md` files never duplicate this.
-- **`docs/projects/`** — per-app/service facts (not conventions). `cockpit/` covers the whole monorepo + main app (vision, tech stack, architecture); sibling folders (`cv/`, `habits/`, `login/`, `store/`, `litellm/`, `actual/`, `vikunja/`) each describe one other app or external service.
-- **`docs/tasks/`** — history of every task worked on, spec → plan → work-log per task. Old maister-era tasks were migrated here too (see below).
-- **`docs/backend/`** — reference docs specific to `cockpit-api/` (architecture detail, MCP server, upstream API specs, dev commands).
-- **`docs/CONTRIBUTING.md`** — where new documentation belongs and how to slice it into the right folder. Read this before adding any new file under `docs/`.
-- **`.claude/skills/`** — the workflow skills (below).
+Old task history (`docs/tasks/`, maister era) was backfilled as closed issues labelled `archive` (#78–#83). Originals: git tag `pre-github-workflow`. Vikunja is for personal/household tasks only, not repo work.
 
 ## Skills
 
-| Skill                     | When                                     | Does                                                                                                                            |
-| ------------------------- | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------|
-| `cockpit-read-docs`       | Start of any task touching code or docs  | Finds and reads the `docs/` content relevant to the current job, starting at `docs/AGENTS.md`                                  |
-| `cockpit-develop-feature` | Starting any non-trivial feature/change  | Orchestrates the full SDLC below end to end                                                                                    |
-| `cockpit-fix-bug`         | Starting a bug fix                       | Orchestrates the (lighter) bug-fix SDLC end to end                                                                             |
-| `cockpit-grill-me`        | Start of any non-trivial task            | Interrogates requirements, exposes hidden decisions, writes `spec.md`                                                          |
-| `cockpit-plan-slices`     | After cockpit-grill-me                   | Breaks spec into small vertical-slice (tracer bullet) issues, writes `plan.md`                                                 |
-| `cockpit-fresh-review`    | After implementation                     | Reviews the diff against spec/plan in a **clean session** (not the one that wrote the code), appends findings to `work-log.md` |
+Matt Pocock's skills are vendored in [`.claude/skills/`](.claude/skills/README.md), so any clone has them. Some are user-only: type `/name` yourself.
 
-## Task types
+| Step | Skill | Result |
+|---|---|---|
+| Stress-test an idea, build the domain model | `/grill-with-docs` (or `/grilling` for plain interrogation) | decisions, updates `CONTEXT.md` and ADRs |
+| Write the spec | `/to-spec` | spec issue on GitHub |
+| Slice it | `/to-tickets` | tracer-bullet ticket issues with blocking links |
+| Sort incoming issues | `/triage` | triage labels applied |
+| Build | `/implement` (drives `/tdd`, ends with `/code-review`) | commits on a branch |
+| Review | `/code-review` | standards + spec review of the diff |
+| Hard bug | `/diagnosing-bugs` | root cause, regression test |
+| Big, fuzzy chunk of work | `/wayfinder` | map issue + decision tickets |
+| Not sure which | `/ask-matt` | router |
 
-`docs/tasks/<type>/` — use whichever type fits: `development` (new features/fixes), `migration` (rewrites/moves), `product-design` (exploratory/pre-spec work). Add new types as needed — this isn't enforced by tooling, just convention.
+Also available: `/prototype`, `/research`, `/codebase-design`, `/improve-codebase-architecture`, `/resolving-merge-conflicts`, `/handoff`.
 
-## What got migrated from maister
+## The loop
 
-Existing task history (habit-tracker-app development, store-angular-to-react migration, locked-package-json-versions, habit-tracker-app product-design) was copied into `docs/tasks/` as-is — spec/plan/work-log/verification content kept, maister's internal `orchestrator-state.yml` files dropped (meaningless without the plugin). These are read as history/reference, not as templates — new tasks follow the simpler spec→plan→work-log structure above.
+1. Idea or bug → `/grill-with-docs` (new feature) or `/diagnosing-bugs` (bug).
+2. `/to-spec`, then `/to-tickets`. Tickets that are fully specified get `ready-for-agent`.
+3. `/implement #<ticket>` per ticket: TDD, PR with `Closes #<n>`.
+4. `/code-review`, merge. The issue closes itself; the issue thread is the work log.
+
+Before touching code, read the relevant `AGENTS.md` and `docs/standards/` for the domain (see [`docs/AGENTS.md`](docs/AGENTS.md)).
+
+## Working from a phone
+
+Start a Claude Code session on the repo from the Claude app, then type e.g. `/implement #123` or `/to-spec` with your idea. The skills come from the repo's `.claude/skills/`. Agents start only when you start a session; nothing picks up `ready-for-agent` issues on its own yet.
