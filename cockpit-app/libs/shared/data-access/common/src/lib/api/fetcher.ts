@@ -14,6 +14,21 @@ interface FetcherArgs<ResponseData> {
   withCredentials?: boolean;
 }
 
+let refreshPromise: Promise<unknown> | null = null;
+
+/**
+ * Refresh tokens are single-use, so parallel 401s must share one refresh call.
+ * Otherwise the losers present an already-revoked token and get logged out.
+ */
+function refreshOnce(): Promise<unknown> {
+  if (!refreshPromise) {
+    refreshPromise = refreshAccessToken().finally(() => {
+      refreshPromise = null;
+    });
+  }
+  return refreshPromise;
+}
+
 export async function fetcher<ResponseData>({
   url,
   responseDataSchema,
@@ -28,7 +43,7 @@ export async function fetcher<ResponseData>({
 
   if (response.status === 401) {
     try {
-      await refreshAccessToken();
+      await refreshOnce();
       return fetcher({
         url,
         responseDataSchema,

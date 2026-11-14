@@ -128,4 +128,44 @@ describe('fetcher', () => {
     const calledOptions = fetchMock.mock.calls[0][1];
     expect(calledOptions.credentials).toBeUndefined();
   });
+
+  it('should call refreshAccessToken once when parallel requests all get 401', async () => {
+    const schema = z.object({ id: z.number() });
+    const calls = new Map<string, number>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async (url: string) => {
+        const n = (calls.get(url) ?? 0) + 1;
+        calls.set(url, n);
+        return n === 1 ? makeResponse(401, undefined, false) : makeResponse(200, { id: 1 });
+      }),
+    );
+    mockRefreshAccessToken.mockImplementation(
+      () => new Promise((resolve) => setTimeout(resolve, 10)),
+    );
+
+    const results = await Promise.all(
+      ['/a', '/b', '/c'].map((url) => fetcher({ url, responseDataSchema: schema })),
+    );
+
+    expect(results).toEqual([{ id: 1 }, { id: 1 }, { id: 1 }]);
+    expect(mockRefreshAccessToken).toHaveBeenCalledTimes(1);
+    expect(mockLogout).not.toHaveBeenCalled();
+  });
+
+  it('should start a new refresh after the previous one settled', async () => {
+    const schema = z.object({ id: z.number() });
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(makeResponse(401, undefined, false))
+      .mockResolvedValueOnce(makeResponse(200, { id: 1 }))
+      .mockResolvedValueOnce(makeResponse(401, undefined, false))
+      .mockResolvedValueOnce(makeResponse(200, { id: 2 }));
+    vi.stubGlobal('fetch', fetchMock);
+    mockRefreshAccessToken.mockResolvedValue(undefined);
+
+    await fetcher({ url: '/a', responseDataSchema: schema });
+    await fetcher({ url: '/b', responseDataSchema: schema });
+
+    expect(mockRefreshAccessToken).toHaveBeenCalledTimes(2);
+  });
 });
