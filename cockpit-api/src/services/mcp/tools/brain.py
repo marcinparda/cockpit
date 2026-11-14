@@ -103,7 +103,7 @@ def _err(exc: BrainError) -> CallToolResult:
     )
 
 
-def _safe[**P](fn: Callable[P, Awaitable[Any]]) -> Callable[P, Awaitable[Any]]:
+def _safe[**P](fn: Callable[P, Awaitable[Any]]) -> Callable[P, Awaitable[Any]]:  # Any: see _ok
     """Decorator: turn BrainError and validation errors into structured error results instead of raising."""
 
     @functools.wraps(fn)
