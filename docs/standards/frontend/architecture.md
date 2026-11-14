@@ -64,7 +64,7 @@ cockpit-app/
     └── shared/utils/                  # environments, cn(), logger, predicates
 ```
 
-Note: `store` was migrated from Angular 19 to React 19 (see `docs/tasks/migrations/2026-05-21-store-angular-to-react/`) — all apps are React except `cv`, which is Vue 3.5 + Pinia.
+Note: `store` was migrated from Angular 19 to React 19 (see GitHub issue #81) — all apps are React except `cv`, which is Vue 3.5 + Pinia.
 
 ### State Management by App
 

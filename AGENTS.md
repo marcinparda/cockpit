@@ -11,7 +11,7 @@ Root `Makefile` wraps both projects. Read it when you need to run some commands.
 
 ## Documentation
 
-All docs live under [`docs/`](docs/). See [`docs/AGENTS.md`](docs/AGENTS.md) for high-level map of what's inside (standards, projects, backend, deployment, tasks, ontology) and [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for where new documentation belongs and how to slice it into the right folder. Use the `cockpit-read-docs` skill to find and read the docs relevant to the job at hand before acting.
+All docs live under [`docs/`](docs/). See [`docs/AGENTS.md`](docs/AGENTS.md) for high-level map of what's inside (standards, projects, backend, deployment, agents, adr, ontology) and [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for where new documentation belongs and how to slice it into the right folder.
 
 Module `AGENTS.md` files (this file, `cockpit-api/AGENTS.md`, `cockpit-app/AGENTS.md`) only describe what each module _is_ — its purpose, frameworks, ports, and pointers into `docs/`. All coding conventions and "how to write code here" rules live in `docs/standards/` — check there first, don't duplicate rules per-module.
 
@@ -19,6 +19,18 @@ If you notice a recurring pattern, fix, or convention during implementation that
 
 ## AI Workflow
 
-New/returning to this repo? Read [`onboarding.md`](onboarding.md) — explains the AI SDLC, available skills, and task workflow. Task history lives in [`docs/tasks/`](docs/tasks/). (Must-read for agents)
+Work is tracked in **GitHub Issues** (`marcinparda/cockpit`), driven by the Matt Pocock skills (vendored in `.claude/skills/`). Read [`onboarding.md`](onboarding.md) for the flow. Past task history lives in closed issues labelled `archive` (originals at git tag `pre-github-workflow`).
 
-Skills: `cockpit-read-docs`, `cockpit-grill-me`, `cockpit-plan-slices`, `cockpit-fresh-review`, `cockpit-develop-feature`, `cockpit-fix-bug` — all under `cockpit-` prefix.
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues via `gh`. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default five-label vocabulary (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.

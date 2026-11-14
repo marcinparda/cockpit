@@ -12,7 +12,8 @@ Where a new doc file goes in `docs/`, and what belongs in it. Read before adding
 | `docs/projects/<name>/` | Facts about one app/service: what it is, its purpose, ports, stack. `cockpit/` covers the whole monorepo + main app (vision, tech stack, architecture); every other app/service (`cv/`, `habits/`, `login/`, `store/`, `litellm/`, `actual/`, `vikunja/`) gets its own sibling folder | Coding conventions (→ `standards/`) |
 | `docs/backend/` | `cockpit-api`-specific reference docs: detailed architecture, MCP server, upstream API specs, dev commands | General backend conventions (→ `standards/backend/`) |
 | `docs/deployment/` | CI/CD, production stack, secrets — deployment mechanics that apply repo-wide | Per-app Dockerfile conventions (→ `standards/global/containers.md`) |
-| `docs/tasks/` | Per-task history: `spec.md` → `plan.md` → `work-log.md`, one folder per task | Standing conventions (→ `standards/`) |
+| `docs/agents/` | Config for the engineering skills (issue tracker, triage labels, domain-doc layout) | Task/spec content (→ GitHub Issues) |
+| `docs/adr/` | Architecture Decision Records: hard-to-reverse, surprising, real trade-off | Routine decisions, task logs |
 | `docs/ontology/` | Ontology/graph config artifacts (scripts, seed data, JSON) | — |
 
 Module `AGENTS.md` files (root, `cockpit-api/AGENTS.md`, `cockpit-app/AGENTS.md`) are *not* documentation — they're short pointer files. They may only state what a module is (purpose, stack, ports) and link into `docs/`. Never write conventions or "how to write code here" content directly into an `AGENTS.md` — that always goes in `docs/standards/`.
@@ -25,7 +26,7 @@ Ask, in order:
 2. **Is it a fact about the whole project/monorepo (why it exists, what stack, what it's for) or about the main `cockpit` app specifically?** → `docs/projects/cockpit/`.
 3. **Is it a fact specific to one other app or external service** (ports, purpose, integration points)? → `docs/projects/<name>/` (e.g. `docs/projects/habits/`, `docs/projects/vikunja/`). For deeper module-specific reference docs beyond a short README (endpoint lists, MCP tool catalogues) — e.g. `cockpit-api` — those live in a dedicated top-level folder instead (`docs/backend/`).
 4. **Is it about deploying/running the whole repo in production?** → `docs/deployment/`.
-5. **Is it the record of one specific task's work?** → `docs/tasks/<type>/<date>-<slug>/`, per the `cockpit-grill-me` → `cockpit-plan-slices` → `cockpit-fresh-review` flow in [`onboarding.md`](../onboarding.md).
+5. **Is it the spec, plan, progress or outcome of one specific task?** → not a file: it belongs in a GitHub issue (see [`onboarding.md`](../onboarding.md)). A hard-to-reverse decision that came out of it → `docs/adr/`; a domain term → root `CONTEXT.md`.
 
 If a new file doesn't fit any existing folder, that's a signal to think about the split before adding one — don't create a folder for a single one-off file when an existing one already covers the domain.
 
