@@ -6,10 +6,10 @@ import threading
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 from src.services.brain import frontmatter_io as fio
 from src.services.brain.errors import BrainError
+from src.services.brain.json_types import JsonMap, JsonValue
 from src.services.brain.links import Link, extract_body_links, extract_property_links
 from src.services.brain.paths import iter_note_files
 
@@ -21,18 +21,20 @@ _UPDATED_KEYS = ("updated", "updated_at", "modified")
 
 
 def version_of(data: bytes | str) -> str:
+    """Short content hash of a note's bytes; the optimistic-concurrency token exposed as `version`."""
     raw = data.encode("utf-8") if isinstance(data, str) else data
     return hashlib.sha256(raw).hexdigest()[:16]
 
 
 @dataclass
 class NoteRecord:
+    """Everything parsed from one note file (cached by mtime): metadata, frontmatter, timestamps with sources, version, links."""
     path: str
     title: str
     type: str
     tags: list[str]
     aliases: list[str]
-    all_props: dict[str, Any]
+    all_props: JsonMap
     created_at: datetime
     created_source: str
     updated_at: datetime
@@ -42,11 +44,13 @@ class NoteRecord:
     parse_error: str | None = None
 
     @property
-    def properties(self) -> dict[str, Any]:
+    def properties(self) -> JsonMap:
+        """Frontmatter keys not already surfaced as dedicated fields (title, tags, type, aliases)."""
         return {k: v for k, v in self.all_props.items() if k not in SURFACED}
 
 
-def _as_list(value: Any) -> list[str]:
+def _as_list(value: JsonValue) -> list[str]:
+    """Normalize a tags/aliases value (list, comma/space-separated string or scalar) to a list of strings."""
     if value is None:
         return []
     if isinstance(value, (list, tuple)):
@@ -56,7 +60,8 @@ def _as_list(value: Any) -> list[str]:
     return [str(value)]
 
 
-def _parse_dt(value: Any) -> datetime | None:
+def _parse_dt(value: JsonValue) -> datetime | None:
+    """Parse an ISO date/datetime value to an aware UTC datetime, or None if it is not one."""
     if value is None or isinstance(value, bool):
         return None
     try:
@@ -66,7 +71,8 @@ def _parse_dt(value: Any) -> datetime | None:
     return dtv if dtv.tzinfo else dtv.replace(tzinfo=timezone.utc)
 
 
-def _frontmatter_time(props: dict[str, Any], keys: tuple[str, ...]) -> datetime | None:
+def _frontmatter_time(props: JsonMap, keys: tuple[str, ...]) -> datetime | None:
+    """First parseable timestamp among `keys` in the frontmatter, or None."""
     for k in keys:
         dtv = _parse_dt(props.get(k))
         if dtv:
@@ -75,10 +81,11 @@ def _frontmatter_time(props: dict[str, Any], keys: tuple[str, ...]) -> datetime 
 
 
 def build_record(rel: str, data: bytes, st: os.stat_result) -> NoteRecord:
+    """Parse one note file's bytes and stat into a NoteRecord (timestamps: frontmatter first, then file times)."""
     text = data.decode("utf-8")
     parts = fio.split_document(text)
     error = None
-    props: dict[str, Any] = {}
+    props: JsonMap = {}
     if parts.has_fm:
         try:
             props = fio.parse_properties(parts.fm)
@@ -113,6 +120,7 @@ _cache_lock = threading.Lock()
 
 
 def invalidate(root: str, rel: str | None = None) -> None:
+    """Drop cached records for one note (or the whole vault when `rel` is None) after a write."""
     with _cache_lock:
         if rel is None:
             _cache.pop(root, None)
@@ -121,6 +129,7 @@ def invalidate(root: str, rel: str | None = None) -> None:
 
 
 def read_record(root: str, rel: str) -> NoteRecord:
+    """Parse a note fresh from disk and refresh its cache entry."""
     full = Path(root) / rel
     st = full.stat()
     rec = build_record(rel, full.read_bytes(), st)

@@ -9,6 +9,7 @@ TRASH_DIR = ".trash"
 
 
 def _invalid(path: str, reason: str) -> BrainError:
+    """Build the `invalid_path` error for `path` with a human-readable reason."""
     return BrainError("invalid_path", f"Invalid path {path!r}: {reason}", {"path": path, "reason": reason})
 
 

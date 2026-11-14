@@ -25,6 +25,14 @@ Assumed by me:
 15. `brain_query_notes` extra op `contains`; `null`/empty/missing all count as "missing".
 16. REST router untouched except a `BrainError` → HTTP handler in `main.py`; new fields flow in via shared schemas.
 
+## Follow-up: typing and docstrings (PR review)
+
+- Replaced `Any` in `links.py`, `frontmatter_io.py`, `errors.py`, `notes_index.py` and `service.py` with recursive `JsonValue`/`JsonMap` aliases (`brain/json_types.py`, PEP 695). mypy on the brain package went from errors to clean, except `router.py:41` (existed before this work, FastAPI `= ...` default idiom).
+- `Any` remains only as `JsonPayload` (pydantic/MCP-facing schemas and tool signatures), because pydantic renders the recursive alias as `$defs/$ref` in every tool schema; the reason is commented at its definition. `_ok`/`_safe` return `Any` with a comment (tools are annotated with their output model so FastMCP derives `outputSchema`, but return `CallToolResult`).
+- `NoteOut` is now an explicit class instead of `create_model`.
+- `patch_note` takes `list[Edit]`.
+- New standards: "Avoid `Any`" in `docs/standards/backend/python.md`, "Docstring every function whose name isn't explicit" in `docs/standards/global/commenting.md`. Applied to every function/class in the PR's brain modules and MCP tool file (AST check: only `__init__`, `get_note`, `list_notes`, `list_folders`, `create_note`, `append_to_section`, `search_notes`, `NoteCreate`, `FolderTree` have none, by the "explicit name" exemption).
+
 ## Check and report (answers)
 
 - **Auth on `/mcp`:** Bearer token = static `MCP_API_KEY` (`==` compare, not constant time) or OAuth access token (PKCE S256, exact redirect_uri match, expiry/revocation checked). Weak points (NOT changed, separate task): open dynamic client registration (`POST /oauth/clients`, no auth); login form interpolates `state/scope/client_id/redirect_uri` unescaped into HTML (reflected XSS) and `state` is not URL-encoded in the redirect; `/oauth/authorize` password attempts only get the generic 100/min rate limit; OAuth tokens are not scope-limited and MCP ignores the per-feature permissions the REST API enforces, so any valid token reaches finances, tasks and notes; access tokens appear to be looked up by raw value (likely stored unhashed — not verified).

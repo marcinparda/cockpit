@@ -9,18 +9,19 @@ import threading
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any
 
 from src.services.brain import body_edit
 from src.services.brain import frontmatter_io as fio
 from src.services.brain import notes_index
 from src.services.brain import search as search_index
+from src.services.brain.json_types import JsonMap, JsonValue, as_json_list
 from src.services.brain.errors import BrainError, NoteExists, NoteNotFound
 from src.services.brain.links import LinkResolver
 from src.services.brain.notes_index import NoteRecord, version_of
 from src.services.brain.paths import TRASH_DIR, iter_note_files, normalize_folder, resolve_note
 from src.services.brain.schemas import (
     Note,
+    Edit,
     NoteCreate,
     NoteMeta,
     NoteOp,
@@ -43,6 +44,7 @@ MAX_LIMIT = 500
 # ---------------------------------------------------------------- records → schemas
 
 def _to_meta(rec: NoteRecord) -> NoteMeta:
+    """NoteRecord → NoteMeta (no body)."""
     return NoteMeta(
         path=rec.path, title=rec.title, tags=rec.tags, type=rec.type, aliases=rec.aliases,
         created_at=rec.created_at, updated_at=rec.updated_at,
@@ -51,11 +53,13 @@ def _to_meta(rec: NoteRecord) -> NoteMeta:
 
 
 def _to_note(rec: NoteRecord, text: str) -> Note:
+    """NoteRecord + file text → Note with trimmed body and the extra frontmatter properties."""
     body = fio.split_document(text).rest.strip()
     return Note(**_to_meta(rec).model_dump(), body=body, properties=rec.properties)
 
 
 def _read_text(full: Path) -> str | None:
+    """Read a note as UTF-8 text; None if the file does not exist."""
     try:
         return full.read_bytes().decode("utf-8")
     except FileNotFoundError:
@@ -76,10 +80,12 @@ async def get_note(notes_path: str, path: str) -> Note:
 
 
 def _scan(notes_path: str) -> list[NoteRecord]:
+    """All note records of the vault (cached by mtime)."""
     return notes_index.scan(notes_path)
 
 
 def _in_folder(rel: str, folder: str) -> bool:
+    """True if `rel` is inside `folder` (recursive prefix on a segment boundary; empty folder = whole vault)."""
     return not folder or rel.startswith(folder + "/")
 
 
@@ -93,13 +99,15 @@ async def list_notes(notes_path: str, path_filter: str | None, type_filter: str 
     ]
 
 
-def _builtin(rec: NoteRecord, name: str) -> Any:
+def _builtin(rec: NoteRecord, name: str) -> JsonValue:
+    """Value of a built-in note field, datetimes as ISO strings."""
     if name in ("created_at", "updated_at"):
         return getattr(rec, name).isoformat()
     return getattr(rec, name)
 
 
-def _get_field(rec: NoteRecord, name: str) -> tuple[bool, Any]:
+def _get_field(rec: NoteRecord, name: str) -> tuple[bool, JsonValue]:
+    """(present, value) for a built-in field or a frontmatter key."""
     if name in BUILTIN_FIELDS:
         return True, _builtin(rec, name)
     if name in rec.all_props:
@@ -107,7 +115,8 @@ def _get_field(rec: NoteRecord, name: str) -> tuple[bool, Any]:
     return False, None
 
 
-def _num(v: Any) -> float | None:
+def _num(v: JsonValue) -> float | None:
+    """Number for numeric comparison, or None if the value is not numeric (bools excluded)."""
     if isinstance(v, bool):
         return None
     if isinstance(v, (int, float)):
@@ -120,7 +129,8 @@ def _num(v: Any) -> float | None:
     return None
 
 
-def _compare(actual: Any, expected: Any, op: str) -> bool:
+def _compare(actual: JsonValue, expected: JsonValue, op: str) -> bool:
+    """lt/gt comparison: numeric when both sides are numbers, string order for two strings, otherwise never matches."""
     a, e = _num(actual), _num(expected)
     if a is not None and e is not None and not (isinstance(actual, str) and isinstance(expected, str)):
         return a < e if op == "lt" else a > e
@@ -129,7 +139,7 @@ def _compare(actual: Any, expected: Any, op: str) -> bool:
     return False
 
 
-def _eq(a: Any, b: Any) -> bool:
+def _eq(a: JsonValue, b: JsonValue) -> bool:
     """Type-aware equality: 3 == 3.0, but "3" != 3 and True != 1."""
     if isinstance(a, bool) or isinstance(b, bool):
         return isinstance(a, bool) and isinstance(b, bool) and a == b
@@ -139,6 +149,7 @@ def _eq(a: Any, b: Any) -> bool:
 
 
 def _matches(rec: NoteRecord, cond: PropertyCondition) -> bool:
+    """Evaluate one query condition against a note."""
     present, actual = _get_field(rec, cond.key)
     empty = (not present) or actual is None or actual == "" or actual == []
     op = cond.op
@@ -167,10 +178,12 @@ def _matches(rec: NoteRecord, cond: PropertyCondition) -> bool:
 
 
 def _encode_cursor(after: str) -> str:
+    """Opaque pagination cursor holding the last returned path."""
     return base64.urlsafe_b64encode(json.dumps({"after": after}).encode()).decode()
 
 
 def _decode_cursor(cursor: str) -> str:
+    """Last path stored in a cursor; a malformed cursor raises `invalid_cursor`."""
     try:
         return json.loads(base64.urlsafe_b64decode(cursor.encode()))["after"]
     except Exception as e:
@@ -186,7 +199,8 @@ async def query_notes(
     fields: list[str] | None = None,
     limit: int | None = None,
     cursor: str | None = None,
-) -> dict[str, Any]:
+) -> JsonMap:
+    """Filter notes by folder/type/tag/conditions and return one page of projected fields: {items, next_cursor, total}."""
     folder_n = normalize_folder(folder or "")
     limit_n = max(1, min(limit or DEFAULT_LIMIT, MAX_LIMIT))
     fields_n = fields or DEFAULT_FIELDS
@@ -205,12 +219,12 @@ async def query_notes(
     page = page[:limit_n]
     items = []
     for r in page:
-        row: dict[str, Any] = {"path": r.path}
+        row: JsonMap = {"path": r.path}
         for f in fields_n:
             row[f] = _get_field(r, f)[1]
         items.append(row)
     return {
-        "items": items,
+        "items": as_json_list(items),
         "next_cursor": _encode_cursor(page[-1].path) if has_more and page else None,
         "total": len(matched),
     }
@@ -218,6 +232,7 @@ async def query_notes(
 
 async def list_folders(notes_path: str) -> list[str]:
     def work() -> list[str]:
+        """Folder paths that contain notes, sorted."""
         folders = set()
         for _full, rel in iter_note_files(notes_path):
             if "/" in rel:
@@ -230,10 +245,12 @@ async def list_folders(notes_path: str) -> list[str]:
 # ---------------------------------------------------------------- link graph
 
 def _resolver(records: list[NoteRecord]) -> LinkResolver:
+    """Link resolver built from the given records."""
     return LinkResolver((r.path, r.title, r.aliases) for r in records)
 
 
-async def resolve_link(notes_path: str, link: str, from_path: str | None = None) -> dict[str, Any]:
+async def resolve_link(notes_path: str, link: str, from_path: str | None = None) -> JsonMap:
+    """Resolve a wikilink/title/alias to a note path (see LinkResolver.resolve)."""
     records = await asyncio.to_thread(_scan, notes_path)
     res = _resolver(records).resolve(link, from_path)
     by_path = {r.path: r for r in records}
@@ -243,11 +260,12 @@ async def resolve_link(notes_path: str, link: str, from_path: str | None = None)
         "title": by_path[res.path].title if res.path else None,
         "resolved_by": res.resolved_by,
         "ambiguous": res.ambiguous,
-        "matches": res.matches,
+        "matches": as_json_list(res.matches),
     }
 
 
-async def get_links(notes_path: str, path: str, direction: str = "both") -> dict[str, Any]:
+async def get_links(notes_path: str, path: str, direction: str = "both") -> JsonMap:
+    """Outgoing links and backlinks of one note, including links inside frontmatter values."""
     if direction not in ("out", "in", "both"):
         raise BrainError("invalid_op", "direction must be 'out', 'in' or 'both'", {"direction": direction})
     _full, rel = resolve_note(notes_path, path)
@@ -256,8 +274,8 @@ async def get_links(notes_path: str, path: str, direction: str = "both") -> dict
     if rel not in by_path:
         raise NoteNotFound(rel)
     resolver = _resolver(records)
-    out: list[dict[str, Any]] = []
-    incoming: list[dict[str, Any]] = []
+    out: list[JsonValue] = []
+    incoming: list[JsonValue] = []
     if direction in ("out", "both"):
         seen = set()
         for link in by_path[rel].links:
@@ -285,6 +303,7 @@ async def get_links(notes_path: str, path: str, direction: str = "both") -> dict
 # ---------------------------------------------------------------- writes (atomic batch)
 
 def _check_version(op: NoteOp, text: str, rel: str) -> None:
+    """Raise `version_conflict` (carrying the current content) when `if_version` no longer matches the file."""
     if op.if_version and op.if_version != version_of(text):
         raise BrainError(
             "version_conflict",
@@ -293,7 +312,8 @@ def _check_version(op: NoteOp, text: str, rel: str) -> None:
         )
 
 
-def _bump_updated(text: str, set_props: dict[str, Any]) -> dict[str, Any]:
+def _bump_updated(text: str, set_props: JsonMap) -> JsonMap:
+    """Add a fresh `updated`/`updated_at` to `set_props` only if the note already has such a key."""
     parts = fio.split_document(text)
     if not parts.has_fm:
         return set_props
@@ -308,29 +328,36 @@ def _bump_updated(text: str, set_props: dict[str, Any]) -> dict[str, Any]:
     return set_props
 
 
-def _validate_props(props: dict[str, Any] | None) -> dict[str, Any]:
+def _validate_props(props: JsonMap | None) -> JsonMap:
+    """Reject `properties` that use keys with dedicated parameters (title/type/tags/aliases)."""
     props = props or {}
     clash = [k for k in props if k in RESERVED_KEYS]
     if clash:
-        raise BrainError("invalid_op", f"Use the dedicated parameters for {clash}, not properties", {"keys": clash})
+        raise BrainError("invalid_op", f"Use the dedicated parameters for {clash}, not properties", {"keys": as_json_list(clash)})
     return props
 
 
 def _new_note_text(op: NoteOp) -> str:
+    """File text for a `create` op: frontmatter (including `created`) plus body."""
     if op.title is None or op.body is None:
         raise BrainError("invalid_op", "create requires title and body")
     props = _validate_props(op.properties)
-    base: dict[str, Any] = {"title": op.title, "type": op.type or "note", "tags": op.tags or [], "aliases": op.aliases or []}
+    base: JsonMap = {"title": op.title, "type": op.type or "note",
+                 "tags": as_json_list(op.tags or []), "aliases": as_json_list(op.aliases or [])}
     if "created" not in props and "created_at" not in props:
         base["created"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     return fio.update_text("", {**base, **props}, [], op.body)
 
 
 def _edit_text(op: NoteOp, text: str) -> str:
+    """New file text for an update/patch/append op; refreshes `updated` when the content changed."""
     set_props = _validate_props(op.properties)
     remove = list(op.remove_properties or [])
     if op.op == "update":
-        direct = {k: v for k, v in (("title", op.title), ("type", op.type), ("tags", op.tags), ("aliases", op.aliases)) if v is not None}
+        direct: JsonMap = {}
+        for key, value in (("title", op.title), ("type", op.type), ("tags", op.tags), ("aliases", op.aliases)):
+            if value is not None:
+                direct[key] = as_json_list(value) if isinstance(value, list) else value
         set_props = {**direct, **set_props}
         new = fio.update_text(text, set_props, remove, op.body)
     elif op.op == "patch":
@@ -351,6 +378,7 @@ def _edit_text(op: NoteOp, text: str) -> str:
 
 
 def _atomic_write(full: Path, data: bytes) -> None:
+    """Write bytes via a temp file + rename so readers never see a half-written note."""
     tmp = full.with_name(f".{full.name}.tmp-{uuid.uuid4().hex[:8]}")
     try:
         tmp.write_bytes(data)
@@ -361,6 +389,7 @@ def _atomic_write(full: Path, data: bytes) -> None:
 
 
 def _trash_destination(root: str, rel: str) -> Path:
+    """Free path under `.trash/` for a deleted note (timestamp suffix on a name collision)."""
     dest = Path(root) / TRASH_DIR / rel
     if dest.exists():
         stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
@@ -368,14 +397,15 @@ def _trash_destination(root: str, rel: str) -> Path:
     return dest
 
 
-def _apply_ops_sync(root: str, ops: list[NoteOp]) -> list[dict[str, Any]]:
+def _apply_ops_sync(root: str, ops: list[NoteOp]) -> list[JsonMap]:
+    """Core of all writes, under a process-wide lock: validate every op in memory, re-check disk, write, roll back on any failure."""
     if not ops:
         raise BrainError("invalid_op", "ops is empty")
     with _write_lock:
         original: dict[str, str | None] = {}
         overlay: dict[str, str | None] = {}
         fulls: dict[str, Path] = {}
-        results: list[dict[str, Any]] = []
+        results: list[JsonMap] = []
         for i, op in enumerate(ops):
             try:
                 full, rel = resolve_note(root, op.path)
@@ -418,7 +448,7 @@ def _apply_ops_sync(root: str, ops: list[NoteOp]) -> list[dict[str, Any]]:
                     {"path": rel, "current_version": version_of(now) if now is not None else None, "current_content": now},
                 )
 
-        journal: list[tuple[str, Path, Any]] = []
+        journal: list[tuple[str, Path, Path | str | None]] = []
         try:
             for rel, text in overlay.items():
                 if original.get(rel) == text:
@@ -443,7 +473,7 @@ def _apply_ops_sync(root: str, ops: list[NoteOp]) -> list[dict[str, Any]]:
                         shutil.move(str(target), str(extra))
                     elif extra is None:
                         target.unlink(missing_ok=True)
-                    else:
+                    elif isinstance(extra, str):
                         _atomic_write(target, extra.encode("utf-8"))
                 except Exception:
                     logger.exception("Rollback step failed for %s", target)
@@ -453,10 +483,12 @@ def _apply_ops_sync(root: str, ops: list[NoteOp]) -> list[dict[str, Any]]:
         return results
 
 
-def _props_text(props: dict[str, Any]) -> str:
+def _props_text(props: JsonMap) -> str:
+    """Flatten frontmatter values to plain text for the full-text index."""
     out: list[str] = []
 
-    def walk(v: Any) -> None:
+    def walk(v: JsonValue) -> None:
+        """Collect leaf values, recursing into lists and maps."""
         if isinstance(v, dict):
             for x in v.values():
                 walk(x)
@@ -470,13 +502,14 @@ def _props_text(props: dict[str, Any]) -> str:
     return " ".join(out)
 
 
-async def _reindex(notes_path: str, results: list[dict[str, Any]]) -> None:
+async def _reindex(notes_path: str, results: list[JsonMap]) -> None:
+    """Refresh the full-text index for the notes a batch touched; failures are logged, never raised."""
     for r in results:
         try:
             if r["op"] == "delete":
-                await search_index.delete_note(notes_path, r["path"])
+                await search_index.delete_note(notes_path, str(r["path"]))
                 continue
-            note = await get_note(notes_path, r["path"])
+            note = await get_note(notes_path, str(r["path"]))
             await search_index.upsert_note(notes_path, {
                 "path": note.path, "title": note.title, "body": note.body, "tags": note.tags,
                 "type": note.type, "props": _props_text(note.properties),
@@ -485,7 +518,7 @@ async def _reindex(notes_path: str, results: list[dict[str, Any]]) -> None:
             logger.warning("search reindex failed for %s: %s", r["path"], e)
 
 
-async def apply_batch(notes_path: str, ops: list[NoteOp]) -> list[dict[str, Any]]:
+async def apply_batch(notes_path: str, ops: list[NoteOp]) -> list[JsonMap]:
     """All-or-nothing: validate every op, then write; on any failure nothing is left changed."""
     results = await asyncio.to_thread(_apply_ops_sync, notes_path, ops)
     await _reindex(notes_path, results)
@@ -496,29 +529,32 @@ async def create_note(notes_path: str, path: str, content: NoteCreate) -> Note:
     op = NoteOp(op="create", path=path, title=content.title, body=content.body, type=content.type,
                 tags=content.tags, aliases=content.aliases, properties=content.properties or None)
     results = await apply_batch(notes_path, [op])
-    return await get_note(notes_path, results[0]["path"])
+    return await get_note(notes_path, str(results[0]["path"]))
 
 
 async def update_note(notes_path: str, path: str, content: NoteUpdate) -> Note:
+    """Update one note (a batch of one): `properties` merge into the frontmatter, `body` replaces the whole body."""
     op = NoteOp(op="update", path=path, **content.model_dump())
     results = await apply_batch(notes_path, [op])
-    return await get_note(notes_path, results[0]["path"])
+    return await get_note(notes_path, str(results[0]["path"]))
 
 
-async def patch_note(notes_path: str, path: str, edits: list[dict[str, str]], if_version: str | None = None,
-                     properties: dict[str, Any] | None = None, remove_properties: list[str] | None = None) -> Note:
+async def patch_note(notes_path: str, path: str, edits: list[Edit], if_version: str | None = None,
+                     properties: JsonMap | None = None, remove_properties: list[str] | None = None) -> Note:
+    """Edit the body by exact-match replacements (a batch of one)."""
     op = NoteOp(op="patch", path=path, edits=edits, if_version=if_version, properties=properties, remove_properties=remove_properties)
     results = await apply_batch(notes_path, [op])
-    return await get_note(notes_path, results[0]["path"])
+    return await get_note(notes_path, str(results[0]["path"]))
 
 
 async def append_to_section(notes_path: str, path: str, heading: str, text: str, if_version: str | None = None) -> Note:
     op = NoteOp(op="append", path=path, heading=heading, text=text, if_version=if_version)
     results = await apply_batch(notes_path, [op])
-    return await get_note(notes_path, results[0]["path"])
+    return await get_note(notes_path, str(results[0]["path"]))
 
 
-async def delete_note(notes_path: str, path: str, if_version: str | None = None) -> dict[str, Any]:
+async def delete_note(notes_path: str, path: str, if_version: str | None = None) -> JsonMap:
+    """Move a note to `.trash/` (not a hard delete)."""
     results = await apply_batch(notes_path, [NoteOp(op="delete", path=path, if_version=if_version)])
     return results[0]
 
@@ -538,14 +574,16 @@ async def search_notes(notes_path: str, query: str, type_filter: str | None, tag
 
 
 async def rebuild_search_index(notes_path: str) -> None:
-    def work() -> list[dict[str, Any]]:
-        notes = []
+    """Rebuild the full-text index from every note file (run at startup)."""
+    def work() -> list[JsonMap]:
+        """Read every note file into index rows (runs in a worker thread)."""
+        notes: list[JsonMap] = []
         for full, rel in iter_note_files(notes_path):
             try:
                 data = full.read_bytes()
                 rec = notes_index.build_record(rel, data, full.stat())
                 body = fio.split_document(data.decode("utf-8")).rest
-                notes.append({"path": rec.path, "title": rec.title, "body": body, "tags": rec.tags,
+                notes.append({"path": rec.path, "title": rec.title, "body": body, "tags": as_json_list(rec.tags),
                               "type": rec.type, "props": _props_text(rec.properties)})
             except Exception as e:
                 logger.warning("Skipping %s during index rebuild: %s", rel, e)

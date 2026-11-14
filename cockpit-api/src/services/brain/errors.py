@@ -1,20 +1,20 @@
-from typing import Any
+from src.services.brain.json_types import JsonMap
 
 
 class BrainError(Exception):
     """Structured brain error: stable `code`, human `message`, machine `details`."""
 
     code = "error"
-    http_status = 422
 
-    def __init__(self, code: str | None = None, message: str = "", details: dict[str, Any] | None = None):
+    def __init__(self, code: str | None = None, message: str = "", details: JsonMap | None = None):
         if code is not None:
             self.code = code
         self.message = message or self.code
-        self.details = details or {}
+        self.details: JsonMap = details or {}
         super().__init__(self.message)
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> JsonMap:
+        """Error as the `{code, message, details}` shape returned by MCP tools and REST."""
         return {"code": self.code, "message": self.message, "details": self.details}
 
 
@@ -27,6 +27,8 @@ _STATUS = {
 
 
 class NoteNotFound(BrainError, FileNotFoundError):
+    """Note path does not exist; also a FileNotFoundError so REST handlers keep working."""
+
     code = "not_found"
 
     def __init__(self, path: str):
@@ -34,6 +36,8 @@ class NoteNotFound(BrainError, FileNotFoundError):
 
 
 class NoteExists(BrainError, FileExistsError):
+    """Note path already taken; also a FileExistsError so REST handlers keep working."""
+
     code = "already_exists"
 
     def __init__(self, path: str):
@@ -41,4 +45,5 @@ class NoteExists(BrainError, FileExistsError):
 
 
 def http_status_for(exc: BrainError) -> int:
+    """HTTP status for a brain error code (422 for codes without a specific mapping)."""
     return _STATUS.get(exc.code, 422)

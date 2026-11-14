@@ -11,6 +11,19 @@ async def get_user_by_email(db: AsyncSession, email: str) -> Optional[User]:
 async def list_notes(path: str, filter: str | None) -> list[NoteMeta]:
 ```
 
+### Avoid `Any`
+Don't annotate with `Any` when a real type exists. Order of preference:
+
+1. A concrete type, `Protocol`, or `TypedDict`.
+2. `object` for "anything, but I only pass it through / narrow it with `isinstance`" (mypy then forces the narrowing).
+3. A shared recursive alias for JSON-shaped data: `JsonValue` / `JsonMap` in `src/services/brain/json_types.py` (frontmatter values, error details, tool payloads). Use `as_json_list(...)` to put a `list[str]` into a `JsonValue` (lists are invariant).
+4. `Any` only when genuinely unavoidable (untyped third-party API, framework that derives schemas from annotations). Then add a comment on that line or on the alias saying **why**, e.g. `JsonPayload = Any` with its reason in `json_types.py`. An unexplained `Any` is a review finding.
+
+```python
+def parse_properties(fm_text: str) -> JsonMap: ...
+data: object = YAML(typ="safe").load(text)  # ruamel is untyped; narrowed with isinstance below
+```
+
 ### MyPy Strict Optional
 `strict_optional = true`, `warn_unused_ignores`, `warn_redundant_casts`, `warn_unreachable`, `show_error_codes`. SQLAlchemy plugin required: `sqlalchemy.ext.mypy.plugin`. Source: `pyproject.toml [tool.mypy]`.
 

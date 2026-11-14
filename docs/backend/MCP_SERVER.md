@@ -36,4 +36,5 @@ Rules when changing brain code:
 - **Output:** each tool declares an `outputSchema` (`ToolOut` models in `tools/brain.py`, all fields optional so the error shape validates too) and returns `structuredContent` plus the same compact JSON in the text block.
 - **Timestamps:** `created_at` = frontmatter `created`/`created_at`, else file time; `updated_at` = frontmatter `updated`/`updated_at`/`modified`, else file mtime; `created_source`/`updated_source` say which. Writes bump `updated`/`updated_at` only if that key already exists.
 - **Types are free strings** (known: `note, concept, tool, person, source, hardware, reference, skill, skill-domain, case, context`). The `brain://notes` resource still treats `context`/`reference` as proactive.
+- **Types:** frontmatter/error/payload data is typed with `JsonValue`/`JsonMap` (`brain/json_types.py`); `Any` appears only as the commented `JsonPayload` alias in pydantic/MCP-facing models. See `docs/standards/backend/python.md`.
 - `.index/search.db` (FTS) lives inside the vault; keep `.index/` in the vault's `.gitignore`.

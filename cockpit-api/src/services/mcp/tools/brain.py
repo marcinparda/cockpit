@@ -1,19 +1,23 @@
 import functools
 import json
+from collections.abc import Awaitable, Callable
+from datetime import datetime
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
 from mcp.types import CallToolResult, TextContent, ToolAnnotations
-from pydantic import BaseModel, ValidationError, create_model
+from pydantic import BaseModel, ValidationError
 
 from src.services.brain.errors import BrainError
+from src.services.brain.json_types import JsonMap, JsonPayload, as_json_list
 from src.services.brain.schemas import Edit, Note, NoteOp, PropertyCondition
 
 
 class ErrorBody(BaseModel):
+    """Error payload shared by every brain tool result."""
     code: str
     message: str
-    details: dict[str, Any] = {}
+    details: dict[str, JsonPayload] = {}
 
 
 class ToolOut(BaseModel):
@@ -22,20 +26,32 @@ class ToolOut(BaseModel):
     error: ErrorBody | None = None
 
 
-NoteOut = create_model(
-    "NoteOut", __base__=ToolOut,
-    **{name: (f.annotation | None, None) for name, f in Note.model_fields.items()},
-)
+class NoteOut(ToolOut):
+    """A note (mirrors the `Note` schema); every field is optional so the error shape validates against the same schema."""
+
+    path: str | None = None
+    title: str | None = None
+    tags: list[str] | None = None
+    type: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    aliases: list[str] | None = None
+    created_source: str | None = None
+    updated_source: str | None = None
+    version: str | None = None
+    body: str | None = None
+    properties: dict[str, JsonPayload] | None = None
 
 
 class QueryOut(ToolOut):
-    items: list[dict[str, Any]] | None = None
+    """Result of brain_query_notes / brain_list_notes: one page of items."""
+    items: list[dict[str, JsonPayload]] | None = None
     next_cursor: str | None = None
     total: int | None = None
 
 
 class SearchOut(ToolOut):
-    items: list[dict[str, Any]] | None = None
+    items: list[dict[str, JsonPayload]] | None = None
 
 
 class FoldersOut(ToolOut):
@@ -49,7 +65,7 @@ class DeleteOut(ToolOut):
 
 
 class BatchOut(ToolOut):
-    results: list[dict[str, Any]] | None = None
+    results: list[dict[str, JsonPayload]] | None = None
 
 
 class ResolveOut(ToolOut):
@@ -63,12 +79,13 @@ class ResolveOut(ToolOut):
 
 class LinksOut(ToolOut):
     path: str | None = None
-    outgoing: list[dict[str, Any]] | None = None
-    incoming: list[dict[str, Any]] | None = None
+    outgoing: list[dict[str, JsonPayload]] | None = None
+    incoming: list[dict[str, JsonPayload]] | None = None
 
 
-def _ok(data: dict[str, Any]) -> CallToolResult:
+def _ok(data: JsonMap) -> Any:  # Any: returns CallToolResult, but tools are annotated with their output model so FastMCP derives outputSchema
     # Full compact JSON in the text block too: MCP clients that ignore structuredContent still get the data.
+    """Success result: structuredContent plus the same compact JSON in the text block (for clients that ignore structuredContent)."""
     return CallToolResult(
         content=[TextContent(type="text", text=json.dumps(data, separators=(",", ":"), ensure_ascii=False, default=str))],
         structuredContent=data,
@@ -77,6 +94,7 @@ def _ok(data: dict[str, Any]) -> CallToolResult:
 
 
 def _err(exc: BrainError) -> CallToolResult:
+    """Failure result: `{error: {code, message, details}}` with isError=true."""
     data = {"error": exc.to_dict()}
     return CallToolResult(
         content=[TextContent(type="text", text=json.dumps(data, separators=(",", ":"), ensure_ascii=False, default=str))],
@@ -85,9 +103,12 @@ def _err(exc: BrainError) -> CallToolResult:
     )
 
 
-def _safe(fn):
+def _safe[**P](fn: Callable[P, Awaitable[Any]]) -> Callable[P, Awaitable[Any]]:
+    """Decorator: turn BrainError and validation errors into structured error results instead of raising."""
+
     @functools.wraps(fn)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args: P.args, **kwargs: P.kwargs) -> Any:  # Any: see _ok
+        """Run the tool, mapping errors to results."""
         try:
             return await fn(*args, **kwargs)
         except BrainError as e:
@@ -102,17 +123,20 @@ READ = ToolAnnotations(readOnlyHint=True, openWorldHint=False)
 
 
 def _write(destructive: bool, idempotent: bool) -> ToolAnnotations:
+    """Annotations for a write tool (destructive / idempotent hints)."""
     return ToolAnnotations(readOnlyHint=False, destructiveHint=destructive, idempotentHint=idempotent, openWorldHint=False)
 
 
 def register_brain_tools(mcp: FastMCP) -> None:
+    """Register every brain_* tool on `mcp`."""
     from src.services.brain import service as brain_service
     from src.services.brain.schemas import NoteCreate, NoteUpdate
     from src.core.config import settings
 
     root = lambda: settings.BRAIN_NOTES_PATH  # noqa: E731
 
-    def note_data(note: Note) -> dict[str, Any]:
+    def note_data(note: Note) -> dict[str, JsonPayload]:
+        """Note → JSON-safe dict for structuredContent."""
         return note.model_dump(mode="json")
 
     @mcp.tool(annotations=READ)
@@ -205,7 +229,7 @@ def register_brain_tools(mcp: FastMCP) -> None:
     @_safe
     async def brain_list_folders() -> FoldersOut:
         """List all folders in the vault that contain notes."""
-        return _ok({"folders": await brain_service.list_folders(root())})
+        return _ok({"folders": as_json_list(await brain_service.list_folders(root()))})
 
     @mcp.tool(annotations=READ)
     @_safe
@@ -246,7 +270,7 @@ def register_brain_tools(mcp: FastMCP) -> None:
         type: str = "note",
         tags: list[str] | None = None,
         aliases: list[str] | None = None,
-        properties: dict[str, Any] | None = None,
+        properties: dict[str, JsonPayload] | None = None,
     ) -> NoteOut:
         """Create a note file. Fails with already_exists if the path is taken. Only saves the file (no git commit/push).
 
@@ -274,7 +298,7 @@ def register_brain_tools(mcp: FastMCP) -> None:
         type: str | None = None,
         tags: list[str] | None = None,
         aliases: list[str] | None = None,
-        properties: dict[str, Any] | None = None,
+        properties: dict[str, JsonPayload] | None = None,
         remove_properties: list[str] | None = None,
         if_version: str | None = None,
     ) -> NoteOut:
@@ -309,7 +333,7 @@ def register_brain_tools(mcp: FastMCP) -> None:
         path: str,
         edits: list[Edit],
         if_version: str | None = None,
-        properties: dict[str, Any] | None = None,
+        properties: dict[str, JsonPayload] | None = None,
         remove_properties: list[str] | None = None,
     ) -> NoteOut:
         """Edit part of a note's body by exact text replacement — no need to resend the whole note.
@@ -328,7 +352,7 @@ def register_brain_tools(mcp: FastMCP) -> None:
             remove_properties: Frontmatter keys to delete.
         """
         return _ok(note_data(await brain_service.patch_note(
-            root(), path, [e.model_dump() for e in edits], if_version, properties, remove_properties)))
+            root(), path, edits, if_version, properties, remove_properties)))
 
     @mcp.tool(annotations=_write(destructive=False, idempotent=False))
     @_safe
@@ -382,4 +406,4 @@ def register_brain_tools(mcp: FastMCP) -> None:
             ops: Operations, applied in order.
         """
         results = await brain_service.apply_batch(root(), ops)
-        return _ok({"results": results})
+        return _ok({"results": as_json_list(results)})

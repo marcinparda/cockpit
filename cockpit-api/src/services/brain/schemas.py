@@ -1,10 +1,13 @@
 from datetime import datetime
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from src.services.brain.json_types import JsonPayload
+
 
 class NoteMeta(BaseModel):
+    """Note metadata without the body."""
     path: str
     title: str
     tags: list[str]
@@ -18,8 +21,9 @@ class NoteMeta(BaseModel):
 
 
 class Note(NoteMeta):
+    """Full note: metadata, body and the extra frontmatter properties."""
     body: str
-    properties: dict[str, Any] = Field(default_factory=dict, description="All other frontmatter keys (everything except title, tags, type, aliases)")
+    properties: dict[str, JsonPayload] = Field(default_factory=dict, description="All other frontmatter keys (everything except title, tags, type, aliases)")
 
 
 class NoteCreate(BaseModel):
@@ -28,21 +32,23 @@ class NoteCreate(BaseModel):
     tags: list[str] = []
     type: str = "note"
     aliases: list[str] = []
-    properties: dict[str, Any] = {}
+    properties: dict[str, JsonPayload] = {}
 
 
 class NoteUpdate(BaseModel):
+    """Partial update: omitted fields stay unchanged, `properties` merge, `remove_properties` delete keys."""
     title: str | None = None
     body: str | None = None
     tags: list[str] | None = None
     type: str | None = None
     aliases: list[str] | None = None
-    properties: dict[str, Any] | None = None
+    properties: dict[str, JsonPayload] | None = None
     remove_properties: list[str] | None = None
     if_version: str | None = None
 
 
 class NoteSearchResult(NoteMeta):
+    """Note metadata plus a search excerpt."""
     excerpt: str
 
 
@@ -51,6 +57,7 @@ class FolderTree(BaseModel):
 
 
 class Edit(BaseModel):
+    """One exact-text replacement used by patch."""
     old: str = Field(description="Exact text to replace; must occur exactly once in the body")
     new: str
 
@@ -67,7 +74,7 @@ class NoteOp(BaseModel):
     type: str | None = None
     tags: list[str] | None = None
     aliases: list[str] | None = None
-    properties: dict[str, Any] | None = None
+    properties: dict[str, JsonPayload] | None = None
     remove_properties: list[str] | None = None
     edits: list[Edit] | None = None
     heading: str | None = None
@@ -76,6 +83,7 @@ class NoteOp(BaseModel):
 
 
 class PropertyCondition(BaseModel):
+    """One metadata condition for queries (key, operator, value)."""
     key: str = Field(description="Property name, or a built-in field: path, title, type, tags, aliases, created_at, updated_at")
     op: Literal["eq", "neq", "in", "exists", "missing", "lt", "gt", "contains"] = "eq"
-    value: Any = None
+    value: JsonPayload = None

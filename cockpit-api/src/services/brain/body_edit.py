@@ -3,6 +3,7 @@ import re
 
 from src.services.brain import frontmatter_io as fio
 from src.services.brain.errors import BrainError
+from src.services.brain.json_types import JsonMap, as_json_list
 
 _HEADING = re.compile(r"^(#{1,6})[ \t]+(.*?)[ \t]*#*[ \t]*$")
 _FENCE_LINE = re.compile(r"^\s{0,3}(```|~~~)")
@@ -15,7 +16,7 @@ def patch_body(text: str, edits: list[tuple[str, str]]) -> str:
     """
     parts = fio.split_document(text)
     body = parts.rest
-    failed = []
+    failed: list[JsonMap] = []
     for i, (old, new) in enumerate(edits):
         if not old:
             failed.append({"index": i, "reason": "empty_old", "occurrences": 0})
@@ -36,7 +37,7 @@ def patch_body(text: str, edits: list[tuple[str, str]]) -> str:
             "patch_failed",
             f"{len(failed)} of {len(edits)} edits failed (first: edit #{first['index']} {first['reason']}, "
             f"{first['occurrences']} occurrences). Each 'old' must match the body exactly once. Nothing was changed.",
-            {"failed_edits": failed},
+            {"failed_edits": as_json_list(failed)},
         )
     parts.rest = body
     return parts.join()
