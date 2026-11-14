@@ -1433,7 +1433,10 @@ export interface components {
             /** Detail */
             detail: string;
         };
-        /** Note */
+        /**
+         * Note
+         * @description Full note: metadata, body and the extra frontmatter properties.
+         */
         Note: {
             /** Path */
             path: string;
@@ -1441,7 +1444,10 @@ export interface components {
             title: string;
             /** Tags */
             tags: string[];
-            /** Type */
+            /**
+             * Type
+             * @description Free-form note type, e.g. note, concept, tool, person, source, hardware, reference, skill, skill-domain, case, context
+             */
             type: string;
             /**
              * Created At
@@ -1455,8 +1461,30 @@ export interface components {
             updated_at: string;
             /** Aliases */
             aliases: string[];
+            /**
+             * Created Source
+             * @description Where created_at came from: 'frontmatter' or 'file_time'
+             */
+            created_source?: string | null;
+            /**
+             * Updated Source
+             * @description Where updated_at came from: 'frontmatter' or 'file_mtime'
+             */
+            updated_source?: string | null;
+            /**
+             * Version
+             * @description Content hash; pass back as if_version to detect concurrent edits
+             */
+            version?: string | null;
             /** Body */
             body: string;
+            /**
+             * Properties
+             * @description All other frontmatter keys (everything except title, tags, type, aliases)
+             */
+            properties?: {
+                [key: string]: unknown;
+            };
         };
         /** NoteCreate */
         NoteCreate: {
@@ -1479,8 +1507,18 @@ export interface components {
              * @default []
              */
             aliases: string[];
+            /**
+             * Properties
+             * @default {}
+             */
+            properties: {
+                [key: string]: unknown;
+            };
         };
-        /** NoteMeta */
+        /**
+         * NoteMeta
+         * @description Note metadata without the body.
+         */
         NoteMeta: {
             /** Path */
             path: string;
@@ -1488,7 +1526,10 @@ export interface components {
             title: string;
             /** Tags */
             tags: string[];
-            /** Type */
+            /**
+             * Type
+             * @description Free-form note type, e.g. note, concept, tool, person, source, hardware, reference, skill, skill-domain, case, context
+             */
             type: string;
             /**
              * Created At
@@ -1502,8 +1543,26 @@ export interface components {
             updated_at: string;
             /** Aliases */
             aliases: string[];
+            /**
+             * Created Source
+             * @description Where created_at came from: 'frontmatter' or 'file_time'
+             */
+            created_source?: string | null;
+            /**
+             * Updated Source
+             * @description Where updated_at came from: 'frontmatter' or 'file_mtime'
+             */
+            updated_source?: string | null;
+            /**
+             * Version
+             * @description Content hash; pass back as if_version to detect concurrent edits
+             */
+            version?: string | null;
         };
-        /** NoteSearchResult */
+        /**
+         * NoteSearchResult
+         * @description Note metadata plus a search excerpt.
+         */
         NoteSearchResult: {
             /** Path */
             path: string;
@@ -1511,7 +1570,10 @@ export interface components {
             title: string;
             /** Tags */
             tags: string[];
-            /** Type */
+            /**
+             * Type
+             * @description Free-form note type, e.g. note, concept, tool, person, source, hardware, reference, skill, skill-domain, case, context
+             */
             type: string;
             /**
              * Created At
@@ -1525,10 +1587,28 @@ export interface components {
             updated_at: string;
             /** Aliases */
             aliases: string[];
+            /**
+             * Created Source
+             * @description Where created_at came from: 'frontmatter' or 'file_time'
+             */
+            created_source?: string | null;
+            /**
+             * Updated Source
+             * @description Where updated_at came from: 'frontmatter' or 'file_mtime'
+             */
+            updated_source?: string | null;
+            /**
+             * Version
+             * @description Content hash; pass back as if_version to detect concurrent edits
+             */
+            version?: string | null;
             /** Excerpt */
             excerpt: string;
         };
-        /** NoteUpdate */
+        /**
+         * NoteUpdate
+         * @description Partial update: omitted fields stay unchanged, `properties` merge, `remove_properties` delete keys.
+         */
         NoteUpdate: {
             /** Title */
             title?: string | null;
@@ -1540,6 +1620,14 @@ export interface components {
             type?: string | null;
             /** Aliases */
             aliases?: string[] | null;
+            /** Properties */
+            properties?: {
+                [key: string]: unknown;
+            } | null;
+            /** Remove Properties */
+            remove_properties?: string[] | null;
+            /** If Version */
+            if_version?: string | null;
         };
         /** OAuthServerMetadata */
         OAuthServerMetadata: {
