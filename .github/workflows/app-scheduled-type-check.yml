@@ -45,11 +45,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Create unique branch name
+      - name: Set branch name
         id: branch-info
         run: |
+          # Fixed branch name: each run refreshes the same branch/PR instead of opening a new one
           TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-          BRANCH_NAME="chore/update-api-types-${TIMESTAMP}"
+          BRANCH_NAME="chore/update-api-types"
           echo "branch-name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
           echo "timestamp=${TIMESTAMP}" >> $GITHUB_OUTPUT
 
@@ -97,7 +98,7 @@ jobs:
       - name: Push branch
         if: steps.git-check.outputs.has-changes == 'true'
         run: |
-          git push origin ${{ steps.branch-info.outputs.branch-name }}
+          git push --force origin ${{ steps.branch-info.outputs.branch-name }}
 
       - name: Create Pull Request
         if: steps.git-check.outputs.has-changes == 'true'
@@ -132,6 +133,18 @@ jobs:
               '---',
               '*This PR was created automatically by the Scheduled Type Drift Check workflow.*'
             ].join('\n');
+
+            const head = '${{ steps.branch-info.outputs.branch-name }}';
+            const { data: existing } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: context.repo.owner + ':' + head
+            });
+            if (existing.length > 0) {
+              console.log('PR already open: #' + existing[0].number + ' (branch force-updated)');
+              return;
+            }
 
             const { data: pr } = await github.rest.pulls.create({
               owner: context.repo.owner,
