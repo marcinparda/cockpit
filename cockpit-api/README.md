@@ -75,7 +75,7 @@ Cockpit API exposes an MCP server at `/mcp` (Streamable HTTP transport).
 
 - **URL**: `http://<raspberry-ip>:8000/mcp`
 - **Auth**: `Authorization: Bearer <MCP_API_KEY>`
-- **Tools**: budget (Actual Budget), tasks (Vikunja), cv (Redis presets), brain (notes)
+- **Tools**: budget (Actual Budget), tasks (Vikunja), cv (Redis presets), brain (Obsidian notes: query by frontmatter, patch/append, atomic batch, link graph — see `docs/backend/MCP_SERVER.md`)
 
 Open WebUI connects to this MCP endpoint so AI models can call cockpit tools directly.
 

@@ -15,6 +15,7 @@ from src.services.habits.router import router as habits_router
 from src.services.oauth.router import router as oauth_router
 from src.services.brain import search as brain_search
 from src.services.brain import service as brain_service
+from src.services.brain.errors import BrainError, http_status_for
 from src.services.mcp.server import mcp_asgi
 from src.services.mcp.auth import MCPAPIKeyMiddleware
 from src.core.config import settings
@@ -64,6 +65,12 @@ app = FastAPI(
     docs_url="/api/docs",
     lifespan=lifespan
 )
+
+@app.exception_handler(BrainError)
+async def brain_error_handler(_request, exc: BrainError):
+    from fastapi.responses import JSONResponse
+    return JSONResponse(status_code=http_status_for(exc), content={"error": exc.to_dict()})
+
 
 origins: List[str] = [str(origin) for origin in settings.CORS_ORIGINS] if isinstance(
     settings.CORS_ORIGINS, list) else [str(settings.CORS_ORIGINS)]

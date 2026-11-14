@@ -140,3 +140,17 @@ def make_store_envelope(
     meta_defaults.update(meta_overrides)
 
     return StoreEnvelope(meta=StoreMeta(**meta_defaults), data=data)
+
+
+def make_note_file(vault, rel: str, body: str = "Body\n", **props) -> str:
+    """Write a note file into `vault` (a pathlib.Path) and return its raw text.
+
+    Properties are written in the given order, one `key: value` line each (values via yaml-ish repr:
+    pass strings that need quoting already quoted, e.g. requires='["[[A]]"]').
+    """
+    lines = [f"{k}: {v}" for k, v in props.items()]
+    text = "---\n" + "".join(l + "\n" for l in lines) + "---\n" + body
+    f = vault / rel
+    f.parent.mkdir(parents=True, exist_ok=True)
+    f.write_text(text)
+    return text
