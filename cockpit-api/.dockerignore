@@ -9,3 +9,12 @@ venv
 .env
 .git
 README.md
+.pytest_cache
+.mypy_cache
+.coverage
+htmlcov
+src/tests
+conftest.py
+Dockerfile*
+docker-compose*
+*.md

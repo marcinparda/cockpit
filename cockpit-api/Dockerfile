@@ -1,4 +1,4 @@
-FROM python:3.12-slim as builder
+FROM python:3.12-slim AS builder
 
 # Install system dependencies
 RUN apt-get update \
@@ -8,7 +8,7 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Poetry
-RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=2.3.4 python3 -
 
 # Configure Poetry
 ENV POETRY_NO_INTERACTION=1 \
@@ -23,15 +23,15 @@ WORKDIR /app
 COPY pyproject.toml poetry.lock* ./
 
 # Install dependencies
-RUN poetry install --no-root
+RUN poetry install --only main --no-root
 
 # Production stage
-FROM python:3.12-slim as production
+FROM python:3.12-slim AS production
 
 # Install runtime dependencies
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-    libpq-dev \
+    libpq5 \
     netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
