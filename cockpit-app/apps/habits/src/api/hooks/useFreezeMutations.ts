@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetcher } from '@cockpit-app/common-shared-data-access';
 import { environments } from '@cockpit-app/shared-utils';
@@ -17,6 +18,9 @@ interface CreateFreezePayload {
 
 export function useFreezeMutations() {
   const queryClient = useQueryClient();
+  // No list-freezes endpoint exists yet, so this only counts freezes applied
+  // in this session; the API remains the source of truth for the monthly limit.
+  const [freezesThisMonth, setFreezesThisMonth] = useState(0);
 
   const createFreeze = useMutation({
     mutationFn: ({ habitId, freeze_date }: CreateFreezePayload) =>
@@ -28,6 +32,7 @@ export function useFreezeMutations() {
         },
       }),
     onSuccess: (_data, variables) => {
+      setFreezesThisMonth((n) => n + 1);
       void queryClient.invalidateQueries({
         queryKey: ['habit', variables.habitId],
       });
@@ -35,5 +40,5 @@ export function useFreezeMutations() {
     },
   });
 
-  return { createFreeze };
+  return { createFreeze, freezesThisMonth };
 }

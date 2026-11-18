@@ -1,34 +1,38 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Habit } from '../api/schemas';
+import { useNavigate } from 'react-router-dom';
+import { Star } from 'lucide-react';
+import { LogRow, type LogRowValue } from '@cockpit-app/shared-react-ui';
+import { Habit, HabitEntry } from '../api/schemas';
 import { useHabits } from '../api/hooks/useHabits';
-import { HabitTile } from '../components/HabitTile';
+import { useEntriesByRange } from '../api/hooks/useEntriesByRange';
+import { useEntryMutations } from '../api/hooks/useEntryMutations';
 import { HabitSheet } from '../components/HabitSheet';
 import { ConfettiAnimation } from '../components/ConfettiAnimation';
+import { DayStrip, type DayCompletion } from '../components/DayStrip';
+import { HABIT_ICONS } from '../icons';
+import { truncateName } from '../utils/text';
+import { parseDateKey, toDateKey, weekOf } from '../utils/date';
 
-function formatToday(): string {
-  return new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
-}
+type EntryLike = Pick<
+  HabitEntry,
+  'boolean_value' | 'numeric_value' | 'text_value'
+>;
 
-function getTodayKey(): string {
-  return new Date().toISOString().split('T')[0];
-}
-
-function isCompletedToday(habit: Habit, todayKey: string): boolean {
-  const entry = habit.today_entry;
-  if (!entry) return false;
-  if (entry.logged_at !== todayKey) return false;
+function isDone(habit: Habit, entry: EntryLike | undefined): boolean {
+  if (!entry || entry.boolean_value === false) return false;
   if (habit.type === 'boolean') return entry.boolean_value === true;
   if (habit.type === 'numeric') {
     if (entry.numeric_value == null) return false;
     if (habit.target_value != null) return entry.numeric_value >= habit.target_value;
     return true; // no target set: any logged value counts
   }
-  if (habit.type === 'text') return !!entry.text_value?.trim();
-  return false;
+  return !!entry.text_value?.trim();
+}
+
+function rowValue(habit: Habit, entry: EntryLike | undefined): LogRowValue {
+  if (isDone(habit, entry)) return 'done';
+  if (entry?.boolean_value === false) return 'notDone';
+  return 'unset';
 }
 
 interface CategoryGroup {
@@ -61,34 +65,108 @@ function groupByCategory(habits: Habit[]): CategoryGroup[] {
 }
 
 export default function TodayPage() {
-  const { data: habits, isLoading } = useHabits();
-  const [activeSheet, setActiveSheet] = useState<Habit | null>(null);
-  const [confettiShown, setConfettiShown] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
+  const navigate = useNavigate();
+  const today = toDateKey(new Date());
+  const [selected, setSelected] = useState(today);
+  const week = useMemo(() => weekOf(selected), [selected]);
 
-  const todayKey = getTodayKey();
+  const { data: habits, isLoading } = useHabits();
+  const { data: weekEntries } = useEntriesByRange(week[0], week[6]);
+  const { upsertEntry, deleteEntry } = useEntryMutations();
+
+  const [activeSheet, setActiveSheet] = useState<Habit | null>(null);
+  const [confettiFor, setConfettiFor] = useState<string | null>(null);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const activeHabits = useMemo(
     () => (habits ?? []).filter((h) => h.is_active && !h.is_archived),
     [habits],
   );
 
+  // habitId -> date -> entry
+  const entryIndex = useMemo(() => {
+    const idx = new Map<string, EntryLike & { id: string }>();
+    for (const e of weekEntries ?? []) idx.set(`${e.habit_id}|${e.logged_at}`, e);
+    return idx;
+  }, [weekEntries]);
+
+  const entryFor = (habit: Habit, date: string) =>
+    entryIndex.get(`${habit.id}|${date}`);
+
+  const completion = useMemo(() => {
+    const out: Record<string, DayCompletion> = {};
+    for (const day of week) {
+      const done = activeHabits.filter((h) =>
+        isDone(h, entryIndex.get(`${h.id}|${day}`)),
+      ).length;
+      out[day] =
+        activeHabits.length > 0 && done === activeHabits.length
+          ? 'full'
+          : done > 0
+            ? 'partial'
+            : 'empty';
+    }
+    return out;
+  }, [week, activeHabits, entryIndex]);
+
   const completedCount = useMemo(
-    () => activeHabits.filter((h) => isCompletedToday(h, todayKey)).length,
-    [activeHabits, todayKey],
+    () =>
+      activeHabits.filter((h) => isDone(h, entryIndex.get(`${h.id}|${selected}`)))
+        .length,
+    [activeHabits, entryIndex, selected],
   );
 
-  const allDone = activeHabits.length > 0 && completedCount === activeHabits.length;
+  const allDone =
+    activeHabits.length > 0 && completedCount === activeHabits.length;
 
-  // Trigger confetti once when all habits are done
+  // Confetti once per selected day when all habits become done
   useEffect(() => {
-    if (allDone && !confettiShown) {
+    if (allDone && confettiFor !== selected) {
       setShowConfetti(true);
-      setConfettiShown(true);
+      setConfettiFor(selected);
     }
-  }, [allDone, confettiShown]);
+  }, [allDone, confettiFor, selected]);
 
   const groups = useMemo(() => groupByCategory(activeHabits), [activeHabits]);
+
+  const isToday = selected === today;
+  const dateLabel = parseDateKey(selected).toLocaleDateString('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const selectDone = (habit: Habit) => {
+    const entry = entryFor(habit, selected);
+    if (habit.type !== 'boolean') {
+      setActiveSheet(habit);
+      return;
+    }
+    if (entry?.boolean_value === true) {
+      deleteEntry.mutate({ habitId: habit.id, entryId: entry.id });
+    } else {
+      upsertEntry.mutate({
+        habitId: habit.id,
+        logged_at: selected,
+        boolean_value: true,
+      });
+    }
+  };
+
+  const selectNotDone = (habit: Habit) => {
+    const entry = entryFor(habit, selected);
+    if (entry?.boolean_value === false) {
+      deleteEntry.mutate({ habitId: habit.id, entryId: entry.id });
+    } else {
+      // Numeric/text: API accepts boolean_value=false on any habit type and
+      // treats it as "not done"; this replaces any existing value.
+      upsertEntry.mutate({
+        habitId: habit.id,
+        logged_at: selected,
+        boolean_value: false,
+      });
+    }
+  };
 
   if (isLoading) {
     return (
@@ -105,16 +183,23 @@ export default function TodayPage() {
       )}
 
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-background pb-2 pt-0">
-        <p className="text-sm text-muted-foreground">{formatToday()}</p>
+      <div className="sticky top-0 z-10 flex flex-col gap-2 bg-background pb-2 pt-0">
+        <DayStrip
+          selected={selected}
+          today={today}
+          completion={completion}
+          onSelect={setSelected}
+          onToday={() => setSelected(today)}
+        />
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">Today</h1>
+          <h1 className="text-2xl font-bold">{isToday ? 'Today' : dateLabel}</h1>
           {activeHabits.length > 0 && (
             <span className="text-sm font-medium text-muted-foreground">
               {completedCount}/{activeHabits.length}
             </span>
           )}
         </div>
+        {isToday && <p className="text-sm text-muted-foreground">{dateLabel}</p>}
       </div>
 
       {/* Empty state */}
@@ -137,7 +222,7 @@ export default function TodayPage() {
           className="mb-4 rounded-xl bg-green-100 p-4 text-center dark:bg-green-900/30"
         >
           <p className="text-lg font-bold text-green-700 dark:text-green-400">
-            All done for today!
+            {isToday ? 'All done for today!' : 'All done for this day!'}
           </p>
           <p className="text-sm text-green-600 dark:text-green-500">
             Great work keeping your streak alive.
@@ -145,22 +230,43 @@ export default function TodayPage() {
         </div>
       )}
 
-      {/* Habit grid grouped by category */}
+      {/* Rows grouped by category */}
       {groups.map((group) => (
         <section key={group.categoryId ?? '__uncategorized__'} className="mb-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
             {group.categoryName}
           </h2>
-          <div className="grid grid-cols-4 gap-3">
+          <div className="flex flex-col gap-2">
             {group.habits.map((habit) => {
-              const completed = isCompletedToday(habit, todayKey);
+              const entry = entryFor(habit, selected);
+              const Icon = HABIT_ICONS[habit.icon] ?? Star;
+              const showStreak =
+                habit.streak_mode !== 'none' && habit.current_streak > 0;
+              const subtitle =
+                habit.type === 'numeric' && entry?.numeric_value != null
+                  ? `${entry.numeric_value}${habit.target_value != null ? `/${habit.target_value}` : ''}`
+                  : undefined;
               return (
-                <HabitTile
+                <LogRow
                   key={habit.id}
-                  habit={habit}
-                  completed={completed}
-                  todayEntry={habit.today_entry ?? null}
-                  onOpenSheet={setActiveSheet}
+                  icon={<Icon size={20} aria-hidden="true" />}
+                  color={habit.color ?? '#6b7280'}
+                  title={truncateName(habit.name)}
+                  subtitle={subtitle}
+                  badge={
+                    showStreak ? (
+                      <span
+                        data-testid="streak-badge"
+                        className="rounded-full bg-orange-500 px-1.5 py-0.5 text-[10px] font-bold text-white"
+                      >
+                        🔥 {habit.current_streak}
+                      </span>
+                    ) : undefined
+                  }
+                  value={rowValue(habit, entry)}
+                  onSelectDone={() => selectDone(habit)}
+                  onSelectNotDone={() => selectNotDone(habit)}
+                  onRowClick={() => void navigate(`/habits/${habit.id}`)}
                 />
               );
             })}
@@ -172,7 +278,8 @@ export default function TodayPage() {
       {activeSheet && (
         <HabitSheet
           habit={activeSheet}
-          todayEntry={activeSheet.today_entry ?? null}
+          date={selected}
+          entry={entryFor(activeSheet, selected) ?? null}
           onClose={() => setActiveSheet(null)}
         />
       )}

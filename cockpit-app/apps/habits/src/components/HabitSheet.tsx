@@ -1,25 +1,27 @@
 import { useRef, useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { Habit } from '../api/schemas';
+import { Habit, HabitEntry } from '../api/schemas';
 import { useEntryMutations } from '../api/hooks/useEntryMutations';
 
 interface HabitSheetProps {
   habit: Habit;
-  todayEntry: NonNullable<Habit['today_entry']> | null;
+  /** Day being logged, `YYYY-MM-DD` (local). */
+  date: string;
+  /** Existing entry for that date, if any. */
+  entry: Pick<HabitEntry, 'numeric_value' | 'text_value'> | null;
   onClose: () => void;
 }
 
-export function HabitSheet({ habit, todayEntry, onClose }: HabitSheetProps) {
+export function HabitSheet({ habit, date, entry, onClose }: HabitSheetProps) {
   const { upsertEntry } = useEntryMutations();
-  const today = new Date().toISOString().split('T')[0];
   const isNumeric = habit.type === 'numeric';
   const isText = habit.type === 'text';
 
   const [numericValue, setNumericValue] = useState<string>(
-    todayEntry?.numeric_value?.toString() ?? '',
+    entry?.numeric_value?.toString() ?? '',
   );
   const [textValue, setTextValue] = useState<string>(
-    todayEntry?.text_value ?? '',
+    entry?.text_value ?? '',
   );
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -35,7 +37,7 @@ export function HabitSheet({ habit, todayEntry, onClose }: HabitSheetProps) {
     if (!isNaN(parsed)) {
       upsertEntry.mutate({
         habitId: habit.id,
-        logged_at: today,
+        logged_at: date,
         numeric_value: parsed,
         numeric_unit: habit.unit,
       });
@@ -47,7 +49,7 @@ export function HabitSheet({ habit, todayEntry, onClose }: HabitSheetProps) {
     if (textValue.trim()) {
       upsertEntry.mutate({
         habitId: habit.id,
-        logged_at: today,
+        logged_at: date,
         text_value: textValue,
       });
     }

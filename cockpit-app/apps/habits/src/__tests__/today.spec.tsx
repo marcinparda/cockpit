@@ -2,263 +2,194 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 
-// Mock TanStack Query hooks used by components
-vi.mock('../api/hooks/useHabits', () => ({
-  useHabits: vi.fn(),
+vi.mock('../api/hooks/useHabits', () => ({ useHabits: vi.fn() }));
+vi.mock('../api/hooks/useEntriesByRange', () => ({
+  useEntriesByRange: vi.fn(),
 }));
-
 vi.mock('../api/hooks/useEntryMutations', () => ({
-  useEntryMutations: vi.fn(() => ({
-    upsertEntry: { mutate: vi.fn() },
-    deleteEntry: { mutate: vi.fn() },
-  })),
+  useEntryMutations: vi.fn(),
 }));
 
-// Must import after vi.mock declarations
 import * as useHabitsModule from '../api/hooks/useHabits';
-import { HabitTile } from '../components/HabitTile';
+import * as rangeModule from '../api/hooks/useEntriesByRange';
+import * as mutationsModule from '../api/hooks/useEntryMutations';
 import TodayPage from '../pages/TodayPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { createHabitMock } from '../mocks/habit';
+import { addDays, toDateKey } from '../utils/date';
 
-function makeQueryClient() {
-  return new QueryClient({ defaultOptions: { queries: { retry: false } } });
-}
+const today = toDateKey(new Date());
+const yesterday = addDays(today, -1);
+const upsert = vi.fn();
+const del = vi.fn();
 
-function withQueryClient(ui: React.ReactElement) {
-  return (
+function renderPage() {
+  return render(
     <MemoryRouter>
-      <QueryClientProvider client={makeQueryClient()}>{ui}</QueryClientProvider>
-    </MemoryRouter>
+      <QueryClientProvider client={new QueryClient()}>
+        <TodayPage />
+      </QueryClientProvider>
+    </MemoryRouter>,
   );
 }
 
-const baseHabit = createHabitMock({ id: 'habit-1' });
+function setHabits(habits: unknown[]) {
+  vi.mocked(useHabitsModule.useHabits).mockReturnValue({
+    isLoading: false,
+    data: habits,
+    error: null,
+  } as never);
+}
 
-describe('HabitTile', () => {
-  it('renders with habit.color as border when uncompleted', () => {
-    render(
-      withQueryClient(
-        <HabitTile habit={baseHabit} completed={false} todayEntry={null} />,
-      ),
-    );
-    const tile = screen.getByRole('button');
-    expect(tile).toHaveStyle({ borderColor: '#ff6b6b' });
-  });
+function setEntries(entries: unknown[]) {
+  vi.mocked(rangeModule.useEntriesByRange).mockReturnValue({
+    data: entries,
+  } as never);
+}
 
-  it('shows streak badge only when streak_mode is not none', () => {
-    const { rerender } = render(
-      withQueryClient(
-        <HabitTile habit={baseHabit} completed={false} todayEntry={null} />,
-      ),
-    );
-    // streak_mode = 'soft' + current_streak = 3 → badge visible
-    expect(screen.getByTestId('streak-badge')).toBeInTheDocument();
+function entry(habitId: string, date: string, extra: object = {}) {
+  return { id: `e-${habitId}-${date}`, habit_id: habitId, user_id: 'u', logged_at: date, ...extra };
+}
 
-    const noStreakHabit = { ...baseHabit, streak_mode: 'none' as const };
-    rerender(
-      withQueryClient(
-        <HabitTile
-          habit={noStreakHabit}
-          completed={false}
-          todayEntry={null}
-        />,
-      ),
-    );
-    expect(screen.queryByTestId('streak-badge')).not.toBeInTheDocument();
-  });
-
-  it('applies completed state: filled background + checkmark class', () => {
-    render(
-      withQueryClient(
-        <HabitTile habit={baseHabit} completed={true} todayEntry={null} />,
-      ),
-    );
-    const tile = screen.getByRole('button');
-    expect(tile).toHaveStyle({ backgroundColor: '#ff6b6b' });
-    expect(tile.querySelector('[data-testid="checkmark"]')).toBeInTheDocument();
-  });
-
-  it('renders short names unchanged', () => {
-    render(
-      withQueryClient(
-        <HabitTile habit={baseHabit} completed={false} todayEntry={null} />,
-      ),
-    );
-    expect(screen.getByText('Morning Run')).toBeInTheDocument();
-  });
-
-  it('truncates names over 50 chars and keeps full name in title attribute', () => {
-    const longName = 'a'.repeat(60);
-    const longHabit = { ...baseHabit, name: longName };
-    render(
-      withQueryClient(
-        <HabitTile habit={longHabit} completed={false} todayEntry={null} />,
-      ),
-    );
-    const expected = `${'a'.repeat(50)}…`;
-    expect(screen.getByText(expected)).toBeInTheDocument();
-    expect(screen.getByText(expected)).toHaveAttribute('title', longName);
-  });
-
-  it('clears the long-press timer on pointer up without navigating', () => {
-    render(
-      withQueryClient(
-        <HabitTile habit={baseHabit} completed={false} todayEntry={null} />,
-      ),
-    );
-    const tile = screen.getByRole('button');
-    fireEvent.pointerDown(tile);
-    fireEvent.pointerUp(tile);
-    // No assertion needed beyond not throwing — covers handlePointerDown/Up
-    expect(tile).toBeInTheDocument();
-  });
-});
+const baseHabit = createHabitMock({ id: 'h1', name: 'Run' });
 
 describe('TodayPage', () => {
   beforeEach(() => {
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
-      isLoading: false,
-      data: undefined,
-      error: null,
-    } as any);
+    upsert.mockReset();
+    del.mockReset();
+    vi.mocked(mutationsModule.useEntryMutations).mockReturnValue({
+      upsertEntry: { mutate: upsert },
+      deleteEntry: { mutate: del },
+    } as never);
+    setEntries([]);
+    setHabits([]);
   });
 
-  it('groups habits by category in correct order', () => {
-    const habits = [
-      { ...baseHabit, id: 'h1', name: 'Sleep', category_id: 'cat-b', category_name: 'Sleep' },
-      { ...baseHabit, id: 'h2', name: 'Run', category_id: 'cat-a', category_name: 'Fitness' },
-      { ...baseHabit, id: 'h3', name: 'Walk', category_id: 'cat-a', category_name: 'Fitness' },
-      { ...baseHabit, id: 'h4', name: 'Meditate', category_id: null, category_name: undefined },
-    ];
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
-      isLoading: false,
-      data: habits,
-      error: null,
-    } as any);
-
-    render(withQueryClient(<TodayPage />));
-
-    const headings = screen.getAllByRole('heading', { level: 2 });
-    const headingTexts = headings.map((h) => h.textContent);
-    const fitnessIdx = headingTexts.findIndex((t) => t?.includes('Fitness'));
-    const sleepIdx = headingTexts.findIndex((t) => t?.includes('Sleep'));
-    const uncatIdx = headingTexts.findIndex((t) => t?.includes('Uncategorized'));
-
-    // Categories with IDs appear before uncategorized
-    expect(fitnessIdx).toBeGreaterThanOrEqual(0);
-    expect(sleepIdx).toBeGreaterThanOrEqual(0);
-    expect(uncatIdx).toBeGreaterThanOrEqual(0);
-    expect(uncatIdx).toBeGreaterThan(fitnessIdx);
-    expect(uncatIdx).toBeGreaterThan(sleepIdx);
+  it('groups habits by category, uncategorized last', () => {
+    setHabits([
+      { ...baseHabit, id: 'a', name: 'Sleep', category_id: 'cat-b', category_name: 'Sleep' },
+      { ...baseHabit, id: 'b', name: 'Run', category_id: 'cat-a', category_name: 'Fitness' },
+      { ...baseHabit, id: 'c', name: 'Meditate', category_id: null, category_name: undefined },
+    ]);
+    renderPage();
+    const texts = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(texts).toEqual(['Fitness', 'Sleep', 'Uncategorized']);
   });
 
-  it('shows empty state when habits array is empty', () => {
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
-      isLoading: false,
-      data: [],
-      error: null,
-    } as any);
-
-    render(withQueryClient(<TodayPage />));
-
+  it('shows empty state', () => {
+    renderPage();
     expect(screen.getByTestId('empty-state')).toBeInTheDocument();
   });
 
-  it('marks numeric habit as completed when numeric_value is set', () => {
-    const today = new Date().toISOString().split('T')[0];
-    const habits = [
-      {
-        ...baseHabit,
-        id: 'h1',
-        type: 'numeric' as const,
-        is_active: true,
-        today_entry: { id: 'e1', habit_id: 'h1', logged_at: today, boolean_value: null, numeric_value: 5, text_value: null },
-      },
-    ];
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
-      isLoading: false,
-      data: habits,
-      error: null,
-    } as any);
-
-    render(withQueryClient(<TodayPage />));
-
-    // All-done state should appear since the only habit is completed
-    expect(screen.getByTestId('all-done-state')).toBeInTheDocument();
+  it('boolean ✓ upserts true for today', () => {
+    setHabits([baseHabit]);
+    renderPage();
+    fireEvent.click(screen.getByLabelText('Mark Run done'));
+    expect(upsert).toHaveBeenCalledWith({ habitId: 'h1', logged_at: today, boolean_value: true });
   });
 
-  it('marks text habit as completed when text_value is set', () => {
-    const today = new Date().toISOString().split('T')[0];
-    const habits = [
-      {
-        ...baseHabit,
-        id: 'h1',
-        type: 'text' as const,
-        is_active: true,
-        today_entry: { id: 'e1', habit_id: 'h1', logged_at: today, boolean_value: null, numeric_value: null, text_value: 'Great day' },
-      },
-    ];
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
-      isLoading: false,
-      data: habits,
-      error: null,
-    } as any);
-
-    render(withQueryClient(<TodayPage />));
-
-    expect(screen.getByTestId('all-done-state')).toBeInTheDocument();
+  it('boolean ✗ upserts false', () => {
+    setHabits([baseHabit]);
+    renderPage();
+    fireEvent.click(screen.getByLabelText('Mark Run not done'));
+    expect(upsert).toHaveBeenCalledWith({ habitId: 'h1', logged_at: today, boolean_value: false });
   });
 
-  it('shows tile and opens HabitSheet for numeric habit on click', () => {
-    const habits = [
-      {
-        ...baseHabit,
-        id: 'h1',
-        type: 'numeric' as const,
-        is_active: true,
-        today_entry: null,
-      },
-    ];
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
-      isLoading: false,
-      data: habits,
-      error: null,
-    } as any);
+  it('tapping the active ✓ or ✗ deletes the entry', () => {
+    setHabits([baseHabit]);
+    setEntries([entry('h1', today, { boolean_value: true })]);
+    const { unmount } = renderPage();
+    fireEvent.click(screen.getByLabelText('Mark Run done'));
+    expect(del).toHaveBeenCalledWith({ habitId: 'h1', entryId: `e-h1-${today}` });
+    unmount();
 
-    render(withQueryClient(<TodayPage />));
+    del.mockReset();
+    setEntries([entry('h1', today, { boolean_value: false })]);
+    renderPage();
+    fireEvent.click(screen.getByLabelText('Mark Run not done'));
+    expect(del).toHaveBeenCalledTimes(1);
+  });
 
-    const tile = screen.getByRole('button');
-    fireEvent.click(tile);
+  it('✗ does not count in x/y and shows not-done state', () => {
+    setHabits([baseHabit, { ...baseHabit, id: 'h2', name: 'Read' }]);
+    setEntries([
+      entry('h1', today, { boolean_value: false }),
+      entry('h2', today, { boolean_value: true }),
+    ]);
+    renderPage();
+    expect(screen.getByText('1/2')).toBeInTheDocument();
+    const values = screen.getAllByTestId('log-row').map((r) => r.getAttribute('data-value'));
+    expect(values).toEqual(['notDone', 'done']);
+    expect(screen.queryByTestId('all-done-state')).not.toBeInTheDocument();
+  });
 
-    // HabitSheet should appear
+  it('numeric ✓ opens sheet; ✗ logs boolean_value false', () => {
+    setHabits([{ ...baseHabit, type: 'numeric', target_value: 8 }]);
+    renderPage();
+    fireEvent.click(screen.getByLabelText('Mark Run done'));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Close'));
+    fireEvent.click(screen.getByLabelText('Mark Run not done'));
+    expect(upsert).toHaveBeenCalledWith({ habitId: 'h1', logged_at: today, boolean_value: false });
   });
 
-  it('shows all-done state when all habits have entries for today', () => {
-    const today = new Date().toISOString().split('T')[0];
-    const habits = [
-      {
-        ...baseHabit,
-        id: 'h1',
-        today_entry: { id: 'e1', habit_id: 'h1', logged_at: today, boolean_value: true },
-      },
-      {
-        ...baseHabit,
-        id: 'h2',
-        name: 'Meditate',
-        today_entry: { id: 'e2', habit_id: 'h2', logged_at: today, boolean_value: true },
-      },
-    ];
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
-      isLoading: false,
-      data: habits,
-      error: null,
-    } as any);
+  it('shows numeric progress', () => {
+    setHabits([{ ...baseHabit, type: 'numeric', target_value: 8 }]);
+    setEntries([entry('h1', today, { numeric_value: 3 })]);
+    renderPage();
+    expect(screen.getByText('3/8')).toBeInTheDocument();
+  });
 
-    render(withQueryClient(<TodayPage />));
-
+  it('text habit with value is done and shows all-done banner', () => {
+    setHabits([{ ...baseHabit, type: 'text' }]);
+    setEntries([entry('h1', today, { text_value: 'Great day' })]);
+    renderPage();
     expect(screen.getByTestId('all-done-state')).toBeInTheDocument();
+  });
+
+  it('selects a past day and logs with that date; header shows the date', () => {
+    setHabits([baseHabit]);
+    renderPage();
+    fireEvent.click(screen.getByLabelText('Previous day'));
+    expect(screen.queryByRole('heading', { name: 'Today' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Mark Run done'));
+    expect(upsert).toHaveBeenCalledWith({ habitId: 'h1', logged_at: yesterday, boolean_value: true });
+    fireEvent.click(screen.getByText('Today', { selector: 'button' }));
+    expect(screen.getByRole('heading', { name: 'Today' })).toBeInTheDocument();
+  });
+
+  it('x/y and banner follow the selected day', () => {
+    setHabits([baseHabit]);
+    setEntries([entry('h1', yesterday, { boolean_value: true })]);
+    renderPage();
+    expect(screen.getByText('0/1')).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Previous day'));
+    expect(screen.getByText('1/1')).toBeInTheDocument();
+    expect(screen.getByTestId('all-done-state')).toBeInTheDocument();
+  });
+
+  it('cannot select future days', () => {
+    setHabits([baseHabit]);
+    renderPage();
+    expect(screen.getByLabelText('Next day')).toBeDisabled();
+  });
+
+  it('row tap navigates (no long-press)', () => {
+    setHabits([baseHabit]);
+    renderPage();
+    fireEvent.click(screen.getByText('Run'));
+    // MemoryRouter navigation does not throw; row is a plain click target
+    expect(screen.getByText('Run')).toBeInTheDocument();
+  });
+
+  it('shows streak badge only when streak_mode is not none', () => {
+    setHabits([baseHabit]);
+    const { unmount } = renderPage();
+    expect(screen.getByTestId('streak-badge')).toBeInTheDocument();
+    unmount();
+    setHabits([{ ...baseHabit, streak_mode: 'none' }]);
+    renderPage();
+    expect(screen.queryByTestId('streak-badge')).not.toBeInTheDocument();
   });
 });

@@ -46,7 +46,7 @@ describe('HabitSheet', () => {
     const onClose = vi.fn();
     render(
       withQueryClient(
-        <HabitSheet habit={baseHabit} todayEntry={null} onClose={onClose} />,
+        <HabitSheet habit={baseHabit} date="2026-11-18" entry={null} onClose={onClose} />,
       ),
     );
 
@@ -58,7 +58,7 @@ describe('HabitSheet', () => {
     const onClose = vi.fn();
     render(
       withQueryClient(
-        <HabitSheet habit={baseHabit} todayEntry={null} onClose={onClose} />,
+        <HabitSheet habit={baseHabit} date="2026-11-18" entry={null} onClose={onClose} />,
       ),
     );
 
@@ -74,7 +74,7 @@ describe('HabitSheet', () => {
     const onClose = vi.fn();
     render(
       withQueryClient(
-        <HabitSheet habit={baseHabit} todayEntry={null} onClose={onClose} />,
+        <HabitSheet habit={baseHabit} date="2026-11-18" entry={null} onClose={onClose} />,
       ),
     );
 
@@ -95,7 +95,7 @@ describe('HabitSheet', () => {
     const onClose = vi.fn();
     render(
       withQueryClient(
-        <HabitSheet habit={baseHabit} todayEntry={null} onClose={onClose} />,
+        <HabitSheet habit={baseHabit} date="2026-11-18" entry={null} onClose={onClose} />,
       ),
     );
 
@@ -111,7 +111,7 @@ describe('HabitSheet', () => {
     const onClose = vi.fn();
     render(
       withQueryClient(
-        <HabitSheet habit={textHabit} todayEntry={null} onClose={onClose} />,
+        <HabitSheet habit={textHabit} date="2026-11-18" entry={null} onClose={onClose} />,
       ),
     );
 
@@ -123,7 +123,7 @@ describe('HabitSheet', () => {
     const onClose = vi.fn();
     render(
       withQueryClient(
-        <HabitSheet habit={textHabit} todayEntry={null} onClose={onClose} />,
+        <HabitSheet habit={textHabit} date="2026-11-18" entry={null} onClose={onClose} />,
       ),
     );
 
@@ -143,7 +143,7 @@ describe('HabitSheet', () => {
     const onClose = vi.fn();
     render(
       withQueryClient(
-        <HabitSheet habit={baseHabit} todayEntry={null} onClose={onClose} />,
+        <HabitSheet habit={baseHabit} date="2026-11-18" entry={null} onClose={onClose} />,
       ),
     );
 
