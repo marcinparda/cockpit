@@ -34,6 +34,8 @@ export function useEntryMutations() {
         },
       }),
     onSuccess: (_data, variables) => {
+      // ['habits'] covers the list and the week-range entries query;
+      // ['habit', id] covers detail, per-habit entries and streak.
       void queryClient.invalidateQueries({ queryKey: ['habits'] });
       void queryClient.invalidateQueries({
         queryKey: ['habit', variables.habitId],
@@ -49,6 +51,8 @@ export function useEntryMutations() {
         options: { method: 'DELETE' },
       }),
     onSuccess: (_data, variables) => {
+      // ['habits'] covers the list and the week-range entries query;
+      // ['habit', id] covers detail, per-habit entries and streak.
       void queryClient.invalidateQueries({ queryKey: ['habits'] });
       void queryClient.invalidateQueries({
         queryKey: ['habit', variables.habitId],

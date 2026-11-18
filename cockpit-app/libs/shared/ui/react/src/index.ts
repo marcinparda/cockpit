@@ -13,3 +13,4 @@ export * from './lib/ThemeToggle/ThemeToggle';
 export * from './lib/Select/Select';
 export * from './lib/AlertDialog/AlertDialog';
 export * from './lib/Toaster/Toaster';
+export * from './lib/LogRow/LogRow';

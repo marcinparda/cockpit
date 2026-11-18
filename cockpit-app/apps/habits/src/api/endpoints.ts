@@ -15,6 +15,7 @@ export const CATEGORIES_ENDPOINTS = {
 } as const;
 
 export const ENTRIES_ENDPOINTS = {
+  ALL_BY_RANGE: '/api/v1/habits/entries',
   BY_HABIT: (habitId: string) => `/api/v1/habits/${habitId}/entries`,
   UPSERT: (habitId: string) => `/api/v1/habits/${habitId}/entries`,
   DELETE_ENTRY: (habitId: string, entryId: string) =>
