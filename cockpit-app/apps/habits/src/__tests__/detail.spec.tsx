@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -54,7 +54,7 @@ import * as useHabitStreakModule from '../api/hooks/useHabitStreak';
 import * as useEntryMutationsModule from '../api/hooks/useEntryMutations';
 import * as useFreezeMutationsModule from '../api/hooks/useFreezeMutations';
 import { toDateKey, addDays } from '../utils/date';
-import { HeatmapCalendar } from '../components/HeatmapCalendar';
+import { HeatmapCalendar, heatmapRange } from '../components/HeatmapCalendar';
 import { LineBarChart } from '../components/LineBarChart';
 import HabitDetailPage from '../pages/HabitDetailPage';
 import { createHabitMock } from '../mocks/habit';
@@ -255,20 +255,33 @@ describe('HabitDetailPage', () => {
     );
   });
 
-  it('changes time range when range button is clicked', () => {
-    vi.mocked(useHabitsModule.useHabit).mockReturnValue({
-      isLoading: false,
-      data: mockBooleanHabit,
-    } as any);
+  it('offers the periods 1M, 3M, 6M, 1Y, 2Y, 3Y, 6Y', () => {
+    vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
+    render(withProviders(<HabitDetailPage />));
+    const labels = within(screen.getByRole('group', { name: 'Time range' }))
+      .getAllByRole('button')
+      .map((b) => b.textContent);
+    expect(labels).toEqual(['1M', '3M', '6M', '1Y', '2Y', '3Y', '6Y']);
+  });
 
+  it.each([
+    ['1M', 5],
+    ['3M', 13],
+    ['6M', 26],
+    ['1Y', 52],
+    ['2Y', 104],
+    ['3Y', 156],
+    ['6Y', 312],
+  ])('period %s shows %i weeks of cells and fetches that range', (label, weeks) => {
+    vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
     render(withProviders(<HabitDetailPage />));
 
-    // Find and click the "1W" button
-    const weekBtn = screen.getByRole('button', { name: '1W' });
-    fireEvent.click(weekBtn);
+    fireEvent.click(screen.getByRole('button', { name: label as string }));
 
-    // Should now be active (aria-pressed or highlighted)
-    expect(weekBtn).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: label as string })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getAllByRole('gridcell')).toHaveLength((weeks as number) * 7);
+    const range = heatmapRange(weeks as number);
+    expect(useHabitEntriesModule.useHabitEntries).toHaveBeenLastCalledWith('habit-1', range);
   });
 
   it('renders heatmap entries from real entry data', () => {

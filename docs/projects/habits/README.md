@@ -21,10 +21,10 @@ Row list grouped by category, built on the shared `LogRow` (`@cockpit-app/shared
 
 ## Habit detail heatmap
 
-`components/HeatmapCalendar` is a 12-week grid of buttons (`role="gridcell"`), shown for every Habit type. Per-date state is `done | notDone | unlogged` (done = filled, not done = solid red, unlogged = faint grey); future cells are disabled. `pages/HabitDetailPage.tsx` owns the rules:
+`components/HeatmapCalendar` is a grid of buttons (weeks set by the period) (`role="gridcell"`), shown for every Habit type. Per-date state is `done | notDone | unlogged` (done = filled, not done = solid red, unlogged = faint grey); future cells are disabled. `pages/HabitDetailPage.tsx` owns the rules:
 
-- **Data**: its own `useHabitEntries` call over `heatmapRange(12)`, independent of the 1W–1Y chart range.
+- **Period**: 1M/3M/6M/1Y/2Y/3Y/6Y = 5/13/26/52/104/156/312 weeks (default 3M). The period sets cells shown, fetched range (`heatmapRange(weeks)`), chart and entry list. Up to 13 weeks the grid is fluid; longer periods use fixed 14px cells in a horizontal scroller pinned to the latest week.
 - **Boolean click**: cycles unlogged → done (`boolean_value:true`) → not done (`false`) → unlogged (delete Entry).
 - **Numeric/text click**: opens `HabitSheet` for that date.
 - Mutations invalidate `['habits']` and `['habit', id]`, refreshing heatmap, streak and Today page.
-- Cells are fluid squares (no horizontal overflow at ~375px) with a larger gap on `pointer: coarse` devices.
+- Cells have a larger gap on `pointer: coarse` devices.

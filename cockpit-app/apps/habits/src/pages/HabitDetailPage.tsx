@@ -14,27 +14,21 @@ import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { HABIT_ICONS } from '../icons';
 import type { Habit, HabitEntry } from '../api/schemas';
 
-type TimeRange = '1W' | '1M' | '3M' | '6M' | '1Y';
+type TimeRange = '1M' | '3M' | '6M' | '1Y' | '2Y' | '3Y' | '6Y';
 
-const RANGE_DAYS: Record<TimeRange, number> = {
-  '1W': 7,
-  '1M': 30,
-  '3M': 90,
-  '6M': 180,
-  '1Y': 365,
+/** Heatmap columns (weeks) per period; drives cells shown, chart and entry list. */
+const RANGE_WEEKS: Record<TimeRange, number> = {
+  '1M': 5,
+  '3M': 13,
+  '6M': 26,
+  '1Y': 52,
+  '2Y': 104,
+  '3Y': 156,
+  '6Y': 312,
 };
+const TIME_RANGES = Object.keys(RANGE_WEEKS) as TimeRange[];
 
 const MAX_FREEZES_PER_MONTH = 2;
-
-function getDateRange(days: number): { startDate: string; endDate: string } {
-  const end = new Date();
-  const start = new Date();
-  start.setDate(end.getDate() - days);
-  return {
-    startDate: toDateKey(start),
-    endDate: toDateKey(end),
-  };
-}
 
 function heatmapState(habit: Habit, entry: HabitEntry): HeatmapState {
   if (entry.boolean_value === false) return 'notDone';
@@ -78,17 +72,16 @@ function entryDisplay(entry: HabitEntry): string {
 
 export default function HabitDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [timeRange, setTimeRange] = useState<TimeRange>('1M');
+  const [timeRange, setTimeRange] = useState<TimeRange>('3M');
   const [editOpen, setEditOpen] = useState(false);
   const [sheetDate, setSheetDate] = useState<string | null>(null);
 
   const habitId = id ?? '';
-  const dateRange = getDateRange(RANGE_DAYS[timeRange]);
+  const weeks = RANGE_WEEKS[timeRange];
+  const dateRange = heatmapRange(weeks);
 
   const { data: habit, isLoading: habitLoading } = useHabit(habitId);
   const { data: entries = [], isLoading: entriesLoading } = useHabitEntries(habitId, dateRange);
-  // Heatmap always shows 12 weeks regardless of the selected chart range
-  const { data: heatmapEntriesRaw = [] } = useHabitEntries(habitId, heatmapRange(12));
   const { upsertEntry, deleteEntry } = useEntryMutations();
   const { data: streak } = useHabitStreak(habitId);
   const { createFreeze, freezesThisMonth } = useFreezeMutations();
@@ -112,7 +105,7 @@ export default function HabitDetailPage() {
   }
 
   const IconComponent = HABIT_ICONS[habit.icon] ?? HABIT_ICONS['Star'];
-  const heatmapEntries = buildHeatmapEntries(habit, heatmapEntriesRaw);
+  const heatmapEntries = buildHeatmapEntries(habit, entries);
   const chartData = buildChartData(entries);
 
   function handleCellClick(date: string, state: HeatmapState) {
@@ -126,7 +119,7 @@ export default function HabitDetailPage() {
     } else if (state === 'done') {
       upsertEntry.mutate({ habitId: habit!.id, logged_at: date, boolean_value: false });
     } else {
-      const entry = heatmapEntriesRaw.find((e) => e.logged_at === date);
+      const entry = entries.find((e) => e.logged_at === date);
       if (entry) deleteEntry.mutate({ habitId: habit!.id, entryId: entry.id });
     }
   }
@@ -201,14 +194,14 @@ export default function HabitDetailPage() {
       </button>
 
       {/* Time range selector */}
-      <div role="group" aria-label="Time range" className="flex gap-2">
-        {(['1W', '1M', '3M', '6M', '1Y'] as TimeRange[]).map((range) => (
+      <div role="group" aria-label="Time range" className="flex gap-1.5">
+        {TIME_RANGES.map((range) => (
           <button
             key={range}
             type="button"
             onClick={() => setTimeRange(range)}
             aria-pressed={timeRange === range}
-            className={`flex-1 rounded-lg py-1.5 text-sm font-medium transition-colors ${
+            className={`flex-1 rounded-lg py-1.5 text-xs sm:text-sm font-medium transition-colors ${
               timeRange === range
                 ? 'bg-blue-500 text-white'
                 : 'border hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800'
@@ -230,7 +223,7 @@ export default function HabitDetailPage() {
             <HeatmapCalendar
               entries={heatmapEntries}
               color={habit.color ?? '#3b82f6'}
-              weeks={12}
+              weeks={weeks}
               onCellClick={handleCellClick}
             />
           </div>
@@ -292,7 +285,7 @@ export default function HabitDetailPage() {
         <HabitSheet
           habit={habit}
           date={sheetDate}
-          entry={heatmapEntriesRaw.find((e) => e.logged_at === sheetDate) ?? null}
+          entry={entries.find((e) => e.logged_at === sheetDate) ?? null}
           onClose={() => setSheetDate(null)}
         />
       )}

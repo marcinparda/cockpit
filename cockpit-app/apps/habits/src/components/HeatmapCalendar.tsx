@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { toDateKey } from '../utils/date';
 
 export type HeatmapState = 'done' | 'notDone' | 'unlogged';
@@ -59,6 +60,10 @@ function cellStyle(state: HeatmapState, color: string): React.CSSProperties {
   }
 }
 
+/** Up to this many weeks the grid stretches to fit; beyond it cells keep a fixed size and scroll. */
+const FLUID_MAX_WEEKS = 13;
+const CELL_PX = 14;
+
 export function HeatmapCalendar({
   entries,
   color,
@@ -67,15 +72,26 @@ export function HeatmapCalendar({
 }: HeatmapCalendarProps) {
   const cells = buildCells(weeks);
   const todayKey = toDateKey(new Date());
+  const fluid = weeks <= FLUID_MAX_WEEKS;
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Long ranges overflow: keep the most recent weeks (right edge) in view
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [weeks]);
 
   return (
+    <div ref={scrollRef} className="overflow-x-auto">
     <div
       role="grid"
       aria-label="Habit completion heatmap"
       className="gap-[3px] [@media(pointer:coarse)]:gap-1"
       style={{
         display: 'grid',
-        gridTemplateColumns: `repeat(${weeks}, minmax(0, 1fr))`,
+        gridTemplateColumns: fluid
+          ? `repeat(${weeks}, minmax(0, 1fr))`
+          : `repeat(${weeks}, ${CELL_PX}px)`,
         gridTemplateRows: 'repeat(7, auto)',
         gridAutoFlow: 'column',
       }}
@@ -93,11 +109,12 @@ export function HeatmapCalendar({
             aria-label={`${key}: ${STATE_LABEL[state]}`}
             onClick={() => onCellClick?.(key, state)}
             // Fluid square cell; ~(375-64)/12 ≈ 24px on a phone, no overflow
-            className="aspect-square w-full min-w-0 rounded-[3px] p-0 disabled:cursor-not-allowed disabled:opacity-20"
+            className="aspect-square min-w-0 rounded-[3px] p-0 disabled:cursor-not-allowed disabled:opacity-20"
             style={cellStyle(state, color)}
           />
         );
       })}
+    </div>
     </div>
   );
 }
