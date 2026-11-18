@@ -20,6 +20,14 @@ vi.mock('../api/hooks/useFreezeMutations', () => ({
   useFreezeMutations: vi.fn(),
 }));
 
+vi.mock('../api/hooks/useEntryMutations', () => ({
+  useEntryMutations: vi.fn(),
+}));
+
+vi.mock('../components/HabitSheet', () => ({
+  HabitSheet: ({ date }: { date: string }) => <div data-testid="habit-sheet">{date}</div>,
+}));
+
 vi.mock('../components/HabitCreationSheet', () => ({
   HabitCreationSheet: () => <div data-testid="habit-creation-sheet" />,
 }));
@@ -43,7 +51,9 @@ vi.mock('recharts', () => ({
 import * as useHabitsModule from '../api/hooks/useHabits';
 import * as useHabitEntriesModule from '../api/hooks/useHabitEntries';
 import * as useHabitStreakModule from '../api/hooks/useHabitStreak';
+import * as useEntryMutationsModule from '../api/hooks/useEntryMutations';
 import * as useFreezeMutationsModule from '../api/hooks/useFreezeMutations';
+import { toDateKey, addDays } from '../utils/date';
 import { HeatmapCalendar } from '../components/HeatmapCalendar';
 import { LineBarChart } from '../components/LineBarChart';
 import HabitDetailPage from '../pages/HabitDetailPage';
@@ -87,7 +97,7 @@ const mockTextHabit = createHabitMock({
 
 describe('HeatmapCalendar', () => {
   it('renders correct number of cells for a 12-week range', () => {
-    const entries: Record<string, boolean> = {};
+    const entries = {};
     render(
       <HeatmapCalendar
         entries={entries}
@@ -99,6 +109,37 @@ describe('HeatmapCalendar', () => {
     // 12 weeks × 7 days = 84 cells
     const cells = screen.getAllByRole('gridcell');
     expect(cells).toHaveLength(84);
+  });
+});
+
+describe('HeatmapCalendar states', () => {
+  const today = toDateKey(new Date());
+  const yesterday = addDays(today, -1);
+
+  it('labels done / not done / unlogged distinctly', () => {
+    render(
+      <HeatmapCalendar
+        entries={{ [today]: 'done', [yesterday]: 'notDone' }}
+        color="#22c55e"
+      />,
+    );
+    expect(screen.getByRole('gridcell', { name: `${today}: done` })).toBeInTheDocument();
+    expect(screen.getByRole('gridcell', { name: `${yesterday}: not done` })).toBeInTheDocument();
+    expect(
+      screen.getByRole('gridcell', { name: `${addDays(today, -2)}: unlogged` }),
+    ).toBeInTheDocument();
+  });
+
+  it('disables future cells and reports clicks on past cells', () => {
+    const onCellClick = vi.fn();
+    render(<HeatmapCalendar entries={{}} color="#22c55e" onCellClick={onCellClick} />);
+    const future = screen.getAllByRole('gridcell').filter((c) => (c as HTMLButtonElement).disabled);
+    expect(future.length).toBeGreaterThan(0);
+    fireEvent.click(future[0]);
+    expect(onCellClick).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('gridcell', { name: `${yesterday}: unlogged` }));
+    expect(onCellClick).toHaveBeenCalledWith(yesterday, 'unlogged');
   });
 });
 
@@ -122,6 +163,11 @@ describe('HabitDetailPage', () => {
   const mockMutate = vi.fn();
 
   beforeEach(() => {
+    vi.mocked(useEntryMutationsModule.useEntryMutations).mockReturnValue({
+      upsertEntry: { mutate: vi.fn() },
+      deleteEntry: { mutate: vi.fn() },
+    } as any);
+
     vi.mocked(useHabitEntriesModule.useHabitEntries).mockReturnValue({
       isLoading: false,
       data: [],
@@ -242,5 +288,59 @@ describe('HabitDetailPage', () => {
     // Grid cells should be present (heatmap rendered)
     const cells = screen.getAllByRole('gridcell');
     expect(cells.length).toBeGreaterThan(0);
+  });
+
+  describe('heatmap interaction', () => {
+    const upsert = vi.fn();
+    const del = vi.fn();
+    const day = addDays(toDateKey(new Date()), -1);
+
+    beforeEach(() => {
+      upsert.mockClear();
+      del.mockClear();
+      vi.mocked(useEntryMutationsModule.useEntryMutations).mockReturnValue({
+        upsertEntry: { mutate: upsert },
+        deleteEntry: { mutate: del },
+      } as any);
+    });
+
+    function entry(boolean_value: boolean | null) {
+      return {
+        id: 'e1', habit_id: 'habit-1', user_id: 'u', logged_at: day,
+        boolean_value, numeric_value: null, text_value: null,
+      };
+    }
+
+    it('cycles boolean cell: unlogged -> done', () => {
+      vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
+      render(withProviders(<HabitDetailPage />));
+      fireEvent.click(screen.getByRole('gridcell', { name: `${day}: unlogged` }));
+      expect(upsert).toHaveBeenCalledWith({ habitId: 'habit-1', logged_at: day, boolean_value: true });
+    });
+
+    it('cycles boolean cell: done -> not done', () => {
+      vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
+      vi.mocked(useHabitEntriesModule.useHabitEntries).mockReturnValue({ isLoading: false, data: [entry(true)] } as any);
+      render(withProviders(<HabitDetailPage />));
+      fireEvent.click(screen.getByRole('gridcell', { name: `${day}: done` }));
+      expect(upsert).toHaveBeenCalledWith({ habitId: 'habit-1', logged_at: day, boolean_value: false });
+    });
+
+    it('cycles boolean cell: not done -> deleted', () => {
+      vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
+      vi.mocked(useHabitEntriesModule.useHabitEntries).mockReturnValue({ isLoading: false, data: [entry(false)] } as any);
+      render(withProviders(<HabitDetailPage />));
+      fireEvent.click(screen.getByRole('gridcell', { name: `${day}: not done` }));
+      expect(del).toHaveBeenCalledWith({ habitId: 'habit-1', entryId: 'e1' });
+    });
+
+    it('opens the sheet for that date on numeric habit cell click', () => {
+      vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockNumericHabit } as any);
+      vi.mocked(useHabitEntriesModule.useHabitEntries).mockReturnValue({ isLoading: false, data: [] } as any);
+      render(withProviders(<HabitDetailPage />, 'habit-2'));
+      fireEvent.click(screen.getByRole('gridcell', { name: `${day}: unlogged` }));
+      expect(screen.getByTestId('habit-sheet')).toHaveTextContent(day);
+      expect(upsert).not.toHaveBeenCalled();
+    });
   });
 });
