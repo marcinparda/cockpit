@@ -21,7 +21,7 @@ Row list grouped by category, built on the shared `LogRow` (`@cockpit-app/shared
 
 ## Habit detail heatmap
 
-`components/HeatmapCalendar` is a 12-week grid of buttons (`role="gridcell"`), shown for every Habit type. Per-date state is `done | notDone | unlogged` (done = filled, not done = red outline, unlogged = faint grey); future cells are disabled. `pages/HabitDetailPage.tsx` owns the rules:
+`components/HeatmapCalendar` is a 12-week grid of buttons (`role="gridcell"`), shown for every Habit type. Per-date state is `done | notDone | unlogged` (done = filled, not done = solid red, unlogged = faint grey); future cells are disabled. `pages/HabitDetailPage.tsx` owns the rules:
 
 - **Data**: its own `useHabitEntries` call over `heatmapRange(12)`, independent of the 1W–1Y chart range.
 - **Boolean click**: cycles unlogged → done (`boolean_value:true`) → not done (`false`) → unlogged (delete Entry).

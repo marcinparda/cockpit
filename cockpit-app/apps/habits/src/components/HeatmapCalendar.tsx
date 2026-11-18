@@ -49,11 +49,8 @@ function cellStyle(state: HeatmapState, color: string): React.CSSProperties {
     case 'done':
       return { backgroundColor: color };
     case 'notDone':
-      // Hollow cell with a red outline: distinct from filled (done) and faint grey (unlogged)
-      return {
-        backgroundColor: 'transparent',
-        border: '2px solid #ef4444',
-      };
+      // Solid red: distinct from habit color (done) and faint grey (unlogged)
+      return { backgroundColor: '#ef4444' };
     default:
       return {
         backgroundColor: 'var(--color-muted, #e5e7eb)',
