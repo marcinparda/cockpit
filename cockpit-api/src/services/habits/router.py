@@ -4,7 +4,7 @@ from datetime import date
 from typing import List, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
@@ -234,6 +234,25 @@ async def list_habits(
         r.best_streak = streak_result.best_streak
         result.append(r)
     return result
+
+
+@router.get("/habits/entries", response_model=List[HabitEntryResponse])
+async def list_all_entries(
+    start_date: date = Query(...),
+    end_date: date = Query(...),
+    current_user: User = Depends(require_permission(Features.HABITS, Actions.READ)),
+    db: AsyncSession = Depends(get_db),
+) -> List[HabitEntryResponse]:
+    """List all of the user's entries across habits within start_date..end_date (inclusive)."""
+    if end_date < start_date:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="end_date must not be before start_date",
+        )
+    entries = await repository.list_entries_for_user(
+        db, UUID(str(current_user.id)), start_date, end_date
+    )
+    return [HabitEntryResponse.model_validate(e) for e in entries]
 
 
 @router.post("/habits", response_model=HabitResponse, status_code=status.HTTP_201_CREATED)
