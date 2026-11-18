@@ -21,6 +21,11 @@ from src.services.habits.models import (
 )
 
 
+# A boolean Entry with boolean_value == False is "not done". It is stored but
+# is not a completion. All completion queries (streaks, stats) must use this.
+COMPLETED_ENTRY = HabitEntry.boolean_value.is_distinct_from(False)
+
+
 # ---------------------------------------------------------------------------
 # Habit CRUD
 # ---------------------------------------------------------------------------
@@ -138,6 +143,24 @@ async def list_entries(
     return result.scalars().all()
 
 
+async def list_entries_for_user(
+    db: AsyncSession, user_id: UUID, start_date: date, end_date: date
+) -> Sequence[HabitEntry]:
+    """List all of a user's entries across habits within an inclusive date range."""
+    result = await db.execute(
+        select(HabitEntry)
+        .where(
+            and_(
+                HabitEntry.user_id == user_id,
+                HabitEntry.logged_at >= start_date,
+                HabitEntry.logged_at <= end_date,
+            )
+        )
+        .order_by(HabitEntry.logged_at.desc())
+    )
+    return result.scalars().all()
+
+
 async def get_entry_by_id(
     db: AsyncSession, entry_id: UUID, user_id: UUID
 ) -> Optional[HabitEntry]:
@@ -159,10 +182,14 @@ async def delete_entry(db: AsyncSession, entry: HabitEntry) -> None:
 async def get_logged_dates(
     db: AsyncSession, habit_id: UUID, user_id: UUID
 ) -> list[date]:
-    """Return all logged_at dates for a habit (for streak calculation)."""
+    """Return logged_at dates of completed entries for a habit (for streak calculation)."""
     result = await db.execute(
         select(HabitEntry.logged_at).where(
-            and_(HabitEntry.habit_id == habit_id, HabitEntry.user_id == user_id)
+            and_(
+                HabitEntry.habit_id == habit_id,
+                HabitEntry.user_id == user_id,
+                COMPLETED_ENTRY,
+            )
         )
     )
     return list(result.scalars().all())
@@ -277,10 +304,14 @@ async def delete_category(db: AsyncSession, category: HabitCategory) -> None:
 async def count_completed_today(
     db: AsyncSession, user_id: UUID, today: date
 ) -> int:
-    """Count how many of the user's habits have an entry for today."""
+    """Count how many of the user's habits have a completed entry for today."""
     result = await db.execute(
         select(func.count(HabitEntry.id)).where(
-            and_(HabitEntry.user_id == user_id, HabitEntry.logged_at == today)
+            and_(
+                HabitEntry.user_id == user_id,
+                HabitEntry.logged_at == today,
+                COMPLETED_ENTRY,
+            )
         )
     )
     return result.scalar_one()
@@ -299,7 +330,7 @@ async def count_active_habits(db: AsyncSession, user_id: UUID) -> int:
 async def get_weekly_completion_counts(
     db: AsyncSession, user_id: UUID, from_date: date, to_date: date
 ) -> list[tuple[date, int]]:
-    """Return (logged_at, count) pairs for each day in the date range."""
+    """Return (logged_at, completed count) pairs for each day in the date range."""
     result = await db.execute(
         select(HabitEntry.logged_at, func.count(HabitEntry.id))
         .where(
@@ -307,6 +338,7 @@ async def get_weekly_completion_counts(
                 HabitEntry.user_id == user_id,
                 HabitEntry.logged_at >= from_date,
                 HabitEntry.logged_at <= to_date,
+                COMPLETED_ENTRY,
             )
         )
         .group_by(HabitEntry.logged_at)
@@ -387,10 +419,10 @@ async def get_today_entries_by_habit(
 async def get_all_logged_dates_for_user(
     db: AsyncSession, user_id: UUID
 ) -> dict[UUID, list[date]]:
-    """Return all logged_at dates grouped by habit_id for a user. Single query."""
+    """Return completed-entry dates grouped by habit_id for a user. Single query."""
     result = await db.execute(
         select(HabitEntry.habit_id, HabitEntry.logged_at).where(
-            HabitEntry.user_id == user_id
+            and_(HabitEntry.user_id == user_id, COMPLETED_ENTRY)
         )
     )
     mapping: dict[UUID, list[date]] = {}

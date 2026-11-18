@@ -81,7 +81,7 @@ A recurring behavior a User tracks, with a value type (`boolean`, `numeric`, `te
 _Avoid_: goal, routine
 
 **Entry**:
-One logged result of a Habit on a date.
+One logged result of a Habit on a date. A boolean Entry is _done_ (`true`), _not done_ (`false`) or _not logged_ (no row); only _done_ counts as completion for Streaks and stats, so _not done_ and _not logged_ behave identically (a _not done_ in a period still in progress is not yet a miss). Numeric and text Entries always count as completion.
 _Avoid_: log, check-in, completion
 
 **Streak**:
