@@ -85,7 +85,7 @@ export function HeatmapCalendar({
     <div
       role="grid"
       aria-label="Habit completion heatmap"
-      className="w-max"
+      className="ml-auto w-max"
       style={{
         display: 'grid',
         gap: `${GAP_PX}px`,
@@ -98,15 +98,16 @@ export function HeatmapCalendar({
         const key = toDateKey(date);
         const state = entries[key] ?? 'unlogged';
         const future = key > todayKey;
+        // Days later this week: keep the grid slot, show nothing
+        if (future) return <div key={key} aria-hidden="true" />;
         return (
           <button
             key={key}
             type="button"
             role="gridcell"
-            disabled={future}
             aria-label={`${key}: ${STATE_LABEL[state]}`}
             onClick={() => onCellClick?.(key, state)}
-            className="rounded-[3px] p-0 disabled:cursor-not-allowed disabled:opacity-20"
+            className="rounded-[3px] p-0"
             style={cellStyle(state, color)}
           />
         );

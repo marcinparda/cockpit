@@ -21,9 +21,9 @@ Row list grouped by category, built on the shared `LogRow` (`@cockpit-app/shared
 
 ## Habit detail heatmap
 
-`components/HeatmapCalendar` is a grid of buttons (weeks set by the period) (`role="gridcell"`), shown for every Habit type. Per-date state is `done | notDone | unlogged` (done = filled, not done = solid red, unlogged = faint grey); future cells are disabled. `pages/HabitDetailPage.tsx` owns the rules:
+`components/HeatmapCalendar` is a grid of buttons (weeks set by the period) (`role="gridcell"`), shown for every Habit type. Per-date state is `done | notDone | unlogged` (done = filled, not done = solid red, unlogged = faint grey); days after today (rest of the current week) are not rendered. `pages/HabitDetailPage.tsx` owns the rules:
 
-- **Period**: 1M/3M/6M/1Y/2Y/3Y/6Y = 5/13/26/52/104/156/312 weeks (default 3M). The period sets cells shown, fetched range (`heatmapRange(weeks)`), chart and entry list. Cells are a fixed 20px for every period (3M fits a 375px phone); longer periods scroll horizontally, pinned to the latest week.
+- **Period**: 6M/1Y/2Y/3Y/6Y = 26/52/104/156/312 weeks (default 1Y). The period sets cells shown, fetched range (`heatmapRange(weeks)`), chart and entry list. Cells are a fixed 20px for every period ; the grid is right-aligned and wider periods scroll horizontally, pinned to the latest week.
 - **Boolean click**: cycles unlogged → done (`boolean_value:true`) → not done (`false`) → unlogged (delete Entry).
 - **Numeric/text click**: opens `HabitSheet` for that date.
 - Mutations invalidate `['habits']` and `['habit', id]`, refreshing heatmap, streak and Today page.

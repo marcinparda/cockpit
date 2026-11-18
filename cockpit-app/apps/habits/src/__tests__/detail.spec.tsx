@@ -59,6 +59,9 @@ import { LineBarChart } from '../components/LineBarChart';
 import HabitDetailPage from '../pages/HabitDetailPage';
 import { createHabitMock } from '../mocks/habit';
 
+/** Days after today in the current Sun–Sat week are not rendered. */
+const FUTURE_DAYS_THIS_WEEK = 6 - new Date().getDay();
+
 function makeQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false } } });
 }
@@ -108,7 +111,7 @@ describe('HeatmapCalendar', () => {
 
     // 12 weeks × 7 days = 84 cells
     const cells = screen.getAllByRole('gridcell');
-    expect(cells).toHaveLength(84);
+    expect(cells).toHaveLength(84 - FUTURE_DAYS_THIS_WEEK);
   });
 });
 
@@ -130,13 +133,11 @@ describe('HeatmapCalendar states', () => {
     ).toBeInTheDocument();
   });
 
-  it('disables future cells and reports clicks on past cells', () => {
+  it('does not render days after today and reports clicks on past cells', () => {
     const onCellClick = vi.fn();
     render(<HeatmapCalendar entries={{}} color="#22c55e" onCellClick={onCellClick} />);
-    const future = screen.getAllByRole('gridcell').filter((c) => (c as HTMLButtonElement).disabled);
-    expect(future.length).toBeGreaterThan(0);
-    fireEvent.click(future[0]);
-    expect(onCellClick).not.toHaveBeenCalled();
+    expect(screen.queryByRole('gridcell', { name: `${addDays(today, 1)}: unlogged` })).toBeNull();
+    expect(screen.getByRole('gridcell', { name: `${today}: unlogged` })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('gridcell', { name: `${yesterday}: unlogged` }));
     expect(onCellClick).toHaveBeenCalledWith(yesterday, 'unlogged');
@@ -255,18 +256,18 @@ describe('HabitDetailPage', () => {
     );
   });
 
-  it('offers the periods 1M, 3M, 6M, 1Y, 2Y, 3Y, 6Y', () => {
+  it('offers the periods 6M, 1Y, 2Y, 3Y, 6Y, defaulting to 1Y', () => {
     vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
     render(withProviders(<HabitDetailPage />));
     const labels = within(screen.getByRole('group', { name: 'Time range' }))
       .getAllByRole('button')
       .map((b) => b.textContent);
-    expect(labels).toEqual(['1M', '3M', '6M', '1Y', '2Y', '3Y', '6Y']);
+    expect(labels).toEqual(['6M', '1Y', '2Y', '3Y', '6Y']);
+    expect(screen.getByRole('button', { name: '1Y' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getAllByRole('gridcell')).toHaveLength(52 * 7 - FUTURE_DAYS_THIS_WEEK);
   });
 
   it.each([
-    ['1M', 5],
-    ['3M', 13],
     ['6M', 26],
     ['1Y', 52],
     ['2Y', 104],
@@ -279,7 +280,7 @@ describe('HabitDetailPage', () => {
     fireEvent.click(screen.getByRole('button', { name: label as string }));
 
     expect(screen.getByRole('button', { name: label as string })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getAllByRole('gridcell')).toHaveLength((weeks as number) * 7);
+    expect(screen.getAllByRole('gridcell')).toHaveLength((weeks as number) * 7 - FUTURE_DAYS_THIS_WEEK);
     const range = heatmapRange(weeks as number);
     expect(useHabitEntriesModule.useHabitEntries).toHaveBeenLastCalledWith('habit-1', range);
   });

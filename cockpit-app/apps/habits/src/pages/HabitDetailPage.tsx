@@ -14,12 +14,10 @@ import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { HABIT_ICONS } from '../icons';
 import type { Habit, HabitEntry } from '../api/schemas';
 
-type TimeRange = '1M' | '3M' | '6M' | '1Y' | '2Y' | '3Y' | '6Y';
+type TimeRange = '6M' | '1Y' | '2Y' | '3Y' | '6Y';
 
 /** Heatmap columns (weeks) per period; drives cells shown, chart and entry list. */
 const RANGE_WEEKS: Record<TimeRange, number> = {
-  '1M': 5,
-  '3M': 13,
   '6M': 26,
   '1Y': 52,
   '2Y': 104,
@@ -72,7 +70,7 @@ function entryDisplay(entry: HabitEntry): string {
 
 export default function HabitDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [timeRange, setTimeRange] = useState<TimeRange>('3M');
+  const [timeRange, setTimeRange] = useState<TimeRange>('1Y');
   const [editOpen, setEditOpen] = useState(false);
   const [sheetDate, setSheetDate] = useState<string | null>(null);
 
