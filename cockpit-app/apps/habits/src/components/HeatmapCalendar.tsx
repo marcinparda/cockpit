@@ -60,9 +60,9 @@ function cellStyle(state: HeatmapState, color: string): React.CSSProperties {
   }
 }
 
-/** Up to this many weeks the grid stretches to fit; beyond it cells keep a fixed size and scroll. */
-const FLUID_MAX_WEEKS = 13;
-const CELL_PX = 14;
+/** Same cell size for every period; long periods scroll horizontally. 13 weeks (3M) fit a 375px phone. */
+const CELL_PX = 20;
+const GAP_PX = 3;
 
 export function HeatmapCalendar({
   entries,
@@ -72,7 +72,6 @@ export function HeatmapCalendar({
 }: HeatmapCalendarProps) {
   const cells = buildCells(weeks);
   const todayKey = toDateKey(new Date());
-  const fluid = weeks <= FLUID_MAX_WEEKS;
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Long ranges overflow: keep the most recent weeks (right edge) in view
@@ -86,13 +85,12 @@ export function HeatmapCalendar({
     <div
       role="grid"
       aria-label="Habit completion heatmap"
-      className="gap-[3px] [@media(pointer:coarse)]:gap-1"
+      className="w-max"
       style={{
         display: 'grid',
-        gridTemplateColumns: fluid
-          ? `repeat(${weeks}, minmax(0, 1fr))`
-          : `repeat(${weeks}, ${CELL_PX}px)`,
-        gridTemplateRows: 'repeat(7, auto)',
+        gap: `${GAP_PX}px`,
+        gridTemplateColumns: `repeat(${weeks}, ${CELL_PX}px)`,
+        gridTemplateRows: `repeat(7, ${CELL_PX}px)`,
         gridAutoFlow: 'column',
       }}
     >
@@ -108,8 +106,7 @@ export function HeatmapCalendar({
             disabled={future}
             aria-label={`${key}: ${STATE_LABEL[state]}`}
             onClick={() => onCellClick?.(key, state)}
-            // Fluid square cell; ~(375-64)/12 ≈ 24px on a phone, no overflow
-            className="aspect-square min-w-0 rounded-[3px] p-0 disabled:cursor-not-allowed disabled:opacity-20"
+            className="rounded-[3px] p-0 disabled:cursor-not-allowed disabled:opacity-20"
             style={cellStyle(state, color)}
           />
         );
