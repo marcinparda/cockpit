@@ -1,26 +1,9 @@
 import { NavLink } from 'react-router-dom';
-import { Home, List, BarChart, Settings } from 'lucide-react';
-
-interface NavItem {
-  to: string;
-  label: string;
-  icon: React.ReactNode;
-}
-
-const navItems: NavItem[] = [
-  { to: '/', label: 'Today', icon: <Home className="h-5 w-5" /> },
-  { to: '/habits', label: 'Habits', icon: <List className="h-5 w-5" /> },
-  { to: '/stats', label: 'Stats', icon: <BarChart className="h-5 w-5" /> },
-  {
-    to: '/settings',
-    label: 'Settings',
-    icon: <Settings className="h-5 w-5" />,
-  },
-];
+import { navItems } from './navItems';
 
 export default function BottomNav() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 flex w-full border-t border-border bg-background">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 flex w-full border-t border-border bg-background md:hidden">
       {navItems.map(({ to, label, icon }) => (
         <NavLink
           key={to}

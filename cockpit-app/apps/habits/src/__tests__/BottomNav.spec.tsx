@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
+import { navItems } from '../components/navItems';
 
 describe('BottomNav', () => {
   it('renders 4 tabs with correct labels and links', () => {
@@ -23,5 +24,20 @@ describe('BottomNav', () => {
     expect(hrefs).toContain('/habits');
     expect(hrefs).toContain('/stats');
     expect(hrefs).toContain('/settings');
+  });
+
+  it('renders from the shared navItems and highlights the active route', () => {
+    render(
+      <MemoryRouter initialEntries={['/habits']}>
+        <BottomNav />
+      </MemoryRouter>,
+    );
+    expect(screen.getAllByRole('link')).toHaveLength(navItems.length);
+    expect(screen.getByRole('link', { name: 'Habits' })).toHaveClass(
+      'text-primary',
+    );
+    expect(screen.getByRole('link', { name: 'Today' })).not.toHaveClass(
+      'text-primary',
+    );
   });
 });
