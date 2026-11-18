@@ -18,3 +18,12 @@ Row list grouped by category, built on the shared `LogRow` (`@cockpit-app/shared
 - **Data**: one `GET /api/v1/habits/entries?start_date&end_date` per visible week (`useEntriesByRange`, key `['habits','entries',start,end]`, refreshed by entry mutations via `['habits']`).
 - **✓/✗**: boolean ✓ → `boolean_value:true`, ✗ → `false`, tapping the active button deletes the Entry. Numeric/text ✓ opens `HabitSheet` for the selected date; ✗ upserts `boolean_value:false` (API accepts it on any type, counts as not done) and **replaces** any existing numeric/text value.
 - Row tap opens the Habit detail page (no long-press).
+
+## Habit detail heatmap
+
+`components/HeatmapCalendar` is a grid of buttons (weeks set by the period) (`role="gridcell"`), shown for every Habit type. Per-date state is `done | notDone | unlogged` (done = filled, not done = solid red, unlogged = faint grey); days after today (rest of the current week) are not rendered. `pages/HabitDetailPage.tsx` owns the rules:
+
+- **Period**: 6M/1Y/2Y/3Y/6Y = 26/52/104/156/312 weeks (default 1Y). The period sets cells shown, fetched range (`heatmapRange(weeks)`), chart and entry list. Cells are a fixed 20px for every period ; the grid is right-aligned and wider periods scroll horizontally, pinned to the latest week.
+- **Boolean click**: cycles unlogged → done (`boolean_value:true`) → not done (`false`) → unlogged (delete Entry).
+- **Numeric/text click**: opens `HabitSheet` for that date.
+- Mutations invalidate `['habits']` and `['habit', id]`, refreshing heatmap, streak and Today page.

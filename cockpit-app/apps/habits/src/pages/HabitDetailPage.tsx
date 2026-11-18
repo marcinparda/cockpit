@@ -5,38 +5,44 @@ import { useHabit } from '../api/hooks/useHabits';
 import { useHabitEntries } from '../api/hooks/useHabitEntries';
 import { useHabitStreak } from '../api/hooks/useHabitStreak';
 import { useFreezeMutations } from '../api/hooks/useFreezeMutations';
-import { HeatmapCalendar } from '../components/HeatmapCalendar';
+import { HeatmapCalendar, heatmapRange, type HeatmapState } from '../components/HeatmapCalendar';
+import { HabitSheet } from '../components/HabitSheet';
+import { useEntryMutations } from '../api/hooks/useEntryMutations';
+import { toDateKey } from '../utils/date';
 import { LineBarChart } from '../components/LineBarChart';
 import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { HABIT_ICONS } from '../icons';
-import type { HabitEntry } from '../api/schemas';
+import type { Habit, HabitEntry } from '../api/schemas';
 
-type TimeRange = '1W' | '1M' | '3M' | '6M' | '1Y';
+type TimeRange = '6M' | '1Y' | '2Y' | '3Y' | '6Y';
 
-const RANGE_DAYS: Record<TimeRange, number> = {
-  '1W': 7,
-  '1M': 30,
-  '3M': 90,
-  '6M': 180,
-  '1Y': 365,
+/** Heatmap columns (weeks) per period; drives cells shown, chart and entry list. */
+const RANGE_WEEKS: Record<TimeRange, number> = {
+  '6M': 26,
+  '1Y': 52,
+  '2Y': 104,
+  '3Y': 156,
+  '6Y': 312,
 };
+const TIME_RANGES = Object.keys(RANGE_WEEKS) as TimeRange[];
 
 const MAX_FREEZES_PER_MONTH = 2;
 
-function getDateRange(days: number): { startDate: string; endDate: string } {
-  const end = new Date();
-  const start = new Date();
-  start.setDate(end.getDate() - days);
-  return {
-    startDate: start.toISOString().slice(0, 10),
-    endDate: end.toISOString().slice(0, 10),
-  };
+function heatmapState(habit: Habit, entry: HabitEntry): HeatmapState {
+  if (entry.boolean_value === false) return 'notDone';
+  if (habit.type === 'boolean') return entry.boolean_value === true ? 'done' : 'unlogged';
+  if (habit.type === 'numeric') {
+    if (entry.numeric_value == null) return 'unlogged';
+    if (habit.target_value != null && entry.numeric_value < habit.target_value) return 'unlogged';
+    return 'done';
+  }
+  return entry.text_value?.trim() ? 'done' : 'unlogged';
 }
 
-function buildHeatmapEntries(entries: HabitEntry[]): Record<string, boolean> {
-  const map: Record<string, boolean> = {};
+function buildHeatmapEntries(habit: Habit, entries: HabitEntry[]): Record<string, HeatmapState> {
+  const map: Record<string, HeatmapState> = {};
   for (const entry of entries) {
-    map[entry.logged_at] = true;
+    map[entry.logged_at] = heatmapState(habit, entry);
   }
   return map;
 }
@@ -64,14 +70,17 @@ function entryDisplay(entry: HabitEntry): string {
 
 export default function HabitDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const [timeRange, setTimeRange] = useState<TimeRange>('1M');
+  const [timeRange, setTimeRange] = useState<TimeRange>('1Y');
   const [editOpen, setEditOpen] = useState(false);
+  const [sheetDate, setSheetDate] = useState<string | null>(null);
 
   const habitId = id ?? '';
-  const dateRange = getDateRange(RANGE_DAYS[timeRange]);
+  const weeks = RANGE_WEEKS[timeRange];
+  const dateRange = heatmapRange(weeks);
 
   const { data: habit, isLoading: habitLoading } = useHabit(habitId);
   const { data: entries = [], isLoading: entriesLoading } = useHabitEntries(habitId, dateRange);
+  const { upsertEntry, deleteEntry } = useEntryMutations();
   const { data: streak } = useHabitStreak(habitId);
   const { createFreeze, freezesThisMonth } = useFreezeMutations();
 
@@ -94,11 +103,27 @@ export default function HabitDetailPage() {
   }
 
   const IconComponent = HABIT_ICONS[habit.icon] ?? HABIT_ICONS['Star'];
-  const heatmapEntries = buildHeatmapEntries(entries);
+  const heatmapEntries = buildHeatmapEntries(habit, entries);
   const chartData = buildChartData(entries);
 
+  function handleCellClick(date: string, state: HeatmapState) {
+    if (habit!.type !== 'boolean') {
+      setSheetDate(date);
+      return;
+    }
+    // unlogged -> done -> not done -> unlogged
+    if (state === 'unlogged') {
+      upsertEntry.mutate({ habitId: habit!.id, logged_at: date, boolean_value: true });
+    } else if (state === 'done') {
+      upsertEntry.mutate({ habitId: habit!.id, logged_at: date, boolean_value: false });
+    } else {
+      const entry = entries.find((e) => e.logged_at === date);
+      if (entry) deleteEntry.mutate({ habitId: habit!.id, entryId: entry.id });
+    }
+  }
+
   function handleApplyFreeze() {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = toDateKey(new Date());
     createFreeze.mutate({ habitId: habit!.id, freeze_date: today });
   }
 
@@ -167,14 +192,14 @@ export default function HabitDetailPage() {
       </button>
 
       {/* Time range selector */}
-      <div role="group" aria-label="Time range" className="flex gap-2">
-        {(['1W', '1M', '3M', '6M', '1Y'] as TimeRange[]).map((range) => (
+      <div role="group" aria-label="Time range" className="flex gap-1.5">
+        {TIME_RANGES.map((range) => (
           <button
             key={range}
             type="button"
             onClick={() => setTimeRange(range)}
             aria-pressed={timeRange === range}
-            className={`flex-1 rounded-lg py-1.5 text-sm font-medium transition-colors ${
+            className={`flex-1 rounded-lg py-1.5 text-xs sm:text-sm font-medium transition-colors ${
               timeRange === range
                 ? 'bg-blue-500 text-white'
                 : 'border hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800'
@@ -190,40 +215,44 @@ export default function HabitDetailPage() {
         <div className="flex h-32 items-center justify-center">
           <p className="text-sm text-muted-foreground">Loading data...</p>
         </div>
-      ) : habit.type === 'boolean' ? (
-        <div className="overflow-x-auto rounded-xl border p-4 dark:border-gray-700">
-          <HeatmapCalendar
-            entries={heatmapEntries}
-            color={habit.color ?? '#3b82f6'}
-            weeks={12}
-          />
-        </div>
-      ) : habit.type === 'numeric' ? (
-        <div className="rounded-xl border p-4 dark:border-gray-700">
-          <LineBarChart
-            data={chartData}
-            targetValue={habit.target_value ?? undefined}
-            color={habit.color ?? '#3b82f6'}
-          />
-        </div>
       ) : (
-        /* text habit — timeline */
-        <div className="flex flex-col gap-2 rounded-xl border p-4 dark:border-gray-700">
-          <h2 className="text-sm font-semibold">Journal entries</h2>
-          {entries.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No entries yet</p>
-          ) : (
-            [...entries]
-              .sort((a, b) => b.logged_at.localeCompare(a.logged_at))
-              .slice(0, 20)
-              .map((entry) => (
-                <div key={entry.id} className="flex items-start gap-2 text-sm">
-                  <span className="w-24 shrink-0 text-muted-foreground">{entry.logged_at}</span>
-                  <span>{entry.text_value ?? '—'}</span>
-                </div>
-              ))
+        <>
+          <div className="rounded-xl border p-4 dark:border-gray-700">
+            <HeatmapCalendar
+              entries={heatmapEntries}
+              color={habit.color ?? '#3b82f6'}
+              weeks={weeks}
+              onCellClick={handleCellClick}
+            />
+          </div>
+          {habit.type === 'numeric' && (
+            <div className="rounded-xl border p-4 dark:border-gray-700">
+              <LineBarChart
+                data={chartData}
+                targetValue={habit.target_value ?? undefined}
+                color={habit.color ?? '#3b82f6'}
+              />
+            </div>
           )}
-        </div>
+          {habit.type === 'text' && (
+            <div className="flex flex-col gap-2 rounded-xl border p-4 dark:border-gray-700">
+              <h2 className="text-sm font-semibold">Journal entries</h2>
+              {entries.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No entries yet</p>
+              ) : (
+                [...entries]
+                  .sort((a, b) => b.logged_at.localeCompare(a.logged_at))
+                  .slice(0, 20)
+                  .map((entry) => (
+                    <div key={entry.id} className="flex items-start gap-2 text-sm">
+                      <span className="w-24 shrink-0 text-muted-foreground">{entry.logged_at}</span>
+                      <span>{entry.text_value ?? '—'}</span>
+                    </div>
+                  ))
+              )}
+            </div>
+          )}
+        </>
       )}
 
       {/* Entry log (boolean/numeric habits) */}
@@ -247,6 +276,16 @@ export default function HabitDetailPage() {
               ))
           )}
         </div>
+      )}
+
+      {/* Past-day check-in sheet (numeric/text) */}
+      {sheetDate && (
+        <HabitSheet
+          habit={habit}
+          date={sheetDate}
+          entry={entries.find((e) => e.logged_at === sheetDate) ?? null}
+          onClose={() => setSheetDate(null)}
+        />
       )}
 
       {/* Edit sheet */}
