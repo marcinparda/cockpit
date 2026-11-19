@@ -872,6 +872,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/habits/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List All Entries
+         * @description List all of the user's entries across habits within start_date..end_date (inclusive).
+         */
+        get: operations["list_all_entries_api_v1_habits_entries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/habits/{habit_id}": {
         parameters: {
             query?: never;
@@ -4007,6 +4027,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HabitResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_all_entries_api_v1_habits_entries_get: {
+        parameters: {
+            query: {
+                start_date: string;
+                end_date: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: {
+                access_token?: string | null;
+            };
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HabitEntryResponse"][];
                 };
             };
             /** @description Validation Error */
