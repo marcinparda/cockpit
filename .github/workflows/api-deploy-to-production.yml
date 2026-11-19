@@ -68,7 +68,6 @@ jobs:
           export VIKUNJA_PASSWORD='${{ secrets.VIKUNJA_PASSWORD }}'
           export ACTUAL_HTTP_API_KEY='${{ secrets.ACTUAL_HTTP_API_KEY }}'
           export ACTUAL_BUDGET_SYNC_ID='${{ secrets.ACTUAL_BUDGET_SYNC_ID }}'
-          export OPEN_ROUTER_KEY='${{ secrets.OPEN_ROUTER_KEY }}'
           export SERPER_API_KEY='${{ secrets.SERPER_API_KEY }}'
           export BRAIN_NOTES_PATH='${{ secrets.BRAIN_NOTES_PATH }}'
           export BRAIN_GIT_REMOTE='${{ secrets.BRAIN_GIT_REMOTE }}'

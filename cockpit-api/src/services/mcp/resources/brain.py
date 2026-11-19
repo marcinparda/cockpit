@@ -1,5 +1,7 @@
 from mcp.server.fastmcp import FastMCP
 
+# Note types treated as "Proactive notes" (see CONTEXT.md): background context
+# that agents should read without being asked. Deliberately fixed, not configurable.
 PROACTIVE_TYPES = {"context", "reference"}
 
 
@@ -9,7 +11,10 @@ def register_brain_resources(mcp: FastMCP) -> None:
 
     @mcp.resource("brain://notes")
     async def list_context_notes() -> str:
-        """Lists all notes with type 'context' or 'reference' — proactive background context."""
+        """Lists Proactive notes: notes whose type is 'context' or 'reference'.
+
+        Other note types are intentionally excluded; use the brain_* tools to reach them.
+        """
         notes = await brain_service.list_notes(settings.BRAIN_NOTES_PATH, None, None, None)
         proactive = [n for n in notes if n.type in PROACTIVE_TYPES]
         if not proactive:

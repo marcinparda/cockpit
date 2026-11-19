@@ -64,7 +64,7 @@ Some services intentionally deviate from the standard 3-layer structure:
 
 When adding new features:
 
-1. Create the database model in the appropriate service submodule (e.g., `src/services/agent/models.py`)
+1. Create the database model in the appropriate service submodule (e.g., `src/services/habits/models.py`)
 2. Add the feature to `Features` enum in `src/services/authorization/permissions/enums.py`
 3. Create migration: `alembic revision --autogenerate -m "add_new_feature"`
 4. Update permissions by adding feature-action pairs to the permissions migration
@@ -80,7 +80,7 @@ from src.services.authorization.permissions.enums import Actions, Features
 
 @router.get("/protected-endpoint")
 async def protected_endpoint(
-    current_user: User = Depends(require_permission(Features.AGENT, Actions.READ))
+    current_user: User = Depends(require_permission(Features.HABITS, Actions.READ))
 ):
     # Endpoint logic here
 ```

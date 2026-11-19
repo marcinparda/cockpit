@@ -17,3 +17,7 @@ class Features(str, Enum):
     BRAIN = "brain"
     VIKUNJA = "vikunja"
     HABITS = "habits"
+    MCP = "mcp"
+    ACTUAL = "actual"
+    CV = "cv"
+    STORE = "store"
