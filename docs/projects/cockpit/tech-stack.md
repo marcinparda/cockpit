@@ -120,7 +120,6 @@ This document describes the technology choices and rationale for Cockpit — a p
 | redis | 5.0+ | Cache client |
 | mcp | 1.9+ | Model Context Protocol server |
 | apscheduler | 3.11 | Background scheduling |
-| openai | latest | AI/LLM integration |
 | httpx | latest | Async HTTP client |
 
 ## Version Management
