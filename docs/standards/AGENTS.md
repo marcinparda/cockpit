@@ -34,6 +34,7 @@ Located in [`docs/projects/`](../projects/). `cockpit/` covers the whole monorep
 
 - [`api.md`](backend/api.md)
 - [`architecture.md`](backend/architecture.md)
+- [`brain-relations.md`](backend/brain-relations.md)
 - [`migrations.md`](backend/migrations.md)
 - [`models.md`](backend/models.md)
 - [`operations.md`](backend/operations.md)

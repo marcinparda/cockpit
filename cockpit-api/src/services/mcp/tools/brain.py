@@ -79,8 +79,8 @@ class ResolveOut(ToolOut):
 
 class LinksOut(ToolOut):
     path: str | None = None
-    outgoing: list[dict[str, JsonPayload]] | None = None
-    incoming: list[dict[str, JsonPayload]] | None = None
+    outgoing: dict[str, list[dict[str, JsonPayload]]] | None = None
+    incoming: dict[str, list[dict[str, JsonPayload]]] | None = None
 
 
 def _ok(data: JsonMap) -> Any:  # Any: returns CallToolResult, but tools are annotated with their output model so FastMCP derives outputSchema
@@ -249,17 +249,20 @@ def register_brain_tools(mcp: FastMCP) -> None:
 
     @mcp.tool(annotations=READ)
     @_safe
-    async def brain_get_links(path: str, direction: str = "both") -> LinksOut:
+    async def brain_get_links(path: str, direction: str = "both", rel: str | None = None) -> LinksOut:
         """Link graph of one note, including links inside frontmatter properties (requires, evidence, used_with...), not only the body.
 
-        `outgoing`: links in this note, each with resolved_path (null = unresolved) and `source` ('body' or 'frontmatter:<key>').
-        `incoming`: backlinks — notes linking here, with from_path and source. Use for prerequisites (outgoing 'requires') and dependents (incoming).
+        Links are grouped by relation: the frontmatter key they sit under (e.g. 'part_of', 'requires', 'related'), or 'body' for plain mentions.
+        `outgoing`: {rel: [links]} in this note, each with resolved_path (null = unresolved) and `source` ('body' or 'frontmatter:<key>').
+        `incoming`: {rel: [backlinks]} — notes linking here, with from_path and source. Use for prerequisites (outgoing 'requires') and dependents (incoming).
+        Example: {"path": "x.md", "rel": "part_of"} → only links typed part_of, both directions.
 
         Args:
             path: Note path.
             direction: 'out', 'in' or 'both' (default).
+            rel: Only links of this relation (frontmatter key, or 'body'). Default: all.
         """
-        return _ok(await brain_service.get_links(root(), path, direction))
+        return _ok(await brain_service.get_links(root(), path, direction, rel))
 
     @mcp.tool(annotations=_write(destructive=False, idempotent=False))
     @_safe

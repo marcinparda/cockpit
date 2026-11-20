@@ -20,6 +20,11 @@ class Link:
     embed: bool
     source: str  # "body" | "frontmatter:<key>"
 
+    @property
+    def rel(self) -> str:
+        """Relation type: the frontmatter key the link sits under, or `body` for plain mentions."""
+        return self.source.removeprefix("frontmatter:")
+
     def to_dict(self) -> JsonMap:
         """Plain-dict form for tool/REST output."""
         return {"target": self.target, "heading": self.heading, "alias": self.alias,
