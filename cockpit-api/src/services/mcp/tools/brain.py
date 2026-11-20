@@ -249,20 +249,20 @@ def register_brain_tools(mcp: FastMCP) -> None:
 
     @mcp.tool(annotations=READ)
     @_safe
-    async def brain_get_links(path: str, direction: str = "both", rel: str | None = None) -> LinksOut:
+    async def brain_get_links(path: str, direction: str = "both", relation: str | None = None) -> LinksOut:
         """Link graph of one note, including links inside frontmatter properties (requires, evidence, used_with...), not only the body.
 
         Links are grouped by relation: the frontmatter key they sit under (e.g. 'part_of', 'requires', 'related'), or 'body' for plain mentions.
-        `outgoing`: {rel: [links]} in this note, each with resolved_path (null = unresolved) and `source` ('body' or 'frontmatter:<key>').
-        `incoming`: {rel: [backlinks]} — notes linking here, with from_path and source. Use for prerequisites (outgoing 'requires') and dependents (incoming).
-        Example: {"path": "x.md", "rel": "part_of"} → only links typed part_of, both directions.
+        `outgoing`: {relation: [links]} in this note, each with resolved_path (null = unresolved) and `source` ('body' or 'frontmatter:<key>').
+        `incoming`: {relation: [backlinks]} — notes linking here, with from_path and source. Use for prerequisites (outgoing 'requires') and dependents (incoming).
+        Example: {"path": "x.md", "relation": "part_of"} → only links typed part_of, both directions.
 
         Args:
             path: Note path.
             direction: 'out', 'in' or 'both' (default).
-            rel: Only links of this relation (frontmatter key, or 'body'). Default: all.
+            relation: Only links of this relation (frontmatter key, or 'body'). Default: all.
         """
-        return _ok(await brain_service.get_links(root(), path, direction, rel))
+        return _ok(await brain_service.get_links(root(), path, direction, relation))
 
     @mcp.tool(annotations=_write(destructive=False, idempotent=False))
     @_safe

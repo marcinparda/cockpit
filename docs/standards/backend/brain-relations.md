@@ -1,6 +1,6 @@
 # Brain Note Relations
 
-In the brain vault, the **frontmatter key holding a `[[wikilink]]` is the relation type** (edge label). `brain_get_links` groups links by that key and `rel` filters on it. Links in the note body are untyped mentions, grouped under `body`.
+In the brain vault, the **frontmatter key holding a `[[wikilink]]` is the relation type** (edge label). `brain_get_links` groups links by that key and `relation` filters on it. Links in the note body are untyped mentions, grouped under `body`.
 
 ```yaml
 ---

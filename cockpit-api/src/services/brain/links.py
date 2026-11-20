@@ -21,7 +21,7 @@ class Link:
     source: str  # "body" | "frontmatter:<key>"
 
     @property
-    def rel(self) -> str:
+    def relation(self) -> str:
         """Relation type: the frontmatter key the link sits under, or `body` for plain mentions."""
         return self.source.removeprefix("frontmatter:")
 

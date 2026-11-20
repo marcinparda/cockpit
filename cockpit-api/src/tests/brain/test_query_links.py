@@ -163,7 +163,7 @@ class TestGetLinks:
         by_source = {(l["target"], l["source"]): l for l in self._flat(r["outgoing"])}
         assert by_source[("HTTP (skill)", "frontmatter:requires")]["resolved_path"] == "g/HTTP (skill).md"
         assert {l["target"] for l in r["outgoing"]["body"]} == {"HTTP (skill)", "Streams (skill)"}
-        assert all(l["rel"] == "requires" for l in r["outgoing"]["requires"])
+        assert all(l["relation"] == "requires" for l in r["outgoing"]["requires"])
         assert r["incoming"] == {}
 
     async def test_incoming_backlinks_grouped(self, vault):
@@ -173,26 +173,26 @@ class TestGetLinks:
         assert set(r["incoming"]) == {"body", "evidence"}
 
     async def test_rel_filter_outgoing_and_incoming(self, vault):
-        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", rel="requires")
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", relation="requires")
         assert list(r["outgoing"]) == ["requires"] and len(r["outgoing"]["requires"]) == 2
         assert r["incoming"] == {}
-        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", rel="evidence")
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", relation="evidence")
         assert r["outgoing"] == {} and list(r["incoming"]) == ["evidence"]
-        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", rel="body")
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", relation="body")
         assert list(r["outgoing"]) == ["body"] and list(r["incoming"]) == ["body"]
-        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", rel="nope")
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", relation="nope")
         assert r["outgoing"] == {} and r["incoming"] == {}
 
     async def test_frontmatter_map_and_alias_keep_rel(self, vault):
         make_note_file(vault, "m/Map.md", title="Map", part_of='"[[SSE (skill)|the sse]]"', evidence_map='{k: "[[SSE (skill)]]"}')
-        r = await service.get_links(str(vault), "g/SSE (skill).md", "in", rel="part_of")
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "in", relation="part_of")
         assert [(l["from_path"], l["alias"]) for l in r["incoming"]["part_of"]] == [("m/Map.md", "the sse")]
-        r = await service.get_links(str(vault), "g/SSE (skill).md", "in", rel="evidence_map")
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "in", relation="evidence_map")
         assert [l["from_path"] for l in r["incoming"]["evidence_map"]] == ["m/Map.md"]
 
     async def test_ambiguous_link_flagged_in_group(self, vault):
         make_note_file(vault, "m/Amb.md", title="Amb", related='"[[HTTP (skill)]]"')
-        r = await service.get_links(str(vault), "m/Amb.md", "out", rel="related")
+        r = await service.get_links(str(vault), "m/Amb.md", "out", relation="related")
         [link] = r["outgoing"]["related"]
         assert link["ambiguous"] is True and link["resolved_path"] in {"g/HTTP (skill).md", "notes/HTTP (skill).md"}
 

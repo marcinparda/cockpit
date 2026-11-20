@@ -268,14 +268,14 @@ def _group_by_rel(links: list[JsonValue]) -> dict[str, list[JsonValue]]:
     """Group link dicts by relation (frontmatter key, or `body`), keeping encounter order."""
     groups: dict[str, list[JsonValue]] = {}
     for item in links:
-        groups.setdefault(str(item["rel"]), []).append(item)  # type: ignore[index]
+        groups.setdefault(str(item["relation"]), []).append(item)  # type: ignore[index]
     return groups
 
 
-async def get_links(notes_path: str, path: str, direction: str = "both", rel: str | None = None) -> JsonMap:
+async def get_links(notes_path: str, path: str, direction: str = "both", relation: str | None = None) -> JsonMap:
     """Outgoing links and backlinks of one note, grouped by relation (frontmatter key, or `body` for plain mentions).
 
-    `rel` keeps only links of that relation, in both directions.
+    `relation` keeps only links of that relation, in both directions.
     """
     if direction not in ("out", "in", "both"):
         raise BrainError("invalid_op", "direction must be 'out', 'in' or 'both'", {"direction": direction})
@@ -290,28 +290,28 @@ async def get_links(notes_path: str, path: str, direction: str = "both", rel: st
     if direction in ("out", "both"):
         seen = set()
         for link in by_path[note_rel].links:
-            if rel is not None and link.rel != rel:
+            if relation is not None and link.relation != relation:
                 continue
             key = (link.target, link.heading, link.source)
             if key in seen:
                 continue
             seen.add(key)
             res = resolver.resolve(link.target, note_rel)
-            out.append({**link.to_dict(), "rel": link.rel, "resolved_path": res.path, "resolved_by": res.resolved_by, "ambiguous": res.ambiguous})
+            out.append({**link.to_dict(), "relation": link.relation, "resolved_path": res.path, "resolved_by": res.resolved_by, "ambiguous": res.ambiguous})
     if direction in ("in", "both"):
         for rec in records:
             if rec.path == note_rel:
                 continue
             seen = set()
             for link in rec.links:
-                if rel is not None and link.rel != rel:
+                if relation is not None and link.relation != relation:
                     continue
                 key = (link.target, link.heading, link.source)
                 if key in seen:
                     continue
                 if resolver.resolve(link.target, rec.path).path == note_rel:
                     seen.add(key)
-                    incoming.append({"from_path": rec.path, "from_title": rec.title, **link.to_dict(), "rel": link.rel})
+                    incoming.append({"from_path": rec.path, "from_title": rec.title, **link.to_dict(), "relation": link.relation})
     return {"path": note_rel, "outgoing": _group_by_rel(out), "incoming": _group_by_rel(incoming)}
 
 
