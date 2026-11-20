@@ -19,7 +19,7 @@ Brain notes are Markdown files in `BRAIN_NOTES_PATH` (an Obsidian vault). The ap
 | `brain_list_notes` | Same engine, no conditions (kept for compatibility); default fields path/title/type |
 | `brain_get_note` | One note: body, `properties` (all frontmatter except title/tags/type/aliases), `version`, timestamp sources |
 | `brain_search_notes` | FTS5 over title, body, tags and frontmatter values |
-| `brain_resolve` / `brain_get_links` | Obsidian-style link resolution; out/in links incl. links inside frontmatter values. `brain_get_links` returns `outgoing`/`incoming` grouped by relation (`{relation: [links]}`; relation = frontmatter key, or `body` for plain mentions); optional `relation` filters both directions. Vocabulary (single source of truth): "Typed edges" in the vault `README.md` |
+| `brain_resolve` / `brain_get_links` | Obsidian-style link resolution; out/in links incl. links inside frontmatter values. `brain_get_links` returns `outgoing`/`incoming` grouped by relation (`{relation: [links]}`; relation = frontmatter key, or `body` for plain mentions); optional `relation` filters both directions. Vocabulary (single source of truth): "Edges" in the vault `README.md` |
 | `brain_create_note` / `brain_update_note` | Single-note write. `properties` **merge**, `null` = empty value, `remove_properties` deletes keys, `body` replaces whole body |
 | `brain_patch_note` | Exact-match body edits, each `old` must occur exactly once |
 | `brain_append_to_section` | Append under a markdown heading (e.g. a table row) |
