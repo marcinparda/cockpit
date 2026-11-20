@@ -153,21 +153,52 @@ class TestResolve:
 
 
 class TestGetLinks:
-    async def test_outgoing_includes_frontmatter_and_body(self, vault):
-        r = await service.get_links(str(vault), "g/SSE (skill).md", "out")
-        by_source = {(l["target"], l["source"]): l for l in r["outgoing"]}
-        assert by_source[("HTTP (skill)", "frontmatter:requires")]["resolved_path"] == "g/HTTP (skill).md"
-        assert ("Streams (skill)", "body") in by_source and ("HTTP (skill)", "body") in by_source
-        assert r["incoming"] == []
+    @staticmethod
+    def _flat(groups):
+        return [l for items in groups.values() for l in items]
 
-    async def test_incoming_backlinks_include_frontmatter(self, vault):
+    async def test_outgoing_grouped_by_relation(self, vault):
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "out")
+        assert set(r["outgoing"]) == {"requires", "body"}
+        by_source = {(l["target"], l["source"]): l for l in self._flat(r["outgoing"])}
+        assert by_source[("HTTP (skill)", "frontmatter:requires")]["resolved_path"] == "g/HTTP (skill).md"
+        assert {l["target"] for l in r["outgoing"]["body"]} == {"HTTP (skill)", "Streams (skill)"}
+        assert all(l["relation"] == "requires" for l in r["outgoing"]["requires"])
+        assert r["incoming"] == {}
+
+    async def test_incoming_backlinks_grouped(self, vault):
         r = await service.get_links(str(vault), "g/SSE (skill).md", "in")
-        assert sorted((l["from_path"], l["source"]) for l in r["incoming"]) == [
+        assert sorted((l["from_path"], l["source"]) for l in self._flat(r["incoming"])) == [
             ("other/Case 1.md", "body"), ("other/Case 1.md", "frontmatter:evidence")]
+        assert set(r["incoming"]) == {"body", "evidence"}
+
+    async def test_rel_filter_outgoing_and_incoming(self, vault):
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", relation="requires")
+        assert list(r["outgoing"]) == ["requires"] and len(r["outgoing"]["requires"]) == 2
+        assert r["incoming"] == {}
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", relation="evidence")
+        assert r["outgoing"] == {} and list(r["incoming"]) == ["evidence"]
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", relation="body")
+        assert list(r["outgoing"]) == ["body"] and list(r["incoming"]) == ["body"]
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "both", relation="nope")
+        assert r["outgoing"] == {} and r["incoming"] == {}
+
+    async def test_frontmatter_map_and_alias_keep_rel(self, vault):
+        make_note_file(vault, "m/Map.md", title="Map", part_of='"[[SSE (skill)|the sse]]"', evidence_map='{k: "[[SSE (skill)]]"}')
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "in", relation="part_of")
+        assert [(l["from_path"], l["alias"]) for l in r["incoming"]["part_of"]] == [("m/Map.md", "the sse")]
+        r = await service.get_links(str(vault), "g/SSE (skill).md", "in", relation="evidence_map")
+        assert [l["from_path"] for l in r["incoming"]["evidence_map"]] == ["m/Map.md"]
+
+    async def test_ambiguous_link_flagged_in_group(self, vault):
+        make_note_file(vault, "m/Amb.md", title="Amb", related='"[[HTTP (skill)]]"')
+        r = await service.get_links(str(vault), "m/Amb.md", "out", relation="related")
+        [link] = r["outgoing"]["related"]
+        assert link["ambiguous"] is True and link["resolved_path"] in {"g/HTTP (skill).md", "notes/HTTP (skill).md"}
 
     async def test_dependents_of_prerequisite(self, vault):
         r = await service.get_links(str(vault), "g/HTTP (skill).md", "in")
-        assert {l["from_path"] for l in r["incoming"]} == {"g/SSE (skill).md"}
+        assert {l["from_path"] for l in self._flat(r["incoming"])} == {"g/SSE (skill).md"}
 
     async def test_missing_note_and_bad_direction(self, vault):
         with pytest.raises(FileNotFoundError):

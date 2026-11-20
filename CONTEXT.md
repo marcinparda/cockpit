@@ -74,6 +74,34 @@ _Avoid_: category, kind
 A Note of type `context` or `reference`, which the `brain://notes` MCP resource surfaces to agents as standing background context.
 _Avoid_: pinned note, system note
 
+**Link**:
+A `[[wikilink]]` from one Note to another, written either in frontmatter or in the body. Notes are the nodes of the Vault's graph; Links are what connect them.
+_Avoid_: reference, backlink (a backlink is a Link seen from its target)
+
+**Relation**:
+What a Link means: the frontmatter key that holds it (e.g. `part_of`, `depends_on`). A Link in the body has the relation `body`.
+_Avoid_: edge label, link type
+
+**Edge**:
+A Link in a frontmatter value; its key is its Relation.
+_Avoid_: typed edge, property link
+
+**Mention**:
+A Link in the body of a Note. It records that one Note refers to another and nothing more.
+_Avoid_: untyped edge, plain link
+
+**Base relation**:
+One of the four general Relations used before inventing anything new: `related` (mutual), `part_of`, `depends_on`, `sources`.
+_Avoid_: core relation, default relation
+
+**Specific relation**:
+A Relation for a case a Base relation is too vague for (e.g. `instructor`, `recommended_by`, `evidence`). Used only once listed in the vocabulary.
+_Avoid_: custom relation, ad hoc relation
+
+**Relation vocabulary**:
+The set of Relations allowed in the Vault, kept in the "Edges" section of the Vault's `README.md`, which is its single source of truth. A Relation not listed there is added there first.
+_Avoid_: edge list, schema
+
 ### Habits
 
 **Habit**:
@@ -153,6 +181,7 @@ _Avoid_: server, prod box
 - Cockpit is built for one owner today; the User, Role and Permission model stays so multi-user remains possible.
 - Every App authenticates through a Session created by the Login App; external Agents use an Access token or the MCP API key instead.
 - An Agent reaches the Brain, Tasks, Budget and CV only through MCP tools and MCP resources.
+- Targets of an Edge are unrestricted: any Note type may point to any other.
 - The Brain owns the Vault; Tasks, Projects and the Budget belong to external services, not the API.
 - A Habit has many Entries and Streak freezes; a User's Habits may start from a Preset habit copy.
 - AI traffic routed through LiteLLM is logged to Langfuse.
