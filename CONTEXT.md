@@ -63,7 +63,7 @@ The Obsidian folder of Markdown files that the Brain operates on. Synced outside
 _Avoid_: brain folder, notes directory
 
 **Note**:
-One Markdown file in the Vault, with optional frontmatter (title, tags, type, properties).
+One Markdown file in the Vault, with optional frontmatter (title, type, properties).
 _Avoid_: page, document, file
 
 **Note type**:
