@@ -68,6 +68,7 @@ class Settings(BaseSettings):
     # VAPID Settings (Web Push notifications)
     VAPID_PRIVATE_KEY: str = ""
     VAPID_PUBLIC_KEY: str = ""
+    VAPID_CONTACT: str = "mailto:admin@parda.me"
 
     # Environment Detection
     ENVIRONMENT: str = "development"  # production, development, test

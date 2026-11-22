@@ -27,3 +27,14 @@ Row list grouped by category, built on the shared `LogRow` (`@cockpit-app/shared
 - **Boolean click**: cycles unlogged → done (`boolean_value:true`) → not done (`false`) → unlogged (delete Entry).
 - **Numeric/text click**: opens `HabitSheet` for that date.
 - Mutations invalidate `['habits']` and `['habit', id]`, refreshing heatmap, streak and Today page.
+
+## Daily reminder
+
+One push per user per day, configured on the Settings page next to the Push toggle (`pages/SettingsPage.tsx`): a time input (clearable) and an IANA timezone. The timezone defaults to the browser's the first time a time is saved. Both persist via `PATCH /api/v1/habits/settings` (`reminder_time`, `timezone`; `null` clears) on `user_habit_settings`; there are no per-Habit reminder fields.
+
+- **Scheduler**: `core/scheduler.py` runs `push_notification_service.send_due_push_notifications` every minute. It iterates users with a reminder time and sends when notifications are enabled, a push subscription is stored, local time is within 5 minutes after the reminder time (tolerates a late tick) and `last_reminder_sent_on` is not today's local date (that column enforces once per local day).
+- **Skip rules**: no push when every due Habit (non-archived) already has a done Entry today, or none are due. Each skip is logged with its reason (INFO for habits-based skips, DEBUG for the rest); sends are logged at INFO.
+- **Send path**: `pywebpush` runs in `asyncio.to_thread`. HTTP 404/410 from the push service clears the subscription and disables notifications; other failures log status and body and leave state untouched (retried on the next tick inside the window).
+- **Client**: `public/sw.js` shows the notification; clicking opens `/today`.
+- **VAPID config**: `VAPID_PRIVATE_KEY`, `VAPID_PUBLIC_KEY`, and `VAPID_CONTACT` (the `sub` claim, default `mailto:admin@parda.me`). See [`docs/deployment/GITHUB_SECRETS.md`](../../deployment/GITHUB_SECRETS.md).
+- **Scaling note**: the per-minute poll over all users with a reminder time is deliberate for a single-user/small deployment (simple, self-healing after restarts, safe with multiple workers thanks to `last_reminder_sent_on`). For many users, rebuild it as per-user scheduled jobs (`CronTrigger` in the user's timezone, registered on startup and on settings changes) or narrow the query by due window, and add catch-up for sends missed during restarts.

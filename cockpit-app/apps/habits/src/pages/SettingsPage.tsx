@@ -32,7 +32,20 @@ export default function SettingsPage() {
   const [pushError, setPushError] = useState<string | null>(null);
   const [isSubscribing, setIsSubscribing] = useState(false);
 
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const reminderTime = (settings?.reminder_time ?? '').slice(0, 5);
+
+  function handleReminderChange(value: string) {
+    if (!value) {
+      updateSettings({ reminder_time: null });
+      return;
+    }
+    // Default the timezone to the browser's the first time a reminder is set.
+    updateSettings({
+      reminder_time: value,
+      ...(settings?.timezone ? {} : { timezone: browserTimezone }),
+    });
+  }
 
   async function handlePushToggle() {
     const currentlyEnabled = settings?.notifications_enabled ?? false;
@@ -135,13 +148,39 @@ export default function SettingsPage() {
         )}
       </section>
 
-      <section aria-labelledby="timezone-heading">
-        <h2 id="timezone-heading" className="text-lg font-semibold mb-4">
-          Timezone
+      <section aria-labelledby="reminder-heading">
+        <h2 id="reminder-heading" className="text-lg font-semibold mb-4">
+          Daily reminder
         </h2>
-        <div className="rounded-lg border p-4">
-          <p className="text-sm text-muted-foreground">Your detected timezone</p>
-          <p className="font-medium mt-1">{timezone}</p>
+        <div className="rounded-lg border p-4 space-y-3">
+          <p className="text-sm text-muted-foreground">
+            One reminder a day, sent only if some habits are still not logged.
+          </p>
+          <div className="flex items-center gap-3">
+            <input
+              data-testid="reminder-time"
+              type="time"
+              aria-label="Reminder time"
+              value={reminderTime}
+              disabled={isPending}
+              onChange={(e) => handleReminderChange(e.target.value)}
+              className="rounded-md border bg-background px-3 py-2"
+            />
+            {reminderTime && (
+              <button
+                data-testid="reminder-clear"
+                type="button"
+                disabled={isPending}
+                onClick={() => updateSettings({ reminder_time: null })}
+                className="text-sm text-muted-foreground underline"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Timezone: <span className="font-medium text-foreground">{settings?.timezone ?? browserTimezone}</span>
+          </p>
         </div>
       </section>
     </div>

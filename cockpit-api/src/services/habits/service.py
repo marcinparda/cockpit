@@ -100,8 +100,6 @@ async def create_habit(
         target_value=data.target_value,
         target_unit=data.target_unit,
         streak_mode=data.streak_mode,
-        reminder_time=data.reminder_time,
-        timezone=data.timezone,
         category_id=data.category_id,
         sort_order=data.sort_order,
     )

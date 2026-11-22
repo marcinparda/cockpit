@@ -172,6 +172,50 @@ describe('SettingsPage', () => {
     });
   });
 
+  it('setting a reminder time saves it with the browser timezone by default', () => {
+    render(withProviders(<SettingsPage />));
+    fireEvent.change(screen.getByTestId('reminder-time'), { target: { value: '08:30' } });
+    expect(mockMutate).toHaveBeenCalledWith({
+      reminder_time: '08:30',
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    });
+  });
+
+  it('keeps the stored timezone when changing the reminder time', () => {
+    vi.mocked(useSettingsModule.useSettings).mockReturnValue({
+      isLoading: false,
+      data: {
+        id: 'settings-1',
+        user_id: 'user-1',
+        notifications_enabled: true,
+        reminder_time: '08:30:00',
+        timezone: 'Europe/Warsaw',
+      },
+      error: null,
+    } as any);
+    render(withProviders(<SettingsPage />));
+    expect((screen.getByTestId('reminder-time') as HTMLInputElement).value).toBe('08:30');
+    fireEvent.change(screen.getByTestId('reminder-time'), { target: { value: '09:00' } });
+    expect(mockMutate).toHaveBeenCalledWith({ reminder_time: '09:00' });
+  });
+
+  it('clear button unsets the reminder time', () => {
+    vi.mocked(useSettingsModule.useSettings).mockReturnValue({
+      isLoading: false,
+      data: {
+        id: 'settings-1',
+        user_id: 'user-1',
+        notifications_enabled: true,
+        reminder_time: '08:30:00',
+        timezone: 'UTC',
+      },
+      error: null,
+    } as any);
+    render(withProviders(<SettingsPage />));
+    fireEvent.click(screen.getByTestId('reminder-clear'));
+    expect(mockMutate).toHaveBeenCalledWith({ reminder_time: null });
+  });
+
   it('enables push notifications when permission granted and subscription succeeds', async () => {
     vi.mocked(useSettingsModule.useSettings).mockReturnValue({
       isLoading: false,

@@ -4,7 +4,9 @@ from datetime import date, time
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+from pydantic import BaseModel, field_validator
 
 
 # ---------------------------------------------------------------------------
@@ -41,8 +43,6 @@ class HabitCreate(BaseModel):
     target_value: Optional[float] = None
     target_unit: Optional[str] = None
     streak_mode: str = "soft"
-    reminder_time: Optional[time] = None
-    timezone: Optional[str] = None
     category_id: Optional[UUID] = None
     sort_order: int = 0
 
@@ -56,8 +56,6 @@ class HabitUpdate(BaseModel):
     target_value: Optional[float] = None
     target_unit: Optional[str] = None
     streak_mode: Optional[str] = None
-    reminder_time: Optional[time] = None
-    timezone: Optional[str] = None
     category_id: Optional[UUID] = None
     is_archived: Optional[bool] = None
     sort_order: Optional[int] = None
@@ -75,8 +73,6 @@ class HabitResponse(BaseModel):
     target_value: Optional[float] = None
     target_unit: Optional[str] = None
     streak_mode: str
-    reminder_time: Optional[time] = None
-    timezone: Optional[str] = None
     category_id: Optional[UUID] = None
     is_archived: bool
     sort_order: int
@@ -130,6 +126,19 @@ class StreakResponse(BaseModel):
 class UserHabitSettingsUpdate(BaseModel):
     push_subscription: Optional[dict] = None
     notifications_enabled: Optional[bool] = None
+    reminder_time: Optional[time] = None
+    timezone: Optional[str] = None
+
+    @field_validator("timezone")
+    @classmethod
+    def _validate_timezone(cls, value: Optional[str]) -> Optional[str]:
+        if value is None:
+            return value
+        try:
+            ZoneInfo(value)
+        except (ZoneInfoNotFoundError, ValueError) as exc:
+            raise ValueError(f"Unknown IANA timezone: {value}") from exc
+        return value
 
 
 class UserHabitSettingsResponse(BaseModel):
@@ -137,6 +146,8 @@ class UserHabitSettingsResponse(BaseModel):
     user_id: UUID
     push_subscription: Optional[dict] = None
     notifications_enabled: bool
+    reminder_time: Optional[time] = None
+    timezone: Optional[str] = None
 
     model_config = {"from_attributes": True}
 

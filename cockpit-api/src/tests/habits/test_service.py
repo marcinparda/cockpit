@@ -76,8 +76,6 @@ class TestHabitCRUD:
         data.target_value = None
         data.target_unit = None
         data.streak_mode = "soft"
-        data.reminder_time = None
-        data.timezone = "UTC"
         data.category_id = None
         data.sort_order = 0
 

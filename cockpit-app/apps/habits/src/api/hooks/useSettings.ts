@@ -7,6 +7,8 @@ import { SETTINGS_ENDPOINTS } from '../endpoints';
 interface UpdateSettingsPayload {
   notifications_enabled?: boolean;
   push_subscription?: Record<string, unknown> | null;
+  reminder_time?: string | null;
+  timezone?: string | null;
 }
 
 export function useSettings() {
