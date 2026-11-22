@@ -104,8 +104,6 @@ class Habit(BaseModel):
         nullable=False,
         default="soft",
     )
-    reminder_time: Mapped[Optional[time]] = mapped_column(Time, nullable=True, default=None)
-    timezone: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, default=None)
     category_id: Mapped[Optional[UUID]] = mapped_column(
         PG_UUID(as_uuid=True),
         ForeignKey("habit_categories.id"),
@@ -214,6 +212,9 @@ class UserHabitSettings(BaseModel):
     )
     push_subscription: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True, default=None)
     notifications_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
+    reminder_time: Mapped[Optional[time]] = mapped_column(Time, nullable=True, default=None)
+    timezone: Mapped[Optional[str]] = mapped_column(String(64), nullable=True, default=None)
+    last_reminder_sent_on: Mapped[Optional[date]] = mapped_column(Date, nullable=True, default=None)
 
 
 class PresetHabit(BaseModel):

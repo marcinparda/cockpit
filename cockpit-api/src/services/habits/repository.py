@@ -384,8 +384,7 @@ async def upsert_settings(
         db.add(settings)
 
     for key, value in kwargs.items():
-        if value is not None:
-            setattr(settings, key, value)
+        setattr(settings, key, value)
 
     await db.commit()
     await db.refresh(settings)

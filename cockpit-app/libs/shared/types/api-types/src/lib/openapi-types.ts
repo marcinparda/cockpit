@@ -1242,10 +1242,6 @@ export interface components {
              * @default soft
              */
             streak_mode: string;
-            /** Reminder Time */
-            reminder_time?: string | null;
-            /** Timezone */
-            timezone?: string | null;
             /** Category Id */
             category_id?: string | null;
             /**
@@ -1331,10 +1327,6 @@ export interface components {
             target_unit?: string | null;
             /** Streak Mode */
             streak_mode: string;
-            /** Reminder Time */
-            reminder_time?: string | null;
-            /** Timezone */
-            timezone?: string | null;
             /** Category Id */
             category_id?: string | null;
             /** Is Archived */
@@ -1393,10 +1385,6 @@ export interface components {
             target_unit?: string | null;
             /** Streak Mode */
             streak_mode?: string | null;
-            /** Reminder Time */
-            reminder_time?: string | null;
-            /** Timezone */
-            timezone?: string | null;
             /** Category Id */
             category_id?: string | null;
             /** Is Archived */
@@ -1973,6 +1961,10 @@ export interface components {
             } | null;
             /** Notifications Enabled */
             notifications_enabled: boolean;
+            /** Reminder Time */
+            reminder_time?: string | null;
+            /** Timezone */
+            timezone?: string | null;
         };
         /** UserHabitSettingsUpdate */
         UserHabitSettingsUpdate: {
@@ -1982,6 +1974,10 @@ export interface components {
             } | null;
             /** Notifications Enabled */
             notifications_enabled?: boolean | null;
+            /** Reminder Time */
+            reminder_time?: string | null;
+            /** Timezone */
+            timezone?: string | null;
         };
         /**
          * UserInfoResponse

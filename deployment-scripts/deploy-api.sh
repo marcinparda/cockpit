@@ -138,6 +138,7 @@ docker run -d \
   -e OAUTH_SERVER_URL="${OAUTH_SERVER_URL}" \
   -e VAPID_PRIVATE_KEY="${VAPID_PRIVATE_KEY}" \
   -e VAPID_PUBLIC_KEY="${VAPID_PUBLIC_KEY}" \
+  -e VAPID_CONTACT="${VAPID_CONTACT:-mailto:admin@parda.me}" \
   -v "${BRAIN_NOTES_PATH}:${BRAIN_NOTES_PATH}" \
   ${IMAGE_NAME}:latest
 

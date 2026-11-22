@@ -124,6 +124,10 @@ _Avoid_: strictness, difficulty
 A period the User marks (e.g. a vacation) during which missed Entries do not break the Streak.
 _Avoid_: pause, vacation mode, skip
 
+**Daily reminder**:
+The single push notification a User may schedule per day, set in Settings as a time of day plus an IANA timezone (off until a time is chosen). Sent at most once per local day, and skipped when every due Habit (non-archived) already has a done Entry today or no Habit is due. Not per Habit.
+_Avoid_: habit reminder, per-habit reminder, alarm
+
 **Habit category**:
 A user-defined grouping of Habits.
 _Avoid_: tag, folder

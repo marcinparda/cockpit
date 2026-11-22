@@ -78,6 +78,8 @@ export const UserHabitSettingsSchema = z.object({
   user_id: z.string().uuid(),
   push_subscription: z.record(z.string(), z.unknown()).nullable().optional(),
   notifications_enabled: z.boolean(),
+  reminder_time: z.string().nullable().optional(),
+  timezone: z.string().nullable().optional(),
 });
 
 export type Habit = z.infer<typeof HabitSchema>;
