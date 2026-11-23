@@ -1,4 +1,6 @@
+import html
 from typing import Optional
+from urllib.parse import quote
 
 from fastapi import APIRouter, Depends, Form, HTTPException, status
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -30,6 +32,13 @@ def _login_form_html(
     error: str = "",
 ) -> str:
     error_html = f'<p class="error">{error}</p>' if error else ""
+    client_id = html.escape(client_id, quote=True)
+    redirect_uri = html.escape(redirect_uri, quote=True)
+    response_type = html.escape(response_type, quote=True)
+    code_challenge = html.escape(code_challenge, quote=True)
+    code_challenge_method = html.escape(code_challenge_method, quote=True)
+    scope = html.escape(scope, quote=True)
+    state = html.escape(state, quote=True)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -201,7 +210,7 @@ async def authorize_post(
 
     callback = f"{redirect_uri}?code={code}"
     if state:
-        callback += f"&state={state}"
+        callback += f"&state={quote(state, safe='')}"
 
     return RedirectResponse(url=callback, status_code=302)
 
