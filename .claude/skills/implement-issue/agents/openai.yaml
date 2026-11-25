@@ -1,5 +1,5 @@
 interface:
   display_name: "Implement Issue"
-  short_description: "Issue to reviewed PR: branch, TDD, docs, implementation review, PR"
+  short_description: "Issue to reviewed PR: branch, TDD, docs, PR via /pr"
 policy:
   allow_implicit_invocation: false
