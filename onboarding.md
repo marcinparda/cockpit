@@ -27,6 +27,7 @@ Matt Pocock's skills are vendored in [`.claude/skills/`](.claude/skills/README.m
 | Slice it | `/to-tickets` | tracer-bullet ticket issues with blocking links |
 | Sort incoming issues | `/triage` | triage labels applied |
 | Build | `/implement` (drives `/tdd`, ends with `/code-review`) | commits on a branch |
+| Issue to PR | `/implement-issue #<n>` (branch, `/tdd`, docs, PR with `Closes #<n>`, `/code-review` posted on the PR) | reviewed PR |
 | Review | `/code-review` | standards + spec review of the diff |
 | Hard bug | `/diagnosing-bugs` | root cause, regression test |
 | Big, fuzzy chunk of work | `/wayfinder` | map issue + decision tickets |
@@ -38,7 +39,7 @@ Also available: `/prototype`, `/research`, `/codebase-design`, `/improve-codebas
 
 1. Idea or bug → `/grill-with-docs` (new feature) or `/diagnosing-bugs` (bug).
 2. `/to-spec`, then `/to-tickets`. Tickets that are fully specified get `ready-for-agent`.
-3. `/implement #<ticket>` per ticket: TDD, PR with `Closes #<n>`.
+3. `/implement-issue #<ticket>` per ticket: branch, TDD, docs, PR with `Closes #<n>`, review posted on the PR.
 4. `/code-review`, merge. The issue closes itself; the issue thread is the work log.
 
 Before touching code, read the relevant `AGENTS.md` and `docs/standards/` for the domain (see [`docs/AGENTS.md`](docs/AGENTS.md)).
