@@ -55,12 +55,13 @@ import * as useEntryMutationsModule from '../api/hooks/useEntryMutations';
 import * as useFreezeMutationsModule from '../api/hooks/useFreezeMutations';
 import { toDateKey, addDays } from '../utils/date';
 import { HeatmapCalendar, heatmapRange } from '../components/HeatmapCalendar';
-
-/** Cheap whole-grid cell query; role queries are too slow in jsdom for thousands of cells. */
-const gridCells = () => document.querySelectorAll('[role="gridcell"]');
 import { LineBarChart } from '../components/LineBarChart';
 import HabitDetailPage from '../pages/HabitDetailPage';
 import { createHabitMock } from '../mocks/habit';
+
+/** Cheap whole-heatmap cell query; role queries are slow in jsdom. */
+const gridCells = () =>
+  document.querySelectorAll('[role="grid"][aria-label="Habit completion heatmap"] [role="gridcell"]');
 
 /** Days after today in the current Sun–Sat week are not rendered. */
 const FUTURE_DAYS_THIS_WEEK = 6 - new Date().getDay();
