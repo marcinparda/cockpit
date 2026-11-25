@@ -26,3 +26,6 @@ Use `interface` for component props, hook return types, structured data. Use `ty
 interface AppCardProps { title: string; description: string; }
 export type UserRole = z.infer<typeof rolesResponseSchema>[number];
 ```
+
+### Frontend Config Is Public, Typed, and Selected by Build Mode
+Frontend config is bundled into client JS, so it is public. Never put credentials in it and never inject it from a CI secret. Keep one `Environments` interface with a `development` and a `production` object committed in `libs/shared/utils/src/lib/environments/environments.ts`, picked by `import.meta.env.PROD` (Vitest's `MODE=test` falls back to development). The shared type makes key drift a compile error. Projects that compile this file need `"module": "esnext"` for `import.meta`.
