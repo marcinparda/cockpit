@@ -14,15 +14,12 @@ import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { HABIT_ICONS } from '../icons';
 import type { Habit, HabitEntry } from '../api/schemas';
 
-type TimeRange = '6M' | '1Y' | '2Y' | '3Y' | '6Y';
+type TimeRange = '6M' | '1Y';
 
 /** Heatmap columns (weeks) per period; drives cells shown, chart and entry list. */
 const RANGE_WEEKS: Record<TimeRange, number> = {
   '6M': 26,
   '1Y': 52,
-  '2Y': 104,
-  '3Y': 156,
-  '6Y': 312,
 };
 const TIME_RANGES = Object.keys(RANGE_WEEKS) as TimeRange[];
 

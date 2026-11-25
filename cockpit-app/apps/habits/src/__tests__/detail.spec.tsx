@@ -55,6 +55,9 @@ import * as useEntryMutationsModule from '../api/hooks/useEntryMutations';
 import * as useFreezeMutationsModule from '../api/hooks/useFreezeMutations';
 import { toDateKey, addDays } from '../utils/date';
 import { HeatmapCalendar, heatmapRange } from '../components/HeatmapCalendar';
+
+/** Cheap whole-grid cell query; role queries are too slow in jsdom for thousands of cells. */
+const gridCells = () => document.querySelectorAll('[role="gridcell"]');
 import { LineBarChart } from '../components/LineBarChart';
 import HabitDetailPage from '../pages/HabitDetailPage';
 import { createHabitMock } from '../mocks/habit';
@@ -110,8 +113,7 @@ describe('HeatmapCalendar', () => {
     );
 
     // 12 weeks × 7 days = 84 cells
-    const cells = screen.getAllByRole('gridcell');
-    expect(cells).toHaveLength(84 - FUTURE_DAYS_THIS_WEEK);
+    expect(gridCells()).toHaveLength(84 - FUTURE_DAYS_THIS_WEEK);
   });
 });
 
@@ -213,8 +215,7 @@ describe('HabitDetailPage', () => {
     render(withProviders(<HabitDetailPage />));
 
     // Boolean habit → 84 grid cells (12 × 7)
-    const cells = screen.getAllByRole('gridcell');
-    expect(cells.length).toBeGreaterThan(0);
+    expect(gridCells().length).toBeGreaterThan(0);
   });
 
   it('renders LineBarChart for numeric habit', () => {
@@ -256,23 +257,20 @@ describe('HabitDetailPage', () => {
     );
   });
 
-  it('offers the periods 6M, 1Y, 2Y, 3Y, 6Y, defaulting to 1Y', () => {
+  it('offers the periods 6M, 1Y, defaulting to 1Y', () => {
     vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
     render(withProviders(<HabitDetailPage />));
     const labels = within(screen.getByRole('group', { name: 'Time range' }))
       .getAllByRole('button')
       .map((b) => b.textContent);
-    expect(labels).toEqual(['6M', '1Y', '2Y', '3Y', '6Y']);
+    expect(labels).toEqual(['6M', '1Y']);
     expect(screen.getByRole('button', { name: '1Y' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getAllByRole('gridcell')).toHaveLength(52 * 7 - FUTURE_DAYS_THIS_WEEK);
+    expect(gridCells()).toHaveLength(52 * 7 - FUTURE_DAYS_THIS_WEEK);
   });
 
   it.each([
     ['6M', 26],
     ['1Y', 52],
-    ['2Y', 104],
-    ['3Y', 156],
-    ['6Y', 312],
   ])('period %s shows %i weeks of cells and fetches that range', (label, weeks) => {
     vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
     render(withProviders(<HabitDetailPage />));
@@ -280,7 +278,7 @@ describe('HabitDetailPage', () => {
     fireEvent.click(screen.getByRole('button', { name: label as string }));
 
     expect(screen.getByRole('button', { name: label as string })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getAllByRole('gridcell')).toHaveLength((weeks as number) * 7 - FUTURE_DAYS_THIS_WEEK);
+    expect(gridCells()).toHaveLength((weeks as number) * 7 - FUTURE_DAYS_THIS_WEEK);
     const range = heatmapRange(weeks as number);
     expect(useHabitEntriesModule.useHabitEntries).toHaveBeenLastCalledWith('habit-1', range);
   });
@@ -300,8 +298,7 @@ describe('HabitDetailPage', () => {
     render(withProviders(<HabitDetailPage />));
 
     // Grid cells should be present (heatmap rendered)
-    const cells = screen.getAllByRole('gridcell');
-    expect(cells.length).toBeGreaterThan(0);
+    expect(gridCells().length).toBeGreaterThan(0);
   });
 
   describe('heatmap interaction', () => {
