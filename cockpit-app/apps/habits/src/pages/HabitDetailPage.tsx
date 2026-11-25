@@ -14,14 +14,14 @@ import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { HABIT_ICONS } from '../icons';
 import type { Habit, HabitEntry } from '../api/schemas';
 
-type TimeRange = '6M' | '1Y';
+const TIME_RANGES = ['6M', '1Y'] as const;
+type TimeRange = (typeof TIME_RANGES)[number];
 
 /** Heatmap columns (weeks) per period; drives cells shown, chart and entry list. */
 const RANGE_WEEKS: Record<TimeRange, number> = {
   '6M': 26,
   '1Y': 52,
 };
-const TIME_RANGES = Object.keys(RANGE_WEEKS) as TimeRange[];
 
 const MAX_FREEZES_PER_MONTH = 2;
 
