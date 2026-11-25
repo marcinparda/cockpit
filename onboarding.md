@@ -40,10 +40,10 @@ Also available: `/prototype`, `/research`, `/codebase-design`, `/improve-codebas
 1. Idea or bug → `/grill-with-docs` (new feature) or `/diagnosing-bugs` (bug).
 2. `/to-spec`, then `/to-tickets`. Tickets that are fully specified get `ready-for-agent`.
 3. `/implement-issue #<ticket>` per ticket: branch, TDD, docs, PR with `Closes #<n>`, review posted on the PR.
-4. `/code-review`, merge. The issue closes itself; the issue thread is the work log.
+4. Read the PR: the implementation review, the "Using simpler words" section and the `/code-review` comments. Merge. The issue closes itself; the issue thread is the work log.
 
 Before touching code, read the relevant `AGENTS.md` and `docs/standards/` for the domain (see [`docs/AGENTS.md`](docs/AGENTS.md)).
 
 ## Working from a phone
 
-Start a Claude Code session on the repo from the Claude app, then type e.g. `/implement #123` or `/to-spec` with your idea. The skills come from the repo's `.claude/skills/`. Agents start only when you start a session; nothing picks up `ready-for-agent` issues on its own yet.
+Start a Claude Code session on the repo from the Claude app, then type e.g. `/implement-issue #123` or `/to-spec` with your idea. The skills come from the repo's `.claude/skills/`. Agents start only when you start a session; nothing picks up `ready-for-agent` issues on its own yet.
