@@ -55,12 +55,13 @@ import * as useEntryMutationsModule from '../api/hooks/useEntryMutations';
 import * as useFreezeMutationsModule from '../api/hooks/useFreezeMutations';
 import { toDateKey, addDays } from '../utils/date';
 import { HeatmapCalendar, heatmapRange } from '../components/HeatmapCalendar';
-
-/** Cheap whole-grid cell query; role queries are too slow in jsdom for thousands of cells. */
-const gridCells = () => document.querySelectorAll('[role="gridcell"]');
 import { LineBarChart } from '../components/LineBarChart';
 import HabitDetailPage from '../pages/HabitDetailPage';
 import { createHabitMock } from '../mocks/habit';
+
+/** Cheap whole-heatmap cell query; role queries are slow in jsdom. */
+const gridCells = () =>
+  document.querySelectorAll('[role="grid"][aria-label="Habit completion heatmap"] [role="gridcell"]');
 
 /** Days after today in the current Sun–Sat week are not rendered. */
 const FUTURE_DAYS_THIS_WEEK = 6 - new Date().getDay();
@@ -214,7 +215,7 @@ describe('HabitDetailPage', () => {
 
     render(withProviders(<HabitDetailPage />));
 
-    // Boolean habit → 84 grid cells (12 × 7)
+    // Boolean habit → heatmap cells rendered (default 1Y = 52 weeks)
     expect(gridCells().length).toBeGreaterThan(0);
   });
 
@@ -271,15 +272,15 @@ describe('HabitDetailPage', () => {
   it.each([
     ['6M', 26],
     ['1Y', 52],
-  ])('period %s shows %i weeks of cells and fetches that range', (label, weeks) => {
+  ] as const)('period %s shows %i weeks of cells and fetches that range', (label, weeks) => {
     vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
     render(withProviders(<HabitDetailPage />));
 
-    fireEvent.click(screen.getByRole('button', { name: label as string }));
+    fireEvent.click(screen.getByRole('button', { name: label }));
 
-    expect(screen.getByRole('button', { name: label as string })).toHaveAttribute('aria-pressed', 'true');
-    expect(gridCells()).toHaveLength((weeks as number) * 7 - FUTURE_DAYS_THIS_WEEK);
-    const range = heatmapRange(weeks as number);
+    expect(screen.getByRole('button', { name: label })).toHaveAttribute('aria-pressed', 'true');
+    expect(gridCells()).toHaveLength(weeks * 7 - FUTURE_DAYS_THIS_WEEK);
+    const range = heatmapRange(weeks);
     expect(useHabitEntriesModule.useHabitEntries).toHaveBeenLastCalledWith('habit-1', range);
   });
 
