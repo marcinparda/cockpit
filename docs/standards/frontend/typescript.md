@@ -10,7 +10,7 @@ Compile to ES2022 module format. Source: `tsconfig.base.json` target/module: ES2
 `forceConsistentCasingInFileNames: true`. Source: `tsconfig.base.json`.
 
 ### Path Aliases for Cross-Library Imports
-Always use `@cockpit-app/*` path aliases for cross-library imports. Never use relative paths across library boundaries. Aliases declared in `tsconfig.base.json`. Source: `tsconfig.base.json` paths, confirmed in 15+ call sites.
+Always use `@cockpit-app/*` path aliases for cross-library imports. Never use relative paths across library boundaries. Aliases declared in `tsconfig.base.json`. Source: `tsconfig.base.json` paths, confirmed in 15+ call sites. Project-level `tsconfig*.json` must not set `compilerOptions.paths`/`baseUrl`: they replace (not merge with) the workspace map and break `typecheck` and `vite:dts`. CI runs the inferred Nx `typecheck` target on every affected project.
 
 ```ts
 // Correct

@@ -14,6 +14,27 @@ const storeEnvelopeSchema = z.object({
   data: z.unknown(),
 });
 
+// A section missing from the store (404) is a valid state: it keeps its empty
+// value so CVData consumers never deal with null fields. The compiler forces
+// this object to list every CVData key.
+const createEmptyCVData = (): CVData => ({
+  header: {
+    name: '',
+    title: '',
+    phone: '',
+    email: '',
+    linkedin: { url: '' },
+    location: '',
+  },
+  summary: [],
+  skills: [],
+  achievements: [],
+  experience: [],
+  education: [],
+  personalProjects: [],
+  courses: [],
+});
+
 function getEndpoints(prefix: string) {
   const BASE = `/api/v1/store/${prefix}/cv`;
   return {
@@ -42,51 +63,38 @@ async function fetchSection<T>(endpoint: string): Promise<T | null> {
   }
 }
 
-export async function getCVData(prefix = 'base'): Promise<CVData | null> {
-  const ENDPOINTS = getEndpoints(prefix);
-  const [
-    header,
-    summary,
-    skills,
-    achievements,
-    experience,
-    education,
-    personalProjects,
-    courses,
-  ] = await Promise.all([
-    fetchSection<CVData['header']>(ENDPOINTS.header),
-    fetchSection<CVData['summary']>(ENDPOINTS.summary),
-    fetchSection<CVData['skills']>(ENDPOINTS.skills),
-    fetchSection<CVData['achievements']>(ENDPOINTS.achievements),
-    fetchSection<CVData['experience']>(ENDPOINTS.experience),
-    fetchSection<CVData['education']>(ENDPOINTS.education),
-    fetchSection<CVData['personalProjects']>(ENDPOINTS.personalProjects),
-    fetchSection<CVData['courses']>(ENDPOINTS.courses),
-  ]);
-
-  if (
-    !header &&
-    !summary &&
-    !skills &&
-    !achievements &&
-    !experience &&
-    !education &&
-    !personalProjects &&
-    !courses
-  ) {
-    return null;
-  }
-
-  return {
-    header,
-    summary,
-    skills,
-    achievements,
-    experience,
-    education,
-    personalProjects,
-    courses,
+// Fetches one section and writes it into `into` when the store has it.
+// Resolves to whether the section was found.
+function sectionLoader<K extends keyof CVData>(key: K) {
+  return async (
+    endpoints: ReturnType<typeof getEndpoints>,
+    into: CVData,
+  ): Promise<boolean> => {
+    const value = await fetchSection<CVData[K]>(endpoints[key]);
+    if (value === null) return false;
+    into[key] = value;
+    return true;
   };
+}
+
+const sectionLoaders = [
+  sectionLoader('header'),
+  sectionLoader('summary'),
+  sectionLoader('skills'),
+  sectionLoader('achievements'),
+  sectionLoader('experience'),
+  sectionLoader('education'),
+  sectionLoader('personalProjects'),
+  sectionLoader('courses'),
+];
+
+export async function getCVData(prefix = 'base'): Promise<CVData | null> {
+  const endpoints = getEndpoints(prefix);
+  const cv = createEmptyCVData();
+  const found = await Promise.all(
+    sectionLoaders.map((load) => load(endpoints, cv)),
+  );
+  return found.some(Boolean) ? cv : null;
 }
 
 export async function putCVData(data: CVData, prefix = 'base'): Promise<void> {

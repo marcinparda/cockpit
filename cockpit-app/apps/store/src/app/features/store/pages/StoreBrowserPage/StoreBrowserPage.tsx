@@ -85,7 +85,7 @@ export default function StoreBrowserPage() {
 
   return (
     <>
-      <Toaster richColors />
+      <Toaster />
       <PermissionGuard feature="redis_store" action="read">
         <div className="flex h-screen overflow-hidden">
           <div className="w-72 overflow-y-auto border-r">

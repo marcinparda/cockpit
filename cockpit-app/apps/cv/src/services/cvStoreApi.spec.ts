@@ -36,6 +36,32 @@ describe('cvStoreApi', () => {
     expect(result).toBeNull();
   });
 
+  it('should default missing sections when only some return 404', async () => {
+    mockGetRequest.mockImplementation((endpoint: string) =>
+      endpoint.endsWith('/summary')
+        ? Promise.resolve(createEnvelopeMock({ data: ['Hello'] }))
+        : Promise.reject(new Error('HTTP 404: Not Found')),
+    );
+    const result = await getCVData('base');
+    expect(result).toEqual({
+      header: {
+        name: '',
+        title: '',
+        phone: '',
+        email: '',
+        linkedin: { url: '' },
+        location: '',
+      },
+      summary: ['Hello'],
+      skills: [],
+      achievements: [],
+      experience: [],
+      education: [],
+      personalProjects: [],
+      courses: [],
+    });
+  });
+
   it('should call putRequest for each CV section on putCVData', async () => {
     mockPutRequest.mockResolvedValue(mockEnvelope);
     const mockCVData = {

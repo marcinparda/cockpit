@@ -66,7 +66,7 @@ Developer pushes to master
 
 **Job 1 — `build-test-and-push`:**
 1. Replaces `environments.ts` with secret `ENVIRONMENTS` (contains API URLs per environment)
-2. Finds the last successful run SHA → uses Nx `affected` to only build/test/lint changed apps
+2. Finds the last successful run SHA → uses Nx `affected` to only build/test/lint/typecheck changed apps
 3. Builds changed apps, pushes per-app images: `ghcr.io/marcinparda/cockpit-{login,cockpit,cv,store}:latest`
 4. Only pushes Docker image if `dist/apps/{name}/` was produced by the build
 
