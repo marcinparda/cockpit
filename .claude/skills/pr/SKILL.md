@@ -18,7 +18,7 @@ Write it from the diff (and the issue's Agent Brief when there is one) to `<scra
 
 End the body with `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
 
-Done when every acceptance criterion has a bullet that cites a file, and the simpler-words example uses values from this diff.
+Done when every acceptance criterion (or, without an issue, every change) has a bullet that cites a file, and the simpler-words example uses values from this diff.
 
 ## 2. Pick labels
 
@@ -36,6 +36,8 @@ Choose from it by each label's description:
 
 Use only labels that exist in the list.
 
+Done when the chosen labels are one category label plus each touched project label, and every one appears in the `gh label list` output.
+
 ## 3. Open the PR
 
 ```
@@ -47,6 +49,8 @@ gh pr create --base master --title "<conventional title>" --body-file <scratchpa
 - Title in conventional-commit style: `fix(habits): ...`.
 - Assignee is `marcinparda` unless the user names someone else.
 - Merge closes the issue through `Closes #<n>`; closing by hand is never needed.
+
+Done when `gh pr create` has printed the PR URL and, with an issue, `Closes #<n>` is in the body.
 
 ## 4. Update an existing PR
 
