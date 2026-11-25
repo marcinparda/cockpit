@@ -2,4 +2,4 @@ interface:
   display_name: "PR"
   short_description: "Open a PR: implementation review body, assignee, labels from gh"
 policy:
-  allow_implicit_invocation: false
+  allow_implicit_invocation: true
