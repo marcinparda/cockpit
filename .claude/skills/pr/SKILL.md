@@ -1,7 +1,6 @@
 ---
 name: pr
 description: "Open or update a pull request on marcinparda/cockpit: implementation-review body, conventional title, marcinparda as assignee, labels picked from the repo's own label list."
-disable-model-invocation: true
 ---
 
 Open a pull request for the current branch, or update the one that exists. `$ARGUMENTS` is an optional issue number the PR closes.
