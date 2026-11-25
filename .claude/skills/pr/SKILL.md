@@ -1,6 +1,6 @@
 ---
 name: pr
-description: "Open or update a pull request on marcinparda/cockpit: implementation-review body, conventional title, marcinparda as assignee, labels picked from the repo's own label list."
+description: "Open or update a pull request on marcinparda/cockpit, with an implementation-review body, conventional title, marcinparda as assignee and labels from the repo's own list. Use when the user asks to open a PR, or to update a PR's body or labels, and when implement-issue reaches its PR step."
 ---
 
 Open a pull request for the current branch, or update the one that exists. `$ARGUMENTS` is an optional issue number the PR closes.
