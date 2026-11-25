@@ -8,4 +8,4 @@ Extras: `OPEN_ROUTER_KEY`, `MCP_API_KEY`, `ACTUAL_HTTP_API_KEY`, `VIKUNJA_DB_NAM
 
 Habits (push notifications): `VAPID_PRIVATE_KEY`, `VAPID_PUBLIC_KEY`, optional `VAPID_CONTACT` (VAPID `sub` claim, must be a `mailto:` or `https:` URL; defaults to `mailto:admin@parda.me` when unset) — keys generate with `py-vapid`: `python3 -c "from py_vapid import Vapid; v=Vapid(); v.generate_keys(); print('PRIVATE:', v.private_pem().decode()); print('PUBLIC:', v.public_key)"`
 
-App: `ENVIRONMENTS` (full environments.ts content) — must include `habitsUrl: 'https://habits.parda.me'`
+App: none. Frontend config is committed in `environments.ts` and selected by build mode (see `docs/standards/frontend/typescript.md`). The old `ENVIRONMENTS` secret is obsolete and can be deleted.

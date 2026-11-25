@@ -65,10 +65,9 @@ Developer pushes to master
 **`app-deploy.yml` (Deploy App)** — single workflow, two jobs:
 
 **Job 1 — `build-test-and-push`:**
-1. Replaces `environments.ts` with secret `ENVIRONMENTS` (contains API URLs per environment)
-2. Finds the last successful run SHA → uses Nx `affected` to only build/test/lint/typecheck changed apps
-3. Builds changed apps, pushes per-app images: `ghcr.io/marcinparda/cockpit-{login,cockpit,cv,store}:latest`
-4. Only pushes Docker image if `dist/apps/{name}/` was produced by the build
+1. Finds the last successful run SHA → uses Nx `affected` to only build/test/lint/typecheck changed apps
+2. Builds changed apps, pushes per-app images: `ghcr.io/marcinparda/cockpit-{login,cockpit,cv,store}:latest`
+3. Only pushes Docker image if `dist/apps/{name}/` was produced by the build
 
 **Job 2 — `deploy-to-raspberry`:**
 - Calls reusable workflow `app-deploy-to-production.yml` after build job succeeds

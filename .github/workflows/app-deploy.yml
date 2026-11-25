@@ -39,10 +39,6 @@ jobs:
           key: npm-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
           restore-keys: npm-
 
-      - name: Replace environments.ts with secret ENVIRONMENTS
-        run: |
-          echo "${{ secrets.ENVIRONMENTS }}" > libs/shared/utils/src/lib/environments/environments.ts
-
       - name: Install dependencies
         run: npm ci
 
