@@ -29,6 +29,12 @@ describe('Toaster', () => {
     expect(container).toBeTruthy();
   });
 
+  it('renders sonner with rich colors enabled', async () => {
+    const { Toaster } = await import('./Toaster');
+    const { getByTestId } = render(<Toaster />);
+    expect(getByTestId('sonner-toaster').getAttribute('data-rich-colors')).toBe('true');
+  });
+
   it('toast.success call does not throw', async () => {
     const { toast } = await import('./Toaster');
     expect(() => toast.success('msg')).not.toThrow();
