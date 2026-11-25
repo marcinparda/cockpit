@@ -14,6 +14,17 @@ const storeEnvelopeSchema = z.object({
   data: z.unknown(),
 });
 
+// A section missing from the store (404) is a valid state: default it so
+// CVData consumers never deal with null fields.
+const emptyHeader = (): CVData['header'] => ({
+  name: '',
+  title: '',
+  phone: '',
+  email: '',
+  linkedin: { url: '' },
+  location: '',
+});
+
 function getEndpoints(prefix: string) {
   const BASE = `/api/v1/store/${prefix}/cv`;
   return {
@@ -78,14 +89,14 @@ export async function getCVData(prefix = 'base'): Promise<CVData | null> {
   }
 
   return {
-    header,
-    summary,
-    skills,
-    achievements,
-    experience,
-    education,
-    personalProjects,
-    courses,
+    header: header ?? emptyHeader(),
+    summary: summary ?? [],
+    skills: skills ?? [],
+    achievements: achievements ?? [],
+    experience: experience ?? [],
+    education: education ?? [],
+    personalProjects: personalProjects ?? [],
+    courses: courses ?? [],
   };
 }
 
