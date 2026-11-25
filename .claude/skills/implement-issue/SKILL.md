@@ -71,4 +71,4 @@ Done when the summary comment is visible on the PR (`gh pr view <pr> --comments`
 
 ## 8. Report
 
-Give the user the issue link, the PR link, the branch, the test result, and the review's worst finding per axis. Merging is theirs.
+Give the user the issue link, the PR link, the branch, the test result, and the review's worst finding per axis. The skill ends here: the human reviewer reads the PR and either approves and merges it or declines it with comments. Merging, approving and declining are theirs.

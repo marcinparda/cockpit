@@ -40,7 +40,7 @@ Also available: `/prototype`, `/research`, `/codebase-design`, `/improve-codebas
 1. Idea or bug → `/grill-with-docs` (new feature) or `/diagnosing-bugs` (bug).
 2. `/to-spec`, then `/to-tickets`. Tickets that are fully specified get `ready-for-agent`.
 3. `/implement-issue #<ticket>` per ticket: branch, TDD, docs, PR with `Closes #<n>`, review posted on the PR.
-4. Read the PR: the implementation review, the "Using simpler words" section and the `/code-review` comments. Merge. The issue closes itself; the issue thread is the work log.
+4. Human review: you read the PR (implementation review, "Using simpler words", `/code-review` comments), then approve and merge, or decline and leave comments. The issue closes itself on merge; the issue thread is the work log.
 
 Before touching code, read the relevant `AGENTS.md` and `docs/standards/` for the domain (see [`docs/AGENTS.md`](docs/AGENTS.md)).
 
