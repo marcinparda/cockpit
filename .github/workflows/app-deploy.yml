@@ -75,7 +75,7 @@ jobs:
         run: git fetch --prune --unshallow --tags
 
       - name: Run affected checks and builds
-        run: npx nx affected --targets=lint,build,test --base=$LAST_SUCCESSFUL_SHA --head=HEAD --parallel=4
+        run: npx nx affected --targets=lint,typecheck,build,test --base=$LAST_SUCCESSFUL_SHA --head=HEAD --parallel=4
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
