@@ -35,10 +35,8 @@ apps/cockpit/src/
 │   ├── app.tsx              # Main application component
 │   ├── providers.tsx        # React Query and other providers
 │   ├── skeleton.tsx         # Loading state component
-│   ├── apps/
-│   │   └── apps.tsx         # Apps overview page
-│   └── components/
-│       └── TopNavBarRighContent.tsx  # Navigation user menu
+│   └── apps/
+│       └── apps.tsx         # Apps overview page
 ├── main.tsx                 # Application entry point
 └── styles.css               # Global styles and Tailwind imports
 ```
