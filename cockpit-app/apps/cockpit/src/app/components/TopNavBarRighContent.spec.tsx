@@ -4,14 +4,12 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { TopNavBarRighContent } from './TopNavBarRighContent';
 
-const { mockLogout } = vi.hoisted(() => ({ mockLogout: vi.fn() }));
-
-vi.mock('@cockpit-app/common-shared-data-access', () => ({
-  logout: mockLogout,
+const { mockLogoutAndRedirect } = vi.hoisted(() => ({
+  mockLogoutAndRedirect: vi.fn(),
 }));
 
-vi.mock('@cockpit-app/shared-utils', () => ({
-  environments: { loginUrl: 'http://login.test' },
+vi.mock('@cockpit-app/common-shared-data-access', () => ({
+  logoutAndRedirect: mockLogoutAndRedirect,
 }));
 
 vi.mock('@cockpit-app/shared-react-ui', () => ({
@@ -31,11 +29,7 @@ const mockUserInfo = {
 describe('TopNavBarRighContent', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockLogout.mockResolvedValue(undefined);
-    Object.defineProperty(window, 'location', {
-      value: { href: '' },
-      writable: true,
-    });
+    mockLogoutAndRedirect.mockResolvedValue(undefined);
   });
 
   it('displays the user email', () => {
@@ -48,12 +42,12 @@ describe('TopNavBarRighContent', () => {
     expect(screen.getByRole('button', { name: /logout/i })).toBeInTheDocument();
   });
 
-  it('calls logout when Logout button is clicked', async () => {
+  it('logs out and redirects when Logout button is clicked', async () => {
     const user = userEvent.setup();
     render(<TopNavBarRighContent userInfo={mockUserInfo as any} />);
 
     await user.click(screen.getByRole('button', { name: /logout/i }));
 
-    expect(mockLogout).toHaveBeenCalledOnce();
+    expect(mockLogoutAndRedirect).toHaveBeenCalledOnce();
   });
 });

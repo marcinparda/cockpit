@@ -5,6 +5,7 @@ import {
   logout,
   refreshAccessToken,
 } from './api';
+import { logoutAndRedirect } from './redirect';
 
 /**
  * Checks if the user is currently logged in (via API call).
@@ -26,4 +27,5 @@ export {
   logout,
   refreshAccessToken,
   isLoggedIn,
+  logoutAndRedirect,
 };

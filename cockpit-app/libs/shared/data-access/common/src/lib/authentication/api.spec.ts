@@ -18,7 +18,13 @@ vi.mock('./endpoints', () => ({
   },
 }));
 
-import { login, getCurrentUser, refreshAccessToken, logout, changePassword } from './api';
+import {
+  login,
+  getCurrentUser,
+  refreshAccessToken,
+  logout,
+  changePassword,
+} from './api';
 
 const userInfo = {
   user_id: '1',

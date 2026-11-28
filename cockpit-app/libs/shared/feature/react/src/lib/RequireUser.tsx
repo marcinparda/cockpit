@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import type { UserInfoResponse } from '@cockpit-app/api-types';
 import { useUser } from '@cockpit-app/shared-react-data-access';
-import { logout } from '@cockpit-app/common-shared-data-access';
+import { logoutAndRedirect } from '@cockpit-app/common-shared-data-access';
 
 interface RequireUserProps {
   children: (user: UserInfoResponse) => ReactNode;
@@ -14,7 +14,7 @@ export function RequireUser({ children }: RequireUserProps) {
   const missing = !isLoading && !user;
 
   useEffect(() => {
-    if (missing) logout();
+    if (missing) logoutAndRedirect();
   }, [missing]);
 
   if (isLoading || !user) return null;

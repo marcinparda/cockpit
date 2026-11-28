@@ -7,7 +7,7 @@ vi.mock('../app/router', () => ({
 }));
 
 vi.mock('@cockpit-app/common-shared-data-access', () => ({
-  logout: vi.fn(),
+  logoutAndRedirect: vi.fn(),
 }));
 
 vi.mock('@cockpit-app/shared-react-data-access', () => ({
@@ -24,7 +24,7 @@ describe('App', () => {
     vi.clearAllMocks();
   });
 
-  it('calls logout and renders nothing when useUser returns no user (401)', () => {
+  it('redirects to Login and renders nothing when useUser returns no user (401)', () => {
     vi.mocked(useUserModule.useUser).mockReturnValue({
       isLoading: false,
       data: undefined,
@@ -32,7 +32,7 @@ describe('App', () => {
 
     const { container } = render(<App />);
 
-    expect(logoutModule.logout).toHaveBeenCalled();
+    expect(logoutModule.logoutAndRedirect).toHaveBeenCalled();
     expect(container.firstChild).toBeNull();
   });
 

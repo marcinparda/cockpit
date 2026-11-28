@@ -1,11 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
-import { logout } from '@cockpit-app/common-shared-data-access';
+import { logoutAndRedirect } from '@cockpit-app/common-shared-data-access';
 import { UserMenu } from './UserMenu';
 
 vi.mock('@cockpit-app/common-shared-data-access', () => ({
-  logout: vi.fn(),
+  logoutAndRedirect: vi.fn(),
 }));
 
 describe('UserMenu', () => {
@@ -14,9 +14,14 @@ describe('UserMenu', () => {
     expect(screen.getByText('me@example.com')).toBeInTheDocument();
   });
 
-  it('logs out on Logout click', () => {
+  it('shows a Logout text button', () => {
     render(<UserMenu user={{ email: 'me@example.com' }} />);
-    fireEvent.click(screen.getByRole('button', { name: /logout/i }));
-    expect(logout).toHaveBeenCalled();
+    expect(screen.getByRole('button')).toHaveTextContent('Logout');
+  });
+
+  it('logs out and redirects to Login on Logout click', () => {
+    render(<UserMenu user={{ email: 'me@example.com' }} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Logout' }));
+    expect(logoutAndRedirect).toHaveBeenCalledOnce();
   });
 });

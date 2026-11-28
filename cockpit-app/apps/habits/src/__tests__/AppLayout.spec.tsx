@@ -3,7 +3,9 @@ import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-vi.mock('@cockpit-app/common-shared-data-access', () => ({ logout: vi.fn() }));
+vi.mock('@cockpit-app/common-shared-data-access', () => ({
+  logoutAndRedirect: vi.fn(),
+}));
 
 import AppLayout from '../components/AppLayout';
 import { navItems } from '../components/navItems';

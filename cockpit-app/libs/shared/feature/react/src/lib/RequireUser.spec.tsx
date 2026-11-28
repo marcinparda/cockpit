@@ -2,12 +2,12 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { useUser } from '@cockpit-app/shared-react-data-access';
-import { logout } from '@cockpit-app/common-shared-data-access';
+import { logoutAndRedirect } from '@cockpit-app/common-shared-data-access';
 import { RequireUser } from './RequireUser';
 
 vi.mock('@cockpit-app/shared-react-data-access', () => ({ useUser: vi.fn() }));
 vi.mock('@cockpit-app/common-shared-data-access', () => ({
-  logout: vi.fn(),
+  logoutAndRedirect: vi.fn(),
 }));
 
 describe('RequireUser', () => {
@@ -20,7 +20,7 @@ describe('RequireUser', () => {
     } as never);
     const { container } = render(<RequireUser>{() => <p>in</p>}</RequireUser>);
     expect(container).toBeEmptyDOMElement();
-    expect(logout).not.toHaveBeenCalled();
+    expect(logoutAndRedirect).not.toHaveBeenCalled();
   });
 
   it('redirects to Login (logout) and renders nothing without a session', () => {
@@ -29,7 +29,7 @@ describe('RequireUser', () => {
       data: undefined,
     } as never);
     const { container } = render(<RequireUser>{() => <p>in</p>}</RequireUser>);
-    expect(logout).toHaveBeenCalled();
+    expect(logoutAndRedirect).toHaveBeenCalled();
     expect(container).toBeEmptyDOMElement();
   });
 
