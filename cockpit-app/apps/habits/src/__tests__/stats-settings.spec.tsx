@@ -3,14 +3,12 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { z } from 'zod';
 
-vi.mock('../api/hooks/useStats', () => ({
+vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   useStatsToday: vi.fn(),
   useStatsWeekly: vi.fn(),
   useStatsStreaks: vi.fn(),
   useStatsMonthly: vi.fn(),
-}));
-
-vi.mock('../api/hooks/useSettings', () => ({
   useSettings: vi.fn(),
   useUpdateSettings: vi.fn(),
 }));
@@ -29,8 +27,7 @@ vi.mock('recharts', () => ({
   ),
 }));
 
-import * as useStatsModule from '../api/hooks/useStats';
-import * as useSettingsModule from '../api/hooks/useSettings';
+import * as dataAccess from '@cockpit-app/habits-data-access';
 import StatsPage from '../pages/StatsPage';
 import SettingsPage from '../pages/SettingsPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -50,13 +47,13 @@ function withProviders(ui: React.ReactElement) {
 
 describe('StatsPage', () => {
   beforeEach(() => {
-    vi.mocked(useStatsModule.useStatsToday).mockReturnValue({
+    vi.mocked(dataAccess.useStatsToday).mockReturnValue({
       isLoading: false,
       data: { completion_pct: 75, completed: 3, total: 4 },
       error: null,
     } as any);
 
-    vi.mocked(useStatsModule.useStatsWeekly).mockReturnValue({
+    vi.mocked(dataAccess.useStatsWeekly).mockReturnValue({
       isLoading: false,
       data: [
         { day: 'Mon', completion_percentage: 100 },
@@ -66,13 +63,13 @@ describe('StatsPage', () => {
       error: null,
     } as any);
 
-    vi.mocked(useStatsModule.useStatsStreaks).mockReturnValue({
+    vi.mocked(dataAccess.useStatsStreaks).mockReturnValue({
       isLoading: false,
       data: [],
       error: null,
     } as any);
 
-    vi.mocked(useStatsModule.useStatsMonthly).mockReturnValue({
+    vi.mocked(dataAccess.useStatsMonthly).mockReturnValue({
       isLoading: false,
       data: null,
       error: null,
@@ -92,7 +89,7 @@ describe('StatsPage', () => {
   });
 
   it('renders streak list when streaks data available', () => {
-    vi.mocked(useStatsModule.useStatsStreaks).mockReturnValue({
+    vi.mocked(dataAccess.useStatsStreaks).mockReturnValue({
       isLoading: false,
       data: [
         { id: 'h1', name: 'Run', current_streak: 7 },
@@ -108,7 +105,7 @@ describe('StatsPage', () => {
   });
 
   it('shows no streak data message when streaks is empty', () => {
-    vi.mocked(useStatsModule.useStatsStreaks).mockReturnValue({
+    vi.mocked(dataAccess.useStatsStreaks).mockReturnValue({
       isLoading: false,
       data: [],
       error: null,
@@ -120,7 +117,7 @@ describe('StatsPage', () => {
   });
 
   it('renders monthly highlights when monthly data is provided', () => {
-    vi.mocked(useStatsModule.useStatsMonthly).mockReturnValue({
+    vi.mocked(dataAccess.useStatsMonthly).mockReturnValue({
       isLoading: false,
       data: {
         longest_streak_habit: 'Morning Run',
@@ -143,7 +140,7 @@ describe('SettingsPage', () => {
 
   beforeEach(() => {
     // notifications_enabled: true so clicking disables it — calls mutate synchronously
-    vi.mocked(useSettingsModule.useSettings).mockReturnValue({
+    vi.mocked(dataAccess.useSettings).mockReturnValue({
       isLoading: false,
       data: {
         id: 'settings-1',
@@ -154,7 +151,7 @@ describe('SettingsPage', () => {
       error: null,
     } as any);
 
-    vi.mocked(useSettingsModule.useUpdateSettings).mockReturnValue({
+    vi.mocked(dataAccess.useUpdateSettings).mockReturnValue({
       mutate: mockMutate,
       isPending: false,
     } as any);
@@ -182,7 +179,7 @@ describe('SettingsPage', () => {
   });
 
   it('keeps the stored timezone when changing the reminder time', () => {
-    vi.mocked(useSettingsModule.useSettings).mockReturnValue({
+    vi.mocked(dataAccess.useSettings).mockReturnValue({
       isLoading: false,
       data: {
         id: 'settings-1',
@@ -200,7 +197,7 @@ describe('SettingsPage', () => {
   });
 
   it('clear button unsets the reminder time', () => {
-    vi.mocked(useSettingsModule.useSettings).mockReturnValue({
+    vi.mocked(dataAccess.useSettings).mockReturnValue({
       isLoading: false,
       data: {
         id: 'settings-1',
@@ -217,7 +214,7 @@ describe('SettingsPage', () => {
   });
 
   it('enables push notifications when permission granted and subscription succeeds', async () => {
-    vi.mocked(useSettingsModule.useSettings).mockReturnValue({
+    vi.mocked(dataAccess.useSettings).mockReturnValue({
       isLoading: false,
       data: {
         id: 'settings-1',
@@ -266,7 +263,7 @@ describe('SettingsPage', () => {
   });
 
   it('renders loading state while settings load', () => {
-    vi.mocked(useSettingsModule.useSettings).mockReturnValue({
+    vi.mocked(dataAccess.useSettings).mockReturnValue({
       isLoading: true,
       data: undefined,
       error: null,
@@ -278,7 +275,7 @@ describe('SettingsPage', () => {
   });
 
   it('shows push error when permission is denied', async () => {
-    vi.mocked(useSettingsModule.useSettings).mockReturnValue({
+    vi.mocked(dataAccess.useSettings).mockReturnValue({
       isLoading: false,
       data: {
         id: 'settings-1',

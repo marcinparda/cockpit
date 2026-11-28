@@ -3,7 +3,9 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Archive, Pencil, MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Habit } from '../api/schemas';
+import {
+  Habit,
+} from '@cockpit-app/habits-data-access';
 import { HABIT_ICONS } from '../icons/index';
 import { truncateName } from '../utils/text';
 

@@ -1,18 +1,9 @@
 import { useState } from 'react';
-import { useSettings, useUpdateSettings } from '../api/hooks/useSettings';
-import { SETTINGS_ENDPOINTS } from '../api/endpoints';
-import { environments } from '@cockpit-app/shared-utils';
-
-async function fetchVapidPublicKey(): Promise<string> {
-  const response = await fetch(`${environments.apiUrl}${SETTINGS_ENDPOINTS.VAPID_PUBLIC_KEY}`, {
-    credentials: 'include',
-  });
-  if (!response.ok) {
-    throw new Error('Failed to fetch VAPID public key');
-  }
-  const data = (await response.json()) as { public_key: string };
-  return data.public_key;
-}
+import {
+  fetchVapidPublicKey,
+  useSettings,
+  useUpdateSettings,
+} from '@cockpit-app/habits-data-access';
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);

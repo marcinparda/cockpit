@@ -1,7 +1,10 @@
 import { useRef, useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { Habit, HabitEntry } from '../api/schemas';
-import { useEntryMutations } from '../api/hooks/useEntryMutations';
+import {
+  Habit,
+  HabitEntry,
+  useEntryMutations,
+} from '@cockpit-app/habits-data-access';
 
 interface HabitSheetProps {
   habit: Habit;

@@ -2,21 +2,18 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 
-vi.mock('../api/hooks/useHabits', () => ({ useHabits: vi.fn() }));
-vi.mock('../api/hooks/useEntriesByRange', () => ({
+vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  useHabits: vi.fn(),
   useEntriesByRange: vi.fn(),
-}));
-vi.mock('../api/hooks/useEntryMutations', () => ({
   useEntryMutations: vi.fn(),
 }));
 
-import * as useHabitsModule from '../api/hooks/useHabits';
-import * as rangeModule from '../api/hooks/useEntriesByRange';
-import * as mutationsModule from '../api/hooks/useEntryMutations';
+import * as dataAccess from '@cockpit-app/habits-data-access';
 import TodayPage from '../pages/TodayPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { createHabitMock } from '../mocks/habit';
+import { createHabitMock } from '@cockpit-app/habits-data-access';
 import { addDays, toDateKey } from '../utils/date';
 
 const today = toDateKey(new Date());
@@ -35,7 +32,7 @@ function renderPage() {
 }
 
 function setHabits(habits: unknown[]) {
-  vi.mocked(useHabitsModule.useHabits).mockReturnValue({
+  vi.mocked(dataAccess.useHabits).mockReturnValue({
     isLoading: false,
     data: habits,
     error: null,
@@ -43,7 +40,7 @@ function setHabits(habits: unknown[]) {
 }
 
 function setEntries(entries: unknown[]) {
-  vi.mocked(rangeModule.useEntriesByRange).mockReturnValue({
+  vi.mocked(dataAccess.useEntriesByRange).mockReturnValue({
     data: entries,
   } as never);
 }
@@ -58,7 +55,7 @@ describe('TodayPage', () => {
   beforeEach(() => {
     upsert.mockReset();
     del.mockReset();
-    vi.mocked(mutationsModule.useEntryMutations).mockReturnValue({
+    vi.mocked(dataAccess.useEntryMutations).mockReturnValue({
       upsertEntry: { mutate: upsert },
       deleteEntry: { mutate: del },
     } as never);

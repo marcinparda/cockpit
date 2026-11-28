@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { Plus, Tag } from 'lucide-react';
-import { useHabits } from '../api/hooks/useHabits';
-import { useHabitMutations } from '../api/hooks/useHabitMutations';
-import { Habit } from '../api/schemas';
+import {
+  Habit,
+  useHabitMutations,
+  useHabits,
+} from '@cockpit-app/habits-data-access';
 import { SortableCategoryGroup } from '../components/SortableCategoryGroup';
 import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { ManageCategoriesSheet } from '../components/ManageCategoriesSheet';

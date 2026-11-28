@@ -1,9 +1,12 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { Habit, PresetHabit } from '../api/schemas';
-import { useHabitMutations } from '../api/hooks/useHabitMutations';
-import { useCategories } from '../api/hooks/useCategories';
-import { usePresets } from '../api/hooks/usePresets';
+import {
+  Habit,
+  PresetHabit,
+  useCategories,
+  useHabitMutations,
+  usePresets,
+} from '@cockpit-app/habits-data-access';
 import { IconPicker } from './IconPicker';
 import { HABIT_COLORS } from '../colors';
 

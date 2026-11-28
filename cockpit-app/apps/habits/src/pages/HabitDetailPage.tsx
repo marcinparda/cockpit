@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Pencil } from 'lucide-react';
-import { useHabit } from '../api/hooks/useHabits';
-import { useHabitEntries } from '../api/hooks/useHabitEntries';
-import { useHabitStreak } from '../api/hooks/useHabitStreak';
-import { useFreezeMutations } from '../api/hooks/useFreezeMutations';
+import {
+  useEntryMutations,
+  useFreezeMutations,
+  useHabit,
+  useHabitEntries,
+  useHabitStreak,
+  type Habit,
+  type HabitEntry,
+} from '@cockpit-app/habits-data-access';
 import { HeatmapCalendar, heatmapRange, type HeatmapState } from '../components/HeatmapCalendar';
 import { HabitSheet } from '../components/HabitSheet';
-import { useEntryMutations } from '../api/hooks/useEntryMutations';
 import { toDateKey } from '../utils/date';
 import { LineBarChart } from '../components/LineBarChart';
 import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { HABIT_ICONS } from '../icons';
-import type { Habit, HabitEntry } from '../api/schemas';
 
 const TIME_RANGES = ['6M', '1Y'] as const;
 type TimeRange = (typeof TIME_RANGES)[number];

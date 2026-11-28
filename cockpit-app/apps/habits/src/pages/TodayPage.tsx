@@ -2,10 +2,13 @@ import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { LogRow, type LogRowValue } from '@cockpit-app/shared-react-ui';
-import { Habit, HabitEntry } from '../api/schemas';
-import { useHabits } from '../api/hooks/useHabits';
-import { useEntriesByRange } from '../api/hooks/useEntriesByRange';
-import { useEntryMutations } from '../api/hooks/useEntryMutations';
+import {
+  Habit,
+  HabitEntry,
+  useEntriesByRange,
+  useEntryMutations,
+  useHabits,
+} from '@cockpit-app/habits-data-access';
 import { HabitSheet } from '../components/HabitSheet';
 import { ConfettiAnimation } from '../components/ConfettiAnimation';
 import { DayStrip, type DayCompletion } from '../components/DayStrip';

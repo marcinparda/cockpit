@@ -1,4 +1,4 @@
-import type { HabitCategory } from '../api/schemas';
+import type { HabitCategory } from '../schemas';
 
 export function createCategoryMock(overrides: Partial<HabitCategory> = {}): HabitCategory {
   return {

@@ -10,7 +10,9 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { Habit } from '../api/schemas';
+import {
+  Habit,
+} from '@cockpit-app/habits-data-access';
 import { SortableHabitRow } from './SortableHabitRow';
 
 interface SortableCategoryGroupProps {

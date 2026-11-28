@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { X, Pencil, Trash2, Check, Plus } from 'lucide-react';
-import { useCategories, useCategoryMutations } from '../api/hooks/useCategories';
-import { HabitCategory } from '../api/schemas';
+import {
+  HabitCategory,
+  useCategories,
+  useCategoryMutations,
+} from '@cockpit-app/habits-data-access';
 
 const COLORS = [
   '#ef4444',

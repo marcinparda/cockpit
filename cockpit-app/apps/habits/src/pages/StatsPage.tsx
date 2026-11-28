@@ -7,7 +7,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { useStatsToday, useStatsWeekly, useStatsStreaks, useStatsMonthly } from '../api/hooks/useStats';
+import {
+  useStatsMonthly,
+  useStatsStreaks,
+  useStatsToday,
+  useStatsWeekly,
+} from '@cockpit-app/habits-data-access';
 
 export default function StatsPage() {
   const { data: todayStats, isLoading: todayLoading } = useStatsToday();

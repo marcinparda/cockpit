@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
 import { SortableHabitRow } from '../components/SortableHabitRow';
-import { createHabitMock } from '../mocks/habit';
+import { createHabitMock } from '@cockpit-app/habits-data-access';
 
 const baseHabit = createHabitMock({ id: 'habit-1' });
 

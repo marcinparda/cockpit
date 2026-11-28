@@ -5,16 +5,14 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 
 // Mock hooks before imports
-vi.mock('../api/hooks/useCategories', () => ({
+vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   useCategories: vi.fn(() => ({ data: [], isLoading: false })),
   useCategoryMutations: vi.fn(() => ({
     createCategory: { mutate: vi.fn(), isPending: false },
     updateCategory: { mutate: vi.fn(), isPending: false },
     deleteCategory: { mutate: vi.fn(), isPending: false },
   })),
-}));
-
-vi.mock('../api/hooks/useHabitMutations', () => ({
   useHabitMutations: vi.fn(() => ({
     createHabit: { mutate: vi.fn(), isPending: false },
     updateHabit: { mutate: vi.fn(), isPending: false },
@@ -22,13 +20,7 @@ vi.mock('../api/hooks/useHabitMutations', () => ({
     archiveHabit: { mutate: vi.fn(), isPending: false },
     updateSortOrder: { mutate: vi.fn(), isPending: false },
   })),
-}));
-
-vi.mock('../api/hooks/usePresets', () => ({
   usePresets: vi.fn(() => ({ data: [], isLoading: false })),
-}));
-
-vi.mock('../api/hooks/useHabits', () => ({
   useHabits: vi.fn(() => ({ data: [], isLoading: false })),
 }));
 
@@ -37,8 +29,9 @@ import { IconPicker } from '../components/IconPicker';
 import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { SortableHabitRow } from '../components/SortableHabitRow';
 import HabitsPage from '../pages/HabitsPage';
-import * as useHabitsModule from '../api/hooks/useHabits';
-import { createHabitMock } from '../mocks/habit';
+import * as dataAccess from '@cockpit-app/habits-data-access';
+
+const { createHabitMock } = dataAccess;
 
 function makeQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -71,7 +64,7 @@ describe('HabitCreationSheet', () => {
   // Test 2: Browse Templates tab pre-fills form fields without auto-creating
   it('Browse Templates tab pre-fills Quick Add form without creating habit', async () => {
     const onClose = vi.fn();
-    const { usePresets } = await import('../api/hooks/usePresets');
+    const { usePresets } = dataAccess;
     vi.mocked(usePresets).mockReturnValue({
       data: [
         {
@@ -222,7 +215,7 @@ describe('HabitCreationSheet form interactions', () => {
 
 describe('HabitCreationSheet edit mode', () => {
   it('renders with editHabit pre-fills form and calls updateHabit on submit', async () => {
-    const { useHabitMutations } = await import('../api/hooks/useHabitMutations');
+    const { useHabitMutations } = dataAccess;
     const mockUpdate = vi.fn();
     vi.mocked(useHabitMutations).mockReturnValue({
       createHabit: { mutate: vi.fn(), isPending: false },
@@ -260,7 +253,7 @@ describe('HabitCreationSheet edit mode', () => {
 
 describe('HabitCreationSheet submit valid form', () => {
   it('calls createHabit when form is submitted with valid name and type', async () => {
-    const { useHabitMutations } = await import('../api/hooks/useHabitMutations');
+    const { useHabitMutations } = dataAccess;
     const mockCreate = vi.fn();
     vi.mocked(useHabitMutations).mockReturnValue({
       createHabit: { mutate: mockCreate, isPending: false },
@@ -295,7 +288,7 @@ describe('HabitCreationSheet submit valid form', () => {
 // Test 5: HabitsPage shows archive toggle and filters correctly
 describe('HabitsPage', () => {
   beforeEach(() => {
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
+    vi.mocked(dataAccess.useHabits).mockReturnValue({
       data: [
         { ...baseHabit, id: 'h1', name: 'Active Habit', is_archived: false },
         { ...baseHabit, id: 'h2', name: 'Archived Habit', is_archived: true },
@@ -324,7 +317,7 @@ describe('HabitsPage', () => {
   });
 
   it('shows empty state when no habits exist', () => {
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
+    vi.mocked(dataAccess.useHabits).mockReturnValue({
       data: [],
       isLoading: false,
     } as any);
@@ -335,7 +328,7 @@ describe('HabitsPage', () => {
   });
 
   it('opens HabitCreationSheet when FAB is clicked', () => {
-    vi.mocked(useHabitsModule.useHabits).mockReturnValue({
+    vi.mocked(dataAccess.useHabits).mockReturnValue({
       data: [],
       isLoading: false,
     } as any);

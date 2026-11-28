@@ -1,4 +1,4 @@
-import type { Habit } from '../api/schemas';
+import type { Habit } from '../schemas';
 
 export function createHabitMock(overrides: Partial<Habit> = {}): Habit {
   return {

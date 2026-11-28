@@ -3,13 +3,14 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-vi.mock('../api/hooks/useEntryMutations', () => ({
+vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   useEntryMutations: vi.fn(),
 }));
 
-import * as useEntryMutationsModule from '../api/hooks/useEntryMutations';
+import * as dataAccess from '@cockpit-app/habits-data-access';
 import { HabitSheet } from '../components/HabitSheet';
-import { createHabitMock } from '../mocks/habit';
+import { createHabitMock } from '@cockpit-app/habits-data-access';
 
 function makeQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -35,7 +36,7 @@ const baseHabit = createHabitMock({
 
 describe('HabitSheet', () => {
   beforeEach(() => {
-    vi.mocked(useEntryMutationsModule.useEntryMutations).mockReturnValue({
+    vi.mocked(dataAccess.useEntryMutations).mockReturnValue({
       upsertEntry: { mutate: mockUpsertMutate },
       deleteEntry: { mutate: vi.fn() },
     } as any);

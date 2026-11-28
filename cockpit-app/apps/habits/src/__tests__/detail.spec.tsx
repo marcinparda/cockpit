@@ -4,23 +4,12 @@ import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
-vi.mock('../api/hooks/useHabits', () => ({
+vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   useHabit: vi.fn(),
-}));
-
-vi.mock('../api/hooks/useHabitEntries', () => ({
   useHabitEntries: vi.fn(),
-}));
-
-vi.mock('../api/hooks/useHabitStreak', () => ({
   useHabitStreak: vi.fn(),
-}));
-
-vi.mock('../api/hooks/useFreezeMutations', () => ({
   useFreezeMutations: vi.fn(),
-}));
-
-vi.mock('../api/hooks/useEntryMutations', () => ({
   useEntryMutations: vi.fn(),
 }));
 
@@ -48,16 +37,12 @@ vi.mock('recharts', () => ({
   ),
 }));
 
-import * as useHabitsModule from '../api/hooks/useHabits';
-import * as useHabitEntriesModule from '../api/hooks/useHabitEntries';
-import * as useHabitStreakModule from '../api/hooks/useHabitStreak';
-import * as useEntryMutationsModule from '../api/hooks/useEntryMutations';
-import * as useFreezeMutationsModule from '../api/hooks/useFreezeMutations';
+import * as dataAccess from '@cockpit-app/habits-data-access';
 import { toDateKey, addDays } from '../utils/date';
 import { HeatmapCalendar, heatmapRange } from '../components/HeatmapCalendar';
 import { LineBarChart } from '../components/LineBarChart';
 import HabitDetailPage from '../pages/HabitDetailPage';
-import { createHabitMock } from '../mocks/habit';
+import { createHabitMock } from '@cockpit-app/habits-data-access';
 
 /** Cheap whole-heatmap cell query; role queries are slow in jsdom. */
 const gridCells = () =>
@@ -167,17 +152,17 @@ describe('HabitDetailPage', () => {
   const mockMutate = vi.fn();
 
   beforeEach(() => {
-    vi.mocked(useEntryMutationsModule.useEntryMutations).mockReturnValue({
+    vi.mocked(dataAccess.useEntryMutations).mockReturnValue({
       upsertEntry: { mutate: vi.fn() },
       deleteEntry: { mutate: vi.fn() },
     } as any);
 
-    vi.mocked(useHabitEntriesModule.useHabitEntries).mockReturnValue({
+    vi.mocked(dataAccess.useHabitEntries).mockReturnValue({
       isLoading: false,
       data: [],
     } as any);
 
-    vi.mocked(useHabitStreakModule.useHabitStreak).mockReturnValue({
+    vi.mocked(dataAccess.useHabitStreak).mockReturnValue({
       isLoading: false,
       data: {
         habit_id: 'habit-1',
@@ -187,14 +172,14 @@ describe('HabitDetailPage', () => {
       },
     } as any);
 
-    vi.mocked(useFreezeMutationsModule.useFreezeMutations).mockReturnValue({
+    vi.mocked(dataAccess.useFreezeMutations).mockReturnValue({
       createFreeze: { mutate: mockMutate, isPending: false },
       freezesThisMonth: 1,
     } as any);
   });
 
   it('shows freeze button with correct remaining count', () => {
-    vi.mocked(useHabitsModule.useHabit).mockReturnValue({
+    vi.mocked(dataAccess.useHabit).mockReturnValue({
       isLoading: false,
       data: mockBooleanHabit,
     } as any);
@@ -208,7 +193,7 @@ describe('HabitDetailPage', () => {
   });
 
   it('renders HeatmapCalendar for boolean habit', () => {
-    vi.mocked(useHabitsModule.useHabit).mockReturnValue({
+    vi.mocked(dataAccess.useHabit).mockReturnValue({
       isLoading: false,
       data: mockBooleanHabit,
     } as any);
@@ -220,7 +205,7 @@ describe('HabitDetailPage', () => {
   });
 
   it('renders LineBarChart for numeric habit', () => {
-    vi.mocked(useHabitsModule.useHabit).mockReturnValue({
+    vi.mocked(dataAccess.useHabit).mockReturnValue({
       isLoading: false,
       data: mockNumericHabit,
     } as any);
@@ -232,7 +217,7 @@ describe('HabitDetailPage', () => {
   });
 
   it('shows "Habit not found" when habit is null', () => {
-    vi.mocked(useHabitsModule.useHabit).mockReturnValue({
+    vi.mocked(dataAccess.useHabit).mockReturnValue({
       isLoading: false,
       data: null,
     } as any);
@@ -243,7 +228,7 @@ describe('HabitDetailPage', () => {
   });
 
   it('calls createFreeze mutate when freeze button is clicked', () => {
-    vi.mocked(useHabitsModule.useHabit).mockReturnValue({
+    vi.mocked(dataAccess.useHabit).mockReturnValue({
       isLoading: false,
       data: mockBooleanHabit,
     } as any);
@@ -259,7 +244,7 @@ describe('HabitDetailPage', () => {
   });
 
   it('offers the periods 6M, 1Y, defaulting to 1Y', () => {
-    vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
+    vi.mocked(dataAccess.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
     render(withProviders(<HabitDetailPage />));
     const labels = within(screen.getByRole('group', { name: 'Time range' }))
       .getAllByRole('button')
@@ -273,7 +258,7 @@ describe('HabitDetailPage', () => {
     ['6M', 26],
     ['1Y', 52],
   ] as const)('period %s shows %i weeks of cells and fetches that range', (label, weeks) => {
-    vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
+    vi.mocked(dataAccess.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
     render(withProviders(<HabitDetailPage />));
 
     fireEvent.click(screen.getByRole('button', { name: label }));
@@ -281,15 +266,15 @@ describe('HabitDetailPage', () => {
     expect(screen.getByRole('button', { name: label })).toHaveAttribute('aria-pressed', 'true');
     expect(gridCells()).toHaveLength(weeks * 7 - FUTURE_DAYS_THIS_WEEK);
     const range = heatmapRange(weeks);
-    expect(useHabitEntriesModule.useHabitEntries).toHaveBeenLastCalledWith('habit-1', range);
+    expect(dataAccess.useHabitEntries).toHaveBeenLastCalledWith('habit-1', range);
   });
 
   it('renders heatmap entries from real entry data', () => {
-    vi.mocked(useHabitsModule.useHabit).mockReturnValue({
+    vi.mocked(dataAccess.useHabit).mockReturnValue({
       isLoading: false,
       data: mockBooleanHabit,
     } as any);
-    vi.mocked(useHabitEntriesModule.useHabitEntries).mockReturnValue({
+    vi.mocked(dataAccess.useHabitEntries).mockReturnValue({
       isLoading: false,
       data: [
         { id: 'e1', habit_id: 'habit-1', date: '2026-05-01', value: null, boolean_value: true, numeric_value: null, text_value: null, logged_at: '2026-05-01' },
@@ -310,7 +295,7 @@ describe('HabitDetailPage', () => {
     beforeEach(() => {
       upsert.mockClear();
       del.mockClear();
-      vi.mocked(useEntryMutationsModule.useEntryMutations).mockReturnValue({
+      vi.mocked(dataAccess.useEntryMutations).mockReturnValue({
         upsertEntry: { mutate: upsert },
         deleteEntry: { mutate: del },
       } as any);
@@ -324,31 +309,31 @@ describe('HabitDetailPage', () => {
     }
 
     it('cycles boolean cell: unlogged -> done', () => {
-      vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
+      vi.mocked(dataAccess.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
       render(withProviders(<HabitDetailPage />));
       fireEvent.click(screen.getByRole('gridcell', { name: `${day}: unlogged` }));
       expect(upsert).toHaveBeenCalledWith({ habitId: 'habit-1', logged_at: day, boolean_value: true });
     });
 
     it('cycles boolean cell: done -> not done', () => {
-      vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
-      vi.mocked(useHabitEntriesModule.useHabitEntries).mockReturnValue({ isLoading: false, data: [entry(true)] } as any);
+      vi.mocked(dataAccess.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
+      vi.mocked(dataAccess.useHabitEntries).mockReturnValue({ isLoading: false, data: [entry(true)] } as any);
       render(withProviders(<HabitDetailPage />));
       fireEvent.click(screen.getByRole('gridcell', { name: `${day}: done` }));
       expect(upsert).toHaveBeenCalledWith({ habitId: 'habit-1', logged_at: day, boolean_value: false });
     });
 
     it('cycles boolean cell: not done -> deleted', () => {
-      vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
-      vi.mocked(useHabitEntriesModule.useHabitEntries).mockReturnValue({ isLoading: false, data: [entry(false)] } as any);
+      vi.mocked(dataAccess.useHabit).mockReturnValue({ isLoading: false, data: mockBooleanHabit } as any);
+      vi.mocked(dataAccess.useHabitEntries).mockReturnValue({ isLoading: false, data: [entry(false)] } as any);
       render(withProviders(<HabitDetailPage />));
       fireEvent.click(screen.getByRole('gridcell', { name: `${day}: not done` }));
       expect(del).toHaveBeenCalledWith({ habitId: 'habit-1', entryId: 'e1' });
     });
 
     it('opens the sheet for that date on numeric habit cell click', () => {
-      vi.mocked(useHabitsModule.useHabit).mockReturnValue({ isLoading: false, data: mockNumericHabit } as any);
-      vi.mocked(useHabitEntriesModule.useHabitEntries).mockReturnValue({ isLoading: false, data: [] } as any);
+      vi.mocked(dataAccess.useHabit).mockReturnValue({ isLoading: false, data: mockNumericHabit } as any);
+      vi.mocked(dataAccess.useHabitEntries).mockReturnValue({ isLoading: false, data: [] } as any);
       render(withProviders(<HabitDetailPage />, 'habit-2'));
       fireEvent.click(screen.getByRole('gridcell', { name: `${day}: unlogged` }));
       expect(screen.getByTestId('habit-sheet')).toHaveTextContent(day);

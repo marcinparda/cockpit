@@ -2,14 +2,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 
-vi.mock('../api/hooks/useCategories', () => ({
+vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
   useCategories: vi.fn(),
   useCategoryMutations: vi.fn(),
 }));
 
-import * as useCategoriesModule from '../api/hooks/useCategories';
+import * as dataAccess from '@cockpit-app/habits-data-access';
 import { ManageCategoriesSheet } from '../components/ManageCategoriesSheet';
-import { createCategoryMock } from '../mocks/category';
+import { createCategoryMock } from '@cockpit-app/habits-data-access';
 
 const mockCreateMutate = vi.fn();
 const mockUpdateMutate = vi.fn();
@@ -22,10 +23,10 @@ const categories = [
 
 describe('ManageCategoriesSheet', () => {
   beforeEach(() => {
-    vi.mocked(useCategoriesModule.useCategories).mockReturnValue({
+    vi.mocked(dataAccess.useCategories).mockReturnValue({
       data: categories,
     } as any);
-    vi.mocked(useCategoriesModule.useCategoryMutations).mockReturnValue({
+    vi.mocked(dataAccess.useCategoryMutations).mockReturnValue({
       createCategory: { mutate: mockCreateMutate, isPending: false },
       updateCategory: { mutate: mockUpdateMutate, isPending: false },
       deleteCategory: { mutate: mockDeleteMutate, isPending: false },
@@ -42,7 +43,7 @@ describe('ManageCategoriesSheet', () => {
   });
 
   it('shows empty state when there are no categories', () => {
-    vi.mocked(useCategoriesModule.useCategories).mockReturnValue({
+    vi.mocked(dataAccess.useCategories).mockReturnValue({
       data: [],
     } as any);
     render(<ManageCategoriesSheet onClose={vi.fn()} />);
