@@ -35,10 +35,8 @@ Libs are also split by scope — **shared** libs (under `libs/shared/`) may be i
 | App (`apps/<app>`) | `scope:<app>`, `type:app` | Routing and providers only |
 
 - **Creation:** App UI and App feature libs are created only when an App needs them, not up front.
-- **Discovery:** before creating a component, search Shared UI and every App UI lib. If it exists in another App's lib, move it to Shared UI and reuse it. Never copy it.
+- **Discovery and promotion:** before creating a component, search Shared UI and every App UI lib. A component belongs in Shared UI as soon as two Apps use it: if it exists in another App's lib, move it to Shared UI and reuse it there. Never copy it.
 - **ui purity:** a ui component may hold local UI state (open/closed, active tab). It must not import data-access, call the API or hold domain rules. This holds in every scope and is lint-enforced (`type:ui` may depend only on `type:ui` and `type:util`). Why: [ADR 0005](../../adr/0005-ui-libs-are-pure-in-every-scope.md).
-- **Scope:** each `scope:<app>` may depend on `scope:shared` and its own scope only.
-- **Responsive:** every App must work on a phone and on a desktop browser, mobile-first. See [`responsive.md`](responsive.md).
 
 ### Apps Are Thin Composition Entry Points
 Apps only wire providers, routing, and top-level composition. Business logic lives in libs, not in app-level code. Apps compose building blocks from libs rather than implementing logic directly — `apps/cockpit` is the canonical example: layout/components → `@cockpit-app/cockpit-ui`, server state → `@cockpit-app/shared-react-data-access`, auth actions → `@cockpit-app/common-shared-data-access`, URLs → `@cockpit-app/shared-utils`.
@@ -75,7 +73,7 @@ cockpit-app/
     ├── shared/data-access/common/     # Framework-agnostic API layer (fetch, auth)
     ├── shared/data-access/react/      # React-specific hooks (useUser, QueryClient)
     ├── shared/ui/react/               # Primitive React components (Radix UI / shadcn-style)
-    ├── shared/feature/react/          # Shared React feature libs
+    ├── shared/feature/react/          # Shared feature libs (scope:shared, type:feature)
     └── shared/utils/                  # environments, cn(), logger, predicates
 ```
 

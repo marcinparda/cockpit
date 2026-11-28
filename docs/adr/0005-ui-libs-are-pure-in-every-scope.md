@@ -12,4 +12,3 @@ Every `type:ui` lib, shared or App-specific, may import only `type:ui` and `type
 - Moving a component from `<app>-ui` to `shared-react-ui` is a file move plus import rewrite, because it already has no data-access dependency.
 - Storybook stories and component tests need no API or QueryClient mocks.
 - Cost: one more lib per App (`<app>-feature`), created only when the App needs data-connected containers.
-- Each `scope:<app>` may depend on `scope:shared` and its own scope only; Apps cannot import each other's libs.
