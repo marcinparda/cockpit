@@ -43,7 +43,7 @@ The backend follows a strict 3-layer pattern per service. The frontend enforces 
   - `ui/react/` — Shared React component library (`@cockpit-app/shared-react-ui`): shadcn/ui-style primitives (Select, AlertDialog, Toaster, etc.) using Radix UI + CVA + Tailwind
   - `feature/` — Shared feature modules
   - `utils/` — Pure utility functions
-- **App-specific** (`libs/<app>/ui`, `libs/<app>/feature`): created only when an App needs them; e.g. `libs/cockpit/` holds Dashboard-specific UI components
+- **App-specific** (`libs/<app>/data-access`, `libs/<app>/ui`, `libs/<app>/feature`): created only when an App needs them; e.g. `libs/cockpit/` holds Dashboard-specific UI components and `libs/habits/` holds all three for Habits
 
 ### Deployment — `deployment-scripts/`
 - **Location**: `deployment-scripts/`, `.github/workflows/`
