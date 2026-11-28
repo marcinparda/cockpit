@@ -14,6 +14,14 @@ _Avoid_: cockpit-app (as a name for the platform), the monorepo
 The App at `apps/cockpit`, the main entry point for tasks, budget, notes and the agent.
 _Avoid_: cockpit app, main app
 
+**Tile**:
+One entry on the Dashboard that links to an App or an external service (e.g. Twodo, Actual budget). Shown only when the User has the Tile's Permission.
+_Avoid_: app card, app (for a Tile that links to an external service), shortcut
+
+**Favorite tile**:
+A Tile the User has starred. Favorite tiles appear first on the Dashboard, and each User has their own on every device. A favorite outlives lost access: the Tile is hidden, and returns as a favorite when access comes back.
+_Avoid_: pinned tile, starred app
+
 **App**:
 One independently deployed frontend under `apps/` (Dashboard, Login, CV, Store, Habits).
 _Avoid_: frontend, project, site
