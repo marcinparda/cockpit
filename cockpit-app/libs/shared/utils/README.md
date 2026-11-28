@@ -58,7 +58,7 @@ processUserInput(123); // throws Error
 ```typescript
 import { isMeaningfulString, isEmptyOrWhitespaceString } from '@cockpit-app/shared-utils';
 
-// Vue.js example
+// React example
 function handleFormSubmit(formData: { name: string; email: string }) {
   if (!isMeaningfulString(formData.name)) {
     showError('Name is required');
@@ -138,8 +138,6 @@ nx test utils
 
 This library is framework-agnostic and can be used in:
 
-- Angular applications
-- Vue.js applications
 - React applications
 - Node.js servers
 - Any TypeScript/JavaScript project

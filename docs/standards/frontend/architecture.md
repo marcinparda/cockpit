@@ -64,7 +64,7 @@ cockpit-app/
     └── shared/utils/                  # environments, cn(), logger, predicates
 ```
 
-Note: `store` was migrated from Angular 19 to React 19 (see GitHub issue #81) — all apps are React except `cv`, which is Vue 3.5 + Pinia.
+Note: `store` was migrated from Angular 19 to React 19 (see GitHub issue #81) — all apps are React 19.
 
 ### State Management by App
 
@@ -72,7 +72,7 @@ Note: `store` was migrated from Angular 19 to React 19 (see GitHub issue #81) �
 | ------- | ------------------------------------------------------------------------------ |
 | cockpit | TanStack Query for server state only                                           |
 | login   | `useState` — minimal local state                                               |
-| cv      | Pinia (Vue) |
+| cv      | TanStack Query for server state                                                |
 | store   | TanStack Query + `useReducer` for tree state                                   |
 | habits  | TanStack Query, service worker registered for push notifications               |
 

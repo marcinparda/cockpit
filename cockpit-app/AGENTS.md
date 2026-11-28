@@ -12,7 +12,7 @@ CockpitApp is a multi-application Nx monorepo of web apps with a shared, type-sa
 | login | React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 |
 | habits | React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 (port 4208, habits.parda.me) |
 | store | React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 (same pattern as cockpit) |
-| cv | Vue 3.5 + Vite + Pinia |
+| cv | React 19 + Vite + TanStack Query + shadcn/ui + Tailwind CSS v4 |
 
 ### Deployment
 See `.github/` dir.

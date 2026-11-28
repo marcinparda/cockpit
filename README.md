@@ -5,7 +5,7 @@ Personal agent platform — self-hosted on Raspberry Pi (arm64).
 | Project                        | Stack                                           | What                                                                   |
 | ------------------------------ | ----------------------------------------------- | ---------------------------------------------------------------------- |
 | [`cockpit-api/`](cockpit-api/) | Python · FastAPI · PostgreSQL · Redis           | REST API + MCP server. Integrates Vikunja, Actual Budget, brain notes. |
-| [`cockpit-app/`](cockpit-app/) | Nx · React 19 · Vue 3.5 · Tailwind · shadcn/ui | Multi-app frontend monorepo (login, cockpit, cv, store, habits). Storybook for UI docs. |
+| [`cockpit-app/`](cockpit-app/) | Nx · React 19 · Tailwind · shadcn/ui | Multi-app frontend monorepo (login, cockpit, cv, store, habits). Storybook for UI docs. |
 
 ## Architecture at a Glance
 

@@ -3,7 +3,7 @@
 Personal agent platform. Two projects:
 
 - **`cockpit-api/`** — Python/FastAPI backend. MCP server, REST API, integrates Vikunja, Actual Budget, brain notes. Deployed as Docker container on Raspberry Pi. See [`cockpit-api/AGENTS.md`](cockpit-api/AGENTS.md).
-- **`cockpit-app/`** — Nx monorepo of React/Vue web apps (login, cockpit, cv, store, habits). Each app deployed as separate Docker container on Raspberry Pi. See [`cockpit-app/AGENTS.md`](cockpit-app/AGENTS.md).
+- **`cockpit-app/`** — Nx monorepo of React web apps (login, cockpit, cv, store, habits). Each app deployed as separate Docker container on Raspberry Pi. See [`cockpit-app/AGENTS.md`](cockpit-app/AGENTS.md).
 
 ## Makefile
 
