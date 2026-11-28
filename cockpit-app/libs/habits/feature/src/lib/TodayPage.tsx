@@ -203,7 +203,6 @@ export function TodayPage() {
         />
         <PageHeader
           title={isToday ? 'Today' : dateLabel}
-          description={isToday ? dateLabel : undefined}
           actions={
             activeHabits.length > 0 ? (
               <span className="text-sm font-medium text-muted-foreground">
@@ -212,6 +211,7 @@ export function TodayPage() {
             ) : undefined
           }
         />
+        {isToday && <p className="text-sm text-muted-foreground">{dateLabel}</p>}
       </div>
 
       {/* Empty state */}
