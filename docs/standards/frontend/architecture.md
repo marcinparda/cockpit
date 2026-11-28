@@ -7,7 +7,7 @@ Strict dependency direction enforced by ESLint `@nx/enforce-module-boundaries`. 
 Layer 0 — types/utils   (no internal deps)        → type:util
 Layer 1 — data-access   (can import: 0)            → type:data-access
 Layer 2 — ui            (can import: 0)            → type:ui
-Layer 3 — feature       (can import: 0, 1, 2)      → type:feature
+Layer 3 — feature       (can import: 0, 1, 2, 3) → type:feature  (3 = other feature libs)
 Layer 4 — apps          (can import: anything)     → type:app
 ```
 
@@ -15,8 +15,8 @@ Layer 4 — apps          (can import: anything)     → type:app
 |-------|--------|------|
 | types/utils | `type:util` | `@cockpit-app/api-types`, `@cockpit-app/shared-utils` |
 | data-access | `type:data-access` | `@cockpit-app/common-shared-data-access`, `@cockpit-app/shared-react-data-access` |
-| ui | `type:ui` | `@cockpit-app/shared-react-ui` (Shared UI), `@cockpit-app/cockpit-ui` (App UI), `<app>-ui` |
-| feature | `type:feature` | `<app>-feature` (App feature) |
+| ui | `type:ui` | `@cockpit-app/shared-react-ui` (Shared UI), `@cockpit-app/cockpit-ui` and future `@cockpit-app/<app>-ui` (App UI, `libs/<app>/ui`) |
+| feature | `type:feature` | `@cockpit-app/shared-react-feature` (shared), future `@cockpit-app/<app>-feature` (App feature, `libs/<app>/feature`) |
 | apps | `type:app` | `apps/*` |
 
 ### Nx Library Tags Required
@@ -30,8 +30,8 @@ Libs are also split by scope — **shared** libs (under `libs/shared/`) may be i
 | Library | Tags | Holds |
 |---------|------|-------|
 | Shared UI (`shared-react-ui`) | `scope:shared`, `type:ui` | Generic components used by two or more Apps |
-| App UI (`<app>-ui`) | `scope:<app>`, `type:ui` | Presentational components used by one App |
-| App feature (`<app>-feature`) | `scope:<app>`, `type:feature` | Data-connected containers: use data-access hooks, compose UI |
+| App UI (`libs/<app>/ui`) | `scope:<app>`, `type:ui` | Presentational components used by one App |
+| App feature (`libs/<app>/feature`) | `scope:<app>`, `type:feature` | Data-connected containers: use data-access hooks, compose UI |
 | App (`apps/<app>`) | `scope:<app>`, `type:app` | Routing and providers only |
 
 - **Creation:** App UI and App feature libs are created only when an App needs them, not up front.
@@ -68,7 +68,7 @@ cockpit-app/
 │   └── habits/      # React 19 — habit tracker (port 4208, habits.parda.me)
 └── libs/
     ├── cockpit/ui/                    # Cockpit App UI (scope:cockpit, type:ui)
-    ├── <app>/ui, <app>/feature/       # App UI / App feature, created only when the App needs them
+    ├── <app>/ui/, <app>/feature/      # App UI / App feature, created only when the App needs them
     ├── shared/types/api-types/        # Auto-generated OpenAPI types + Zod schemas
     ├── shared/data-access/common/     # Framework-agnostic API layer (fetch, auth)
     ├── shared/data-access/react/      # React-specific hooks (useUser, QueryClient)
