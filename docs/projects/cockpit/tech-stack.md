@@ -7,7 +7,7 @@ This document describes the technology choices and rationale for Cockpit — a p
 
 ### TypeScript / JavaScript (5.8 / ES2024)
 - **Usage**: ~65% of codebase
-- **Rationale**: Type-safe frontend across React and Vue apps; shared API types generated from OpenAPI spec ensure frontend-backend consistency
+- **Rationale**: Type-safe frontend across React apps; shared API types generated from OpenAPI spec ensure frontend-backend consistency
 - **Key Features Used**: Strict mode, path aliases, template literals, async/await
 
 ### Python (3.12+)
@@ -18,8 +18,7 @@ This document describes the technology choices and rationale for Cockpit — a p
 ## Frameworks
 
 ### Frontend
-- **React 19** — Main cockpit dashboard, login, and store apps. Latest concurrent features, TanStack Query for server state, shadcn/ui + Tailwind CSS v4.
-- **Vue 3.5** — CV/portfolio app. Composition API with Pinia state management.
+- **React 19** — Cockpit dashboard, login, cv, store, and habits apps. Latest concurrent features, TanStack Query for server state, shadcn/ui + Tailwind CSS v4.
 - **Nx 21** — Monorepo orchestrator. Enforces module boundaries, manages build caching, runs affected targets.
 
 ### Backend
@@ -100,14 +99,11 @@ This document describes the technology choices and rationale for Cockpit — a p
 | Package | Version | Role |
 |---------|---------|------|
 | react | 19 | UI framework |
-| vue | 3.5 | UI framework |
 | @tanstack/react-query | 5.83 | Server state management |
-| pinia | 3 | Vue state management |
 | tailwindcss | 4.1 | Utility CSS |
 | @radix-ui/* | latest | Accessible UI primitives |
 | @dnd-kit/core | latest | Drag-and-drop |
 | lucide-react | latest | Icons |
-| primevue / primeng | latest | Component libraries |
 
 ### Backend
 | Package | Version | Role |

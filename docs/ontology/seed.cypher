@@ -209,14 +209,14 @@ MERGE (:ExternalService {id: 'ext:git', name: 'Git', serviceType: 'Version Contr
 // --- Frontend Apps ---
 MERGE (:FrontendApp {id: 'app:login', name: 'login', framework: 'React 19', path: 'cockpit-app/apps/login', purpose: 'Authentication UI — login form and password change. Redirects to cockpit on success.', requiresAuth: false, port: 4201});
 MERGE (:FrontendApp {id: 'app:cockpit', name: 'cockpit', framework: 'React 19', path: 'cockpit-app/apps/cockpit', purpose: 'Personal dashboard — task overview and hub linking to all other apps', requiresAuth: true, port: 4200});
-MERGE (:FrontendApp {id: 'app:cv', name: 'cv', framework: 'Vue 3.5', path: 'cockpit-app/apps/cv', purpose: 'CV editor and preset manager — create and tailor CV variants for job applications', requiresAuth: true, port: 4202});
-MERGE (:FrontendApp {id: 'app:store', name: 'store', framework: 'Angular 19', path: 'cockpit-app/apps/store', purpose: 'Redis key-value store browser — inspect and manage stored data (including CV presets)', requiresAuth: true, port: 4203});
+MERGE (:FrontendApp {id: 'app:cv', name: 'cv', framework: 'React 19', path: 'cockpit-app/apps/cv', purpose: 'CV editor and preset manager — create and tailor CV variants for job applications', requiresAuth: true, port: 4202});
+MERGE (:FrontendApp {id: 'app:store', name: 'store', framework: 'React 19', path: 'cockpit-app/apps/store', purpose: 'Redis key-value store browser — inspect and manage stored data (including CV presets)', requiresAuth: true, port: 4203});
 
 // --- Pages ---
 MERGE (:Page {id: 'page:login', name: 'LoginPage', path: '/', app: 'login', framework: 'React'});
 MERGE (:Page {id: 'page:cockpit_dashboard', name: 'DashboardPage', path: '/', app: 'cockpit', framework: 'React'});
-MERGE (:Page {id: 'page:cv_editor', name: 'CVEditorPage', path: '/', app: 'cv', framework: 'Vue'});
-MERGE (:Page {id: 'page:store_browser', name: 'StoreBrowserPage', path: '/', app: 'store', framework: 'Angular', requiresPermission: 'redis_store:read'});
+MERGE (:Page {id: 'page:cv_editor', name: 'CVEditorPage', path: '/', app: 'cv', framework: 'React'});
+MERGE (:Page {id: 'page:store_browser', name: 'StoreBrowserPage', path: '/', app: 'store', framework: 'React', requiresPermission: 'redis_store:read'});
 
 // --- Nx Libraries ---
 MERGE (:NxLib {id: 'lib:shared_ui_react', name: 'shared-ui-react', path: 'cockpit-app/libs/shared/ui/react', libType: 'ui', scope: 'shared', framework: 'React'});

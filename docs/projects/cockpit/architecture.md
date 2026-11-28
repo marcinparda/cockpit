@@ -29,7 +29,7 @@ The backend follows a strict 3-layer pattern per service. The frontend enforces 
 - **Apps**:
   - `apps/cockpit/` — React 19: main dashboard (tasks, budget, notes, agent)
   - `apps/login/` — React 19: authentication flow
-  - `apps/cv/` — Vue 3.5: CV/portfolio site
+  - `apps/cv/` — React 19: CV/portfolio site
   - `apps/store/` — React 19: key-value store browser (same pattern as cockpit — Vite + TanStack Query + shadcn/ui + Tailwind CSS v4)
   - `apps/habits/` — React 19: habit tracker (same pattern as cockpit, service worker for push notifications)
 - **Lib Layer Hierarchy** (strict, enforced by ESLint):
@@ -55,7 +55,7 @@ The backend follows a strict 3-layer pattern per service. The frontend enforces 
 Browser App
     │
     ▼
-cockpit-app (React/Vue)
+cockpit-app (React)
     │  HTTP REST (JWT)
     ▼
 cockpit-api (FastAPI)

@@ -6,7 +6,7 @@ Cockpit is a self-hosted personal agent platform that consolidates task manageme
 ## Current State
 - **Status**: Active development — existing apps being extended, infrastructure stable
 - **Users**: Single-user (personal productivity platform)
-- **Tech Stack**: FastAPI + PostgreSQL backend; React/Vue frontend on Nx; Docker on Raspberry Pi
+- **Tech Stack**: FastAPI + PostgreSQL backend; React frontend on Nx; Docker on Raspberry Pi
 - **Architecture**: Fullstack monorepo — clean layer separation, enforced module boundaries, type-safe API bridge
 
 ## Purpose

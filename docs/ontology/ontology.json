@@ -362,8 +362,8 @@
 
     { "id": "app:login", "type": "FrontendApp", "name": "login", "framework": "React 19", "path": "cockpit-app/apps/login", "purpose": "Authentication UI — login form and password change", "requiresAuth": false, "port": 4201 },
     { "id": "app:cockpit", "type": "FrontendApp", "name": "cockpit", "framework": "React 19", "path": "cockpit-app/apps/cockpit", "purpose": "Personal dashboard — task overview and app links hub", "requiresAuth": true, "port": 4200 },
-    { "id": "app:cv", "type": "FrontendApp", "name": "cv", "framework": "Vue 3.5", "path": "cockpit-app/apps/cv", "purpose": "CV editor and preset manager — create and tailor CV variants", "requiresAuth": true, "port": 4202 },
-    { "id": "app:store", "type": "FrontendApp", "name": "store", "framework": "Angular 19", "path": "cockpit-app/apps/store", "purpose": "Redis key-value store browser — inspect and manage stored data", "requiresAuth": true, "port": 4203 },
+    { "id": "app:cv", "type": "FrontendApp", "name": "cv", "framework": "React 19", "path": "cockpit-app/apps/cv", "purpose": "CV editor and preset manager — create and tailor CV variants", "requiresAuth": true, "port": 4202 },
+    { "id": "app:store", "type": "FrontendApp", "name": "store", "framework": "React 19", "path": "cockpit-app/apps/store", "purpose": "Redis key-value store browser — inspect and manage stored data", "requiresAuth": true, "port": 4203 },
 
     { "id": "lib:shared_ui_react", "type": "NxLib", "name": "shared-ui-react", "path": "cockpit-app/libs/shared/ui/react", "type": "ui", "scope": "shared", "framework": "React" },
     { "id": "lib:shared_data_access_common", "type": "NxLib", "name": "shared-data-access-common", "path": "cockpit-app/libs/shared/data-access/common", "type": "data-access", "scope": "shared", "framework": "agnostic" },
@@ -391,8 +391,8 @@
 
     { "id": "page:login", "type": "Page", "name": "LoginPage", "path": "/", "framework": "React", "requiresPermission": null },
     { "id": "page:cockpit_dashboard", "type": "Page", "name": "DashboardPage", "path": "/", "framework": "React", "requiresPermission": null },
-    { "id": "page:cv_editor", "type": "Page", "name": "CVEditorPage", "path": "/", "framework": "Vue", "requiresPermission": null },
-    { "id": "page:store_browser", "type": "Page", "name": "StoreBrowserPage", "path": "/", "framework": "Angular", "requiresPermission": "redis_store:read" }
+    { "id": "page:cv_editor", "type": "Page", "name": "CVEditorPage", "path": "/", "framework": "React", "requiresPermission": null },
+    { "id": "page:store_browser", "type": "Page", "name": "StoreBrowserPage", "path": "/", "framework": "React", "requiresPermission": "redis_store:read" }
   ],
 
   "relationships": [
