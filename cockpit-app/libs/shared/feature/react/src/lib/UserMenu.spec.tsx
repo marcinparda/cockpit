@@ -14,9 +14,11 @@ describe('UserMenu', () => {
     expect(screen.getByText('me@example.com')).toBeInTheDocument();
   });
 
-  it('shows a Logout text button', () => {
+  it('shows a Logout text button with the logout icon', () => {
     render(<UserMenu user={{ email: 'me@example.com' }} />);
-    expect(screen.getByRole('button')).toHaveTextContent('Logout');
+    const button = screen.getByRole('button');
+    expect(button).toHaveTextContent('Logout');
+    expect(button.querySelector('svg.lucide-log-out')).toBeInTheDocument();
   });
 
   it('logs out and redirects to Login on Logout click', () => {
