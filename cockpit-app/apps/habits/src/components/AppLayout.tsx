@@ -1,15 +1,20 @@
 import { Outlet } from 'react-router-dom';
-import BottomNav from './BottomNav';
-import HeaderNav from './HeaderNav';
+import { AppShell } from '@cockpit-app/shared-react-ui';
+import { UserMenu } from '@cockpit-app/shared-react-feature';
+import { navItems } from './navItems';
 
-export default function AppLayout() {
+interface AppLayoutProps {
+  user: { email: string };
+}
+
+export default function AppLayout({ user }: AppLayoutProps) {
   return (
-    <div className="min-h-screen pb-16 md:pb-0">
-      <HeaderNav />
-      <div className="mx-auto w-full max-w-[1920px]">
-        <Outlet />
-      </div>
-      <BottomNav />
-    </div>
+    <AppShell
+      appName="Habits"
+      navItems={navItems}
+      userArea={<UserMenu user={user} />}
+    >
+      <Outlet />
+    </AppShell>
   );
 }
