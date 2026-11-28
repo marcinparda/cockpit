@@ -14,9 +14,9 @@ Layer 4 — apps          (can import: anything)     → type:app
 | Layer | Nx tag | Libs |
 |-------|--------|------|
 | types/utils | `type:util` | `@cockpit-app/api-types`, `@cockpit-app/shared-utils` |
-| data-access | `type:data-access` | `@cockpit-app/common-shared-data-access`, `@cockpit-app/shared-react-data-access` |
-| ui | `type:ui` | `@cockpit-app/shared-react-ui` (Shared UI), `@cockpit-app/cockpit-ui` and future `@cockpit-app/<app>-ui` (App UI, `libs/<app>/ui`) |
-| feature | `type:feature` | `@cockpit-app/shared-react-feature` (shared), future `@cockpit-app/<app>-feature` (App feature, `libs/<app>/feature`) |
+| data-access | `type:data-access` | `@cockpit-app/common-shared-data-access`, `@cockpit-app/shared-react-data-access` (shared), `@cockpit-app/habits-data-access` and future `@cockpit-app/<app>-data-access` (App data-access, `libs/<app>/data-access`) |
+| ui | `type:ui` | `@cockpit-app/shared-react-ui` (Shared UI), `@cockpit-app/cockpit-ui`, `@cockpit-app/habits-ui` and future `@cockpit-app/<app>-ui` (App UI, `libs/<app>/ui`) |
+| feature | `type:feature` | `@cockpit-app/shared-react-feature` (shared), `@cockpit-app/habits-feature` and future `@cockpit-app/<app>-feature` (App feature, `libs/<app>/feature`) |
 | apps | `type:app` | `apps/*` |
 
 ### Nx Library Tags Required
@@ -31,11 +31,14 @@ Libs are also split by scope — **shared** libs (under `libs/shared/`) may be i
 |---------|------|-------|
 | Shared UI (`shared-react-ui`) | `scope:shared`, `type:ui` | Generic components used by two or more Apps, incl. the `AppShell` every App renders inside |
 | Shared feature (`shared-react-feature`) | `scope:shared`, `type:feature` | Data-connected components used by two or more Apps: `PermissionGuard`, `RequireUser`, `UserMenu` |
+| App data-access (`libs/<app>/data-access`) | `scope:<app>`, `type:data-access` | One App's API layer: zod schemas, endpoints, TanStack Query hooks, `createXMock` factories |
 | App UI (`libs/<app>/ui`) | `scope:<app>`, `type:ui` | Presentational components used by one App |
 | App feature (`libs/<app>/feature`) | `scope:<app>`, `type:feature` | Data-connected containers: use data-access hooks, compose UI |
 | App (`apps/<app>`) | `scope:<app>`, `type:app` | Routing and providers only |
 
-- **Creation:** App UI and App feature libs are created only when an App needs them, not up front.
+- **Creation:** App data-access, App UI and App feature libs are created only when an App needs them, not up front. `habits` is the reference split: `apps/habits` keeps `main.tsx` (providers) and `app/` (`RequireUser`, router, `AppLayout` + nav items); everything else lives in `libs/habits/{data-access,ui,feature}`.
+- **Types across the ui boundary:** an App UI component cannot import API types from data-access. It declares the narrow prop shape it reads (e.g. `SortableHabit` in `habits-ui`) and, when it hands the object back through callbacks, is generic over it (`<T extends SortableHabit>`), so feature code passes the full API type unchanged.
+- **Tailwind sources:** each App's `styles.css` must `@source` every lib it renders from (`libs/shared/ui/**`, `libs/<app>/**`), or classes used only in those libs are dropped from the build.
 - **Discovery and promotion:** before creating a component, search Shared UI and every App UI lib. A component belongs in Shared UI as soon as two Apps use it: if it exists in another App's lib, move it to Shared UI and reuse it there. Never copy it.
 - **ui purity:** a ui component may hold local UI state (open/closed, active tab). It must not import data-access, call the API or hold domain rules. This holds in every scope and is lint-enforced (`type:ui` may depend only on `type:ui` and `type:util`). Why: [ADR 0005](../../adr/0005-ui-libs-are-pure-in-every-scope.md).
 
@@ -70,7 +73,10 @@ cockpit-app/
 │   └── habits/      # React 19 — habit tracker (port 4208, habits.parda.me)
 └── libs/
     ├── cockpit/ui/                    # Cockpit App UI (scope:cockpit, type:ui)
-    ├── <app>/ui/, <app>/feature/      # App UI / App feature, created only when the App needs them
+    ├── habits/data-access/            # Habits API hooks, schemas, endpoints, mock factories
+    ├── habits/ui/                     # Habits App UI (presentational, pure)
+    ├── habits/feature/                # Habits pages and data-connected sheets
+    ├── <app>/{data-access,ui,feature} # App libs, created only when the App needs them
     ├── shared/types/api-types/        # Auto-generated OpenAPI types + Zod schemas
     ├── shared/data-access/common/     # Framework-agnostic API layer (fetch, auth)
     ├── shared/data-access/react/      # React-specific hooks (useUser, QueryClient)

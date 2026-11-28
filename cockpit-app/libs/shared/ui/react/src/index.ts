@@ -15,3 +15,5 @@ export * from './lib/AlertDialog/AlertDialog';
 export * from './lib/Toaster/Toaster';
 export * from './lib/LogRow/LogRow';
 export * from './lib/AppShell/AppShell';
+export * from './lib/Sheet/Sheet';
+export * from './lib/Textarea/Textarea';

@@ -17,7 +17,7 @@ Build entity mock data with `createXMock(overrides)` factory functions, not hand
 - Use a random default id (`crypto.randomUUID()` in TS, `uuid4()` in Python) where an id field exists; everything else gets a sensible fixed default. Everything is overridable.
 - Call inline at point of use: `createHabitMock({ type: 'boolean' })`.
 - Python equivalent: a `make_x(**overrides)` function in `tests/factories.py`, same rules — fresh object per call, overrides win.
-- Existing factories: `cockpit-api/src/tests/factories.py`; `cockpit-app/apps/{habits,cv,store}/src/mocks/`.
+- Existing factories: `cockpit-api/src/tests/factories.py`; `cockpit-app/apps/{cv,store}/src/mocks/`; Habits exports `createHabitMock` / `createCategoryMock` from `@cockpit-app/habits-data-access`. A ui lib spec can't import data-access, so it builds its own fixtures for the narrow prop shape the component takes.
 - For a one-off single-field override with no reuse, a plain object literal is fine — don't force a factory for it.
 
 ### Fast Execution
@@ -89,3 +89,9 @@ coverage: {
   reporter: ['text-summary', 'lcov'],
 }
 ```
+
+### Mocking a lib barrel
+When a component imports hooks from a lib barrel (e.g. `@cockpit-app/habits-data-access`), mock the barrel once and keep the real exports: `vi.mock('<lib>', async (importOriginal) => ({ ...(await importOriginal<object>()), useX: vi.fn() }))`, then `import * as dataAccess from '<lib>'` and `vi.mocked(dataAccess.useX)`. Don't `await import('<lib>')` in tests: Nx lint treats it as lazy-loading the lib. Lib ESLint configs enforce `import/first`, so put imports above `vi.mock` (it is hoisted anyway).
+
+### Driving Radix components in jsdom
+Shared `Select` (Radix) needs `hasPointerCapture`, `setPointerCapture`, `releasePointerCapture` and `scrollIntoView` stubs in the project's `setupTests.ts` (see `libs/habits/feature/setupTests.ts`). Open it with `userEvent.click(trigger)` then `userEvent.click(findByRole('option', { name }))`; `fireEvent.change` does nothing. Shared `Sheet` (Radix Dialog) closes on Escape (`userEvent.keyboard('{Escape}')`); overlay clicks are covered in the shared `Sheet` spec, not per App.

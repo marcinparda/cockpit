@@ -1,0 +1,9 @@
+{
+  "name": "habits-feature",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/habits/feature/src",
+  "projectType": "library",
+  "tags": ["scope:habits", "type:feature"],
+  "// targets": "to see all targets run: nx show project habits-feature --web",
+  "targets": {}
+}

@@ -44,6 +44,10 @@ _Avoid_: component library, design system
 The shared frame around every App's pages: header (logo to the Dashboard, App name, nav, user area, theme toggle) plus a bottom nav on phones. `AppShell` is pure and lives in Shared UI; it takes the App name, nav items and user-area and actions slots. `RequireUser` and `UserMenu` (Shared feature) fill the user area.
 _Avoid_: layout (per-App), navbar
 
+**App data-access**:
+The lib `libs/<app>/data-access` holding one App's API layer: schemas, endpoints and query hooks. Only App feature imports it, never App UI.
+_Avoid_: api folder, services
+
 **App UI**:
 The lib `libs/<app>/ui` holding presentational components used by one App. Pure like Shared UI; created only when the App needs it. Moves to Shared UI once a second App needs the component.
 _Avoid_: components folder, local components

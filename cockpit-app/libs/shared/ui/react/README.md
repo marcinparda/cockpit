@@ -40,6 +40,8 @@ import { Button, Input, Label, Card } from '@cockpit-app/shared-react-ui';
 |-----------|-----------|-------|
 | Button | `@radix-ui/react-slot` | CVA variants: default, destructive, outline, secondary, ghost, link |
 | Input | — | Standard input with shadcn styling |
+| Textarea | — | Multi-line input, same styling as Input |
+| Sheet | `@radix-ui/react-dialog` | Sheet, SheetContent (`side`: top/right/bottom/left, default bottom; `showClose`), SheetHeader, SheetFooter, SheetTitle, SheetDescription, SheetClose, SheetTrigger. An `aria-label` on SheetContent names the dialog instead of the title |
 | Label | `@radix-ui/react-label` | Form label |
 | Card | — | Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription, CardAction |
 | Badge | — | Inline badge/tag |

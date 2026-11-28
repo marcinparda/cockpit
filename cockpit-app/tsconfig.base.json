@@ -25,6 +25,11 @@
       "@cockpit-app/common-shared-data-access": [
         "libs/shared/data-access/common/src/index.ts"
       ],
+      "@cockpit-app/habits-data-access": [
+        "libs/habits/data-access/src/index.ts"
+      ],
+      "@cockpit-app/habits-feature": ["libs/habits/feature/src/index.ts"],
+      "@cockpit-app/habits-ui": ["libs/habits/ui/src/index.ts"],
       "@cockpit-app/shared-react-data-access": [
         "libs/shared/data-access/react/src/index.ts"
       ],
