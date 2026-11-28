@@ -1,16 +1,8 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
-
-vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
-  ...(await importOriginal<object>()),
-  useHabits: vi.fn(),
-  useEntriesByRange: vi.fn(),
-  useEntryMutations: vi.fn(),
-}));
-
 import * as dataAccess from '@cockpit-app/habits-data-access';
-import TodayPage from '../pages/TodayPage';
+import { TodayPage } from './TodayPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { createHabitMock } from '@cockpit-app/habits-data-access';
@@ -18,6 +10,13 @@ import {
   addDays,
   toDateKey,
 } from '@cockpit-app/habits-ui';
+
+vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
+  ...(await importOriginal<object>()),
+  useHabits: vi.fn(),
+  useEntriesByRange: vi.fn(),
+  useEntryMutations: vi.fn(),
+}));
 
 const today = toDateKey(new Date());
 const yesterday = addDays(today, -1);

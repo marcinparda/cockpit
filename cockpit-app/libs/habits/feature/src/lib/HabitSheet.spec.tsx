@@ -2,15 +2,14 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import * as dataAccess from '@cockpit-app/habits-data-access';
+import { HabitSheet } from './HabitSheet';
+import { createHabitMock } from '@cockpit-app/habits-data-access';
 
 vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   useEntryMutations: vi.fn(),
 }));
-
-import * as dataAccess from '@cockpit-app/habits-data-access';
-import { HabitSheet } from '../components/HabitSheet';
-import { createHabitMock } from '@cockpit-app/habits-data-access';
 
 function makeQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false } } });

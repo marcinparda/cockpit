@@ -1,16 +1,15 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
+import * as dataAccess from '@cockpit-app/habits-data-access';
+import { ManageCategoriesSheet } from './ManageCategoriesSheet';
+import { createCategoryMock } from '@cockpit-app/habits-data-access';
 
 vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
   ...(await importOriginal<object>()),
   useCategories: vi.fn(),
   useCategoryMutations: vi.fn(),
 }));
-
-import * as dataAccess from '@cockpit-app/habits-data-access';
-import { ManageCategoriesSheet } from '../components/ManageCategoriesSheet';
-import { createCategoryMock } from '@cockpit-app/habits-data-access';
 
 const mockCreateMutate = vi.fn();
 const mockUpdateMutate = vi.fn();

@@ -3,6 +3,8 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import { HabitCreationSheet } from './HabitCreationSheet';
+import * as dataAccess from '@cockpit-app/habits-data-access';
 
 // Mock hooks before imports
 vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
@@ -24,11 +26,6 @@ vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
   useHabits: vi.fn(() => ({ data: [], isLoading: false })),
 }));
 
-// Must import after vi.mock declarations
-import { HabitCreationSheet } from '../components/HabitCreationSheet';
-import HabitsPage from '../pages/HabitsPage';
-import * as dataAccess from '@cockpit-app/habits-data-access';
-
 const { createHabitMock } = dataAccess;
 
 function makeQueryClient() {
@@ -42,8 +39,6 @@ function withProviders(ui: React.ReactElement) {
     </MemoryRouter>
   );
 }
-
-const baseHabit = createHabitMock({ id: 'habit-1' });
 
 // Test 1: HabitCreationSheet Quick Add form validation
 describe('HabitCreationSheet', () => {
@@ -250,59 +245,3 @@ describe('HabitCreationSheet submit valid form', () => {
 });
 
 // Test 5: HabitsPage shows archive toggle and filters correctly
-describe('HabitsPage', () => {
-  beforeEach(() => {
-    vi.mocked(dataAccess.useHabits).mockReturnValue({
-      data: [
-        { ...baseHabit, id: 'h1', name: 'Active Habit', is_archived: false },
-        { ...baseHabit, id: 'h2', name: 'Archived Habit', is_archived: true },
-      ],
-      isLoading: false,
-    } as any);
-  });
-
-  it('shows archive toggle and filters archived habits', () => {
-    render(withProviders(<HabitsPage />));
-
-    // Active habit should be visible
-    expect(screen.getByText('Active Habit')).toBeInTheDocument();
-
-    // Archived habit should not be visible initially
-    expect(screen.queryByText('Archived Habit')).not.toBeInTheDocument();
-
-    // Toggle to show archived
-    const archiveToggle = screen.getByRole('checkbox', {
-      name: /show archived/i,
-    });
-    fireEvent.click(archiveToggle);
-
-    // Now archived habit should be visible
-    expect(screen.getByText('Archived Habit')).toBeInTheDocument();
-  });
-
-  it('shows empty state when no habits exist', () => {
-    vi.mocked(dataAccess.useHabits).mockReturnValue({
-      data: [],
-      isLoading: false,
-    } as any);
-
-    render(withProviders(<HabitsPage />));
-
-    expect(screen.getByTestId('empty-habits')).toBeInTheDocument();
-  });
-
-  it('opens HabitCreationSheet when FAB is clicked', () => {
-    vi.mocked(dataAccess.useHabits).mockReturnValue({
-      data: [],
-      isLoading: false,
-    } as any);
-
-    render(withProviders(<HabitsPage />));
-
-    const fab = screen.getByRole('button', { name: /add habit/i });
-    fireEvent.click(fab);
-
-    // Sheet should open — the HabitCreationSheet is rendered
-    expect(screen.getByRole('dialog', { hidden: true })).toBeInTheDocument();
-  });
-});

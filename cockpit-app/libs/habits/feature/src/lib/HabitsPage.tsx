@@ -8,8 +8,8 @@ import {
 import {
   SortableCategoryGroup,
 } from '@cockpit-app/habits-ui';
-import { HabitCreationSheet } from '../components/HabitCreationSheet';
-import { ManageCategoriesSheet } from '../components/ManageCategoriesSheet';
+import { HabitCreationSheet } from './HabitCreationSheet';
+import { ManageCategoriesSheet } from './ManageCategoriesSheet';
 
 interface CategoryGroup {
   name: string;
@@ -39,7 +39,7 @@ function groupByCategory(habits: Habit[]): CategoryGroup[] {
   return groups;
 }
 
-export default function HabitsPage() {
+export function HabitsPage() {
   const [showArchived, setShowArchived] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [editHabit, setEditHabit] = useState<Habit | undefined>(undefined);

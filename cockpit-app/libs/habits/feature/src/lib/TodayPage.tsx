@@ -9,7 +9,7 @@ import {
   useEntryMutations,
   useHabits,
 } from '@cockpit-app/habits-data-access';
-import { HabitSheet } from '../components/HabitSheet';
+import { HabitSheet } from './HabitSheet';
 import {
   ConfettiAnimation,
   DayStrip,
@@ -72,7 +72,7 @@ function groupByCategory(habits: Habit[]): CategoryGroup[] {
   });
 }
 
-export default function TodayPage() {
+export function TodayPage() {
   const navigate = useNavigate();
   const today = toDateKey(new Date());
   const [selected, setSelected] = useState(today);

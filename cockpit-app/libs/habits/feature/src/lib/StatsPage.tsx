@@ -14,7 +14,7 @@ import {
   useStatsWeekly,
 } from '@cockpit-app/habits-data-access';
 
-export default function StatsPage() {
+export function StatsPage() {
   const { data: todayStats, isLoading: todayLoading } = useStatsToday();
   const { data: weeklyStats, isLoading: weeklyLoading } = useStatsWeekly();
   const { data: streaks, isLoading: streaksLoading } = useStatsStreaks();

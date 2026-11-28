@@ -3,6 +3,10 @@ import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import * as dataAccess from '@cockpit-app/habits-data-access';
+import { addDays, heatmapRange, toDateKey } from '@cockpit-app/habits-ui';
+import { HabitDetailPage } from './HabitDetailPage';
+import { createHabitMock } from '@cockpit-app/habits-data-access';
 
 vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
   ...(await importOriginal<object>()),
@@ -13,11 +17,11 @@ vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
   useEntryMutations: vi.fn(),
 }));
 
-vi.mock('../components/HabitSheet', () => ({
+vi.mock('./HabitSheet', () => ({
   HabitSheet: ({ date }: { date: string }) => <div data-testid="habit-sheet">{date}</div>,
 }));
 
-vi.mock('../components/HabitCreationSheet', () => ({
+vi.mock('./HabitCreationSheet', () => ({
   HabitCreationSheet: () => <div data-testid="habit-creation-sheet" />,
 }));
 
@@ -36,11 +40,6 @@ vi.mock('recharts', () => ({
     <div data-testid="responsive-container">{children}</div>
   ),
 }));
-
-import * as dataAccess from '@cockpit-app/habits-data-access';
-import { addDays, heatmapRange, toDateKey } from '@cockpit-app/habits-ui';
-import HabitDetailPage from '../pages/HabitDetailPage';
-import { createHabitMock } from '@cockpit-app/habits-data-access';
 
 /** Cheap whole-heatmap cell query; role queries are slow in jsdom. */
 const gridCells = () =>

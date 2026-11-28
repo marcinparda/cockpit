@@ -7,8 +7,8 @@ vi.mock('@cockpit-app/common-shared-data-access', () => ({
   logoutAndRedirect: vi.fn(),
 }));
 
-import AppLayout from '../components/AppLayout';
-import { navItems } from '../components/navItems';
+import AppLayout from './AppLayout';
+import { navItems } from './navItems';
 
 function renderLayout(path = '/') {
   return render(

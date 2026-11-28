@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { vi, describe, it, afterEach, expect } from 'vitest';
 import '@testing-library/jest-dom';
 
-vi.mock('../app/router', () => ({
+vi.mock('./router', () => ({
   default: () => <div data-testid="router">Router</div>,
 }));
 
@@ -15,7 +15,7 @@ vi.mock('@cockpit-app/shared-react-data-access', () => ({
   tanstackQueryClient: {},
 }));
 
-import App from '../app/app';
+import App from './app';
 import * as useUserModule from '@cockpit-app/shared-react-data-access';
 import * as logoutModule from '@cockpit-app/common-shared-data-access';
 

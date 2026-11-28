@@ -16,7 +16,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray;
 }
 
-export default function SettingsPage() {
+export function SettingsPage() {
   const { data: settings, isLoading } = useSettings();
   const { mutate: updateSettings, isPending } = useUpdateSettings();
   const [pushError, setPushError] = useState<string | null>(null);

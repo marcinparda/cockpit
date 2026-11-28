@@ -18,8 +18,8 @@ import {
   toDateKey,
   type HeatmapState,
 } from '@cockpit-app/habits-ui';
-import { HabitSheet } from '../components/HabitSheet';
-import { HabitCreationSheet } from '../components/HabitCreationSheet';
+import { HabitSheet } from './HabitSheet';
+import { HabitCreationSheet } from './HabitCreationSheet';
 
 const TIME_RANGES = ['6M', '1Y'] as const;
 type TimeRange = (typeof TIME_RANGES)[number];
@@ -72,7 +72,7 @@ function entryDisplay(entry: HabitEntry): string {
   return '—';
 }
 
-export default function HabitDetailPage() {
+export function HabitDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [timeRange, setTimeRange] = useState<TimeRange>('1Y');
   const [editOpen, setEditOpen] = useState(false);

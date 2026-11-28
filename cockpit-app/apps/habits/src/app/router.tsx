@@ -1,11 +1,13 @@
 import type { UserInfoResponse } from '@cockpit-app/api-types';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import TodayPage from '../pages/TodayPage';
-import HabitsPage from '../pages/HabitsPage';
-import StatsPage from '../pages/StatsPage';
-import SettingsPage from '../pages/SettingsPage';
-import HabitDetailPage from '../pages/HabitDetailPage';
-import AppLayout from '../components/AppLayout';
+import {
+  HabitDetailPage,
+  HabitsPage,
+  SettingsPage,
+  StatsPage,
+  TodayPage,
+} from '@cockpit-app/habits-feature';
+import AppLayout from './AppLayout';
 
 interface RouterProps {
   user: Pick<UserInfoResponse, 'email'>;
