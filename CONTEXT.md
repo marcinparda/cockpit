@@ -32,6 +32,10 @@ _Avoid_: portfolio
 The lib `shared-react-ui` holding generic components used by two or more Apps. Pure: imports no data-access.
 _Avoid_: component library, design system
 
+**App shell**:
+The shared frame around every App's pages: header (logo to the Dashboard, App name, nav, user area, theme toggle) plus a bottom nav on phones. `AppShell` is pure and lives in Shared UI; it takes the App name, nav items and user-area and actions slots. `RequireUser` and `UserMenu` (Shared feature) fill the user area.
+_Avoid_: layout (per-App), navbar
+
 **App UI**:
 The lib `libs/<app>/ui` holding presentational components used by one App. Pure like Shared UI; created only when the App needs it. Moves to Shared UI once a second App needs the component.
 _Avoid_: components folder, local components

@@ -29,7 +29,8 @@ Libs are also split by scope — **shared** libs (under `libs/shared/`) may be i
 ### UI and Feature Libraries
 | Library | Tags | Holds |
 |---------|------|-------|
-| Shared UI (`shared-react-ui`) | `scope:shared`, `type:ui` | Generic components used by two or more Apps |
+| Shared UI (`shared-react-ui`) | `scope:shared`, `type:ui` | Generic components used by two or more Apps, incl. the `AppShell` every App renders inside |
+| Shared feature (`shared-react-feature`) | `scope:shared`, `type:feature` | Data-connected components used by two or more Apps: `PermissionGuard`, `RequireUser`, `UserMenu` |
 | App UI (`libs/<app>/ui`) | `scope:<app>`, `type:ui` | Presentational components used by one App |
 | App feature (`libs/<app>/feature`) | `scope:<app>`, `type:feature` | Data-connected containers: use data-access hooks, compose UI |
 | App (`apps/<app>`) | `scope:<app>`, `type:app` | Routing and providers only |
