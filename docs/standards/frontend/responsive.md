@@ -1,7 +1,7 @@
 ## Responsive Design
 
 ### Mobile-First
-Start with mobile layout and progressively enhance for larger screens.
+Every App must work on a phone and on a desktop browser. Start with mobile layout and progressively enhance for larger screens.
 
 ### Standard Breakpoints
 Use consistent breakpoints (mobile, tablet, desktop) across the application.
