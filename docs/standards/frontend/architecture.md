@@ -29,7 +29,8 @@ Libs are also split by scope — **shared** libs (under `libs/shared/`) may be i
 ### UI and Feature Libraries
 | Library | Tags | Holds |
 |---------|------|-------|
-| Shared UI (`shared-react-ui`) | `scope:shared`, `type:ui` | Generic components used by two or more Apps |
+| Shared UI (`shared-react-ui`) | `scope:shared`, `type:ui` | Generic components used by two or more Apps, incl. the `AppShell` every App renders inside |
+| Shared feature (`shared-react-feature`) | `scope:shared`, `type:feature` | Data-connected components used by two or more Apps: `PermissionGuard`, `RequireUser`, `UserMenu` |
 | App UI (`libs/<app>/ui`) | `scope:<app>`, `type:ui` | Presentational components used by one App |
 | App feature (`libs/<app>/feature`) | `scope:<app>`, `type:feature` | Data-connected containers: use data-access hooks, compose UI |
 | App (`apps/<app>`) | `scope:<app>`, `type:app` | Routing and providers only |
@@ -54,7 +55,8 @@ Cookie-based sessions with refresh token, all apps are React now (no Angular exc
 
 1. **Login**: `POST /api/v1/authentication/sessions/login` → API sets HttpOnly cookies (session + refresh token)
 2. **Requests**: all fetch calls use `credentials: 'include'` — cookies sent automatically
-3. **401**: `fetcher` catches 401 → `POST /api/v1/authentication/tokens/refresh` → retry original request. If refresh also fails and `withRedirect=true` → `logout()` then redirect to `loginUrl?redirect_uri=<current>`
+3. **401**: `fetcher` catches 401 → `POST /api/v1/authentication/tokens/refresh` → retry original request. If refresh also fails and `withRedirect=true` → `logoutAndRedirect()`
+4. **Logout**: always call `logoutAndRedirect()` (`common-shared-data-access`): it ends the session, then redirects to `loginUrl?redirect_uri=<current>` even if the API call fails. Bare `logout()` only ends the session and leaves the user on a dead page.
 
 ## App Inventory (reference)
 

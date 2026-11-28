@@ -5,7 +5,7 @@ React 19 habit tracker. Part of the `cockpit-app` Nx monorepo (`apps/habits/`).
 - **Port**: 4208 (prod container `habits`, image `ghcr.io/marcinparda/cockpit-habits:latest`, `habits.parda.me`)
 - **State**: TanStack Query for server state; service worker registered for push notifications
 - **Deployment**: independent Docker container (`nginx:alpine`, SPA fallback), `linux/arm64`
-- **Layout**: `AppLayout` wraps all routes (content capped at 1920px, centered). Nav items live in `components/navItems.tsx`; below `md:` a fixed `BottomNav` is shown, from `md:` up a `HeaderNav` replaces it.
+- **Layout**: `App` wraps everything in `RequireUser` (`shared-react-feature`; no session → redirect to Login). `AppLayout` renders the shared **App shell** (`AppShell` from `shared-react-ui`, `UserMenu` in its user area) around all routes (content capped at 1920px, centered). Nav items live in `components/navItems.tsx`; the shell shows them in the header from `md:` up and as a fixed bottom nav below `md:`. The logo links to the Dashboard.
 
 Same pattern as `cockpit` (Vite + TanStack Query + shadcn/ui + Tailwind CSS v4), plus a service worker for push. See [`../cockpit/architecture.md`](../cockpit/architecture.md) for the full monorepo layout and [`docs/standards/frontend/architecture.md`](../../standards/frontend/architecture.md) for cross-app conventions.
 

@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { logout, refreshAccessToken } from '../authentication/api';
-import { environments } from '@cockpit-app/shared-utils';
+import { refreshAccessToken } from '../authentication/api';
+import { logoutAndRedirect } from '../authentication/redirect';
 
 interface FetcherArgs<ResponseData> {
   url: string;
@@ -53,10 +53,7 @@ export async function fetcher<ResponseData>({
       });
     } catch {
       if (withRedirect) {
-        await logout();
-        const redirectUrl = new URL(environments.loginUrl);
-        redirectUrl.searchParams.set('redirect_uri', window.location.href);
-        window.location.href = redirectUrl.toString();
+        await logoutAndRedirect();
       }
     }
   }
