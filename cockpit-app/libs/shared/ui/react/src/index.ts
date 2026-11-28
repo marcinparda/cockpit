@@ -14,3 +14,4 @@ export * from './lib/Select/Select';
 export * from './lib/AlertDialog/AlertDialog';
 export * from './lib/Toaster/Toaster';
 export * from './lib/LogRow/LogRow';
+export * from './lib/AppShell/AppShell';
