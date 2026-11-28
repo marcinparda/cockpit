@@ -29,4 +29,14 @@ describe('StreakBadge', () => {
     render(<StreakBadge streakMode="hard" currentStreak={12} />);
     expect(screen.getByTestId('streak-badge')).toHaveTextContent('12');
   });
+
+  it('flows inline so it can sit in a row badge slot', () => {
+    render(<StreakBadge streakMode="soft" currentStreak={3} />);
+    expect(screen.getByTestId('streak-badge')).not.toHaveClass('absolute');
+  });
+
+  it('names the streak for screen readers', () => {
+    render(<StreakBadge streakMode="soft" currentStreak={3} />);
+    expect(screen.getByTestId('streak-badge')).toHaveAccessibleName('3 day streak');
+  });
 });
