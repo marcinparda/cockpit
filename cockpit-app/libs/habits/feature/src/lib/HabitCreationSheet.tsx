@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
 import {
   Habit,
   PresetHabit,
@@ -7,7 +6,38 @@ import {
   useHabitMutations,
   usePresets,
 } from '@cockpit-app/habits-data-access';
-import { HABIT_COLORS, IconPicker } from '@cockpit-app/habits-ui';
+import {
+  ColorSwatchPicker,
+  HABIT_COLORS,
+  IconPicker,
+  TabBar,
+} from '@cockpit-app/habits-ui';
+import {
+  Badge,
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+} from '@cockpit-app/shared-react-ui';
+
+type CreationTab = 'quick-add' | 'browse';
+
+const TABS: readonly { id: CreationTab; label: string }[] = [
+  { id: 'quick-add', label: 'Quick Add' },
+  { id: 'browse', label: 'Browse Templates' },
+];
+
+/** Radix Select reserves '' for "no value", so "No category" needs its own key. */
+const NO_CATEGORY = '__none__';
 
 interface HabitCreationSheetProps {
   onClose: () => void;
@@ -55,7 +85,7 @@ function formFromHabit(habit: Habit): FormState {
 }
 
 export function HabitCreationSheet({ onClose, editHabit }: HabitCreationSheetProps) {
-  const [activeTab, setActiveTab] = useState<'quick-add' | 'browse'>('quick-add');
+  const [activeTab, setActiveTab] = useState<CreationTab>('quick-add');
   const [form, setForm] = useState<FormState>(
     editHabit ? formFromHabit(editHabit) : DEFAULT_FORM,
   );
@@ -105,59 +135,16 @@ export function HabitCreationSheet({ onClose, editHabit }: HabitCreationSheetPro
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={editHabit ? 'Edit habit' : 'Add habit'}
-      className="fixed inset-0 z-[60] flex items-end"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
-      <div className="relative flex h-[85vh] w-full flex-col rounded-t-2xl bg-white dark:bg-gray-900">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3 dark:border-gray-700">
-          <h2 className="text-lg font-semibold">
-            {editHabit ? 'Edit Habit' : 'Add Habit'}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
-            aria-label="Close"
-          >
-            <X size={20} aria-hidden="true" />
-          </button>
-        </div>
+    <Sheet open onOpenChange={(open) => !open && onClose()}>
+      <SheetContent
+        aria-label={editHabit ? 'Edit habit' : 'Add habit'}
+        className="h-[85vh] gap-0"
+      >
+        <SheetHeader className="border-b px-4 py-3">
+          <SheetTitle>{editHabit ? 'Edit Habit' : 'Add Habit'}</SheetTitle>
+        </SheetHeader>
 
-        {/* Tabs */}
-        <div role="tablist" className="flex border-b dark:border-gray-700">
-          <button
-            role="tab"
-            aria-selected={activeTab === 'quick-add'}
-            onClick={() => setActiveTab('quick-add')}
-            className={`flex-1 py-2 text-sm font-medium ${
-              activeTab === 'quick-add'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500'
-            }`}
-          >
-            Quick Add
-          </button>
-          <button
-            role="tab"
-            aria-selected={activeTab === 'browse'}
-            onClick={() => setActiveTab('browse')}
-            className={`flex-1 py-2 text-sm font-medium ${
-              activeTab === 'browse'
-                ? 'border-b-2 border-blue-500 text-blue-600'
-                : 'text-gray-500'
-            }`}
-          >
-            Browse Templates
-          </button>
-        </div>
+        <TabBar tabs={TABS} value={activeTab} onChange={setActiveTab} />
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto px-4 py-4">
@@ -165,10 +152,8 @@ export function HabitCreationSheet({ onClose, editHabit }: HabitCreationSheetPro
             <div className="flex flex-col gap-4">
               {/* Name */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="habit-name" className="text-sm font-medium">
-                  Habit Name
-                </label>
-                <input
+                <Label htmlFor="habit-name">Habit Name</Label>
+                <Input
                   id="habit-name"
                   type="text"
                   value={form.name}
@@ -177,11 +162,11 @@ export function HabitCreationSheet({ onClose, editHabit }: HabitCreationSheetPro
                   }
                   maxLength={100}
                   placeholder="e.g. Morning run"
-                  className="rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                  aria-invalid={errors.name ? true : undefined}
                   aria-describedby={errors.name ? 'name-error' : undefined}
                 />
                 {errors.name && (
-                  <p id="name-error" className="text-sm text-red-500">
+                  <p id="name-error" className="text-sm text-destructive">
                     {errors.name}
                   </p>
                 )}
@@ -189,28 +174,28 @@ export function HabitCreationSheet({ onClose, editHabit }: HabitCreationSheetPro
 
               {/* Type */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="habit-type" className="text-sm font-medium">
-                  Type
-                </label>
-                <select
-                  id="habit-type"
+                <Label htmlFor="habit-type">Type</Label>
+                <Select
                   value={form.type}
-                  onChange={(e) =>
-                    setForm((p) => ({
-                      ...p,
-                      type: e.target.value as Habit['type'] | '',
-                    }))
+                  onValueChange={(value) =>
+                    setForm((p) => ({ ...p, type: value as Habit['type'] }))
                   }
-                  className="rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
-                  aria-describedby={errors.type ? 'type-error' : undefined}
                 >
-                  <option value="">Select type</option>
-                  <option value="boolean">Boolean (yes/no)</option>
-                  <option value="numeric">Numeric</option>
-                  <option value="text">Text</option>
-                </select>
+                  <SelectTrigger
+                    id="habit-type"
+                    aria-invalid={errors.type ? true : undefined}
+                    aria-describedby={errors.type ? 'type-error' : undefined}
+                  >
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="boolean">Boolean (yes/no)</SelectItem>
+                    <SelectItem value="numeric">Numeric</SelectItem>
+                    <SelectItem value="text">Text</SelectItem>
+                  </SelectContent>
+                </Select>
                 {errors.type && (
-                  <p id="type-error" className="text-sm text-red-500">
+                  <p id="type-error" className="text-sm text-destructive">
                     {errors.type}
                   </p>
                 )}
@@ -228,73 +213,64 @@ export function HabitCreationSheet({ onClose, editHabit }: HabitCreationSheetPro
               {/* Color */}
               <div className="flex flex-col gap-1">
                 <span className="text-sm font-medium">Color</span>
-                <div className="flex flex-wrap gap-2">
-                  {HABIT_COLORS.map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      aria-label={c}
-                      aria-pressed={form.color === c}
-                      onClick={() => setForm((p) => ({ ...p, color: c }))}
-                      className={`h-8 w-8 rounded-full border-2 transition-transform ${
-                        form.color === c
-                          ? 'scale-110 border-gray-900 dark:border-white'
-                          : 'border-transparent'
-                      }`}
-                      style={{ backgroundColor: c }}
-                    />
-                  ))}
-                </div>
+                <ColorSwatchPicker
+                  colors={HABIT_COLORS}
+                  value={form.color}
+                  onChange={(c) => setForm((p) => ({ ...p, color: c }))}
+                />
               </div>
 
               {/* Category */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="habit-category" className="text-sm font-medium">
-                  Category
-                </label>
-                <select
-                  id="habit-category"
-                  value={form.category_id}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, category_id: e.target.value }))
+                <Label htmlFor="habit-category">Category</Label>
+                <Select
+                  value={form.category_id || NO_CATEGORY}
+                  onValueChange={(value) =>
+                    setForm((p) => ({
+                      ...p,
+                      category_id: value === NO_CATEGORY ? '' : value,
+                    }))
                   }
-                  className="rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
                 >
-                  <option value="">No category</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger id="habit-category">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={NO_CATEGORY}>No category</SelectItem>
+                    {categories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Frequency */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="habit-frequency" className="text-sm font-medium">
-                  Frequency
-                </label>
-                <select
-                  id="habit-frequency"
+                <Label htmlFor="habit-frequency">Frequency</Label>
+                <Select
                   value={form.frequency}
-                  onChange={(e) =>
-                    setForm((p) => ({ ...p, frequency: e.target.value }))
+                  onValueChange={(value) =>
+                    setForm((p) => ({ ...p, frequency: value }))
                   }
-                  className="rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
                 >
-                  <option value="daily">Daily</option>
-                  <option value="weekly">Weekly</option>
-                  <option value="monthly">Monthly</option>
-                </select>
+                  <SelectTrigger id="habit-frequency">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="daily">Daily</SelectItem>
+                    <SelectItem value="weekly">Weekly</SelectItem>
+                    <SelectItem value="monthly">Monthly</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Target */}
               {form.type === 'numeric' && (
                 <div className="flex flex-col gap-1">
-                  <label htmlFor="habit-target" className="text-sm font-medium">
-                    Target
-                  </label>
-                  <input
+                  <Label htmlFor="habit-target">Target</Label>
+                  <Input
                     id="habit-target"
                     type="number"
                     value={form.target_value}
@@ -303,47 +279,48 @@ export function HabitCreationSheet({ onClose, editHabit }: HabitCreationSheetPro
                     }
                     placeholder="e.g. 30"
                     min={0}
-                    className="rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
                   />
                 </div>
               )}
 
               {/* Streak mode */}
               <div className="flex flex-col gap-1">
-                <label htmlFor="habit-streak" className="text-sm font-medium">
-                  Streak Mode
-                </label>
-                <select
-                  id="habit-streak"
+                <Label htmlFor="habit-streak">Streak Mode</Label>
+                <Select
                   value={form.streak_mode}
-                  onChange={(e) =>
+                  onValueChange={(value) =>
                     setForm((p) => ({
                       ...p,
-                      streak_mode: e.target.value as Habit['streak_mode'],
+                      streak_mode: value as Habit['streak_mode'],
                     }))
                   }
-                  className="rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
                 >
-                  <option value="none">None</option>
-                  <option value="soft">Soft</option>
-                  <option value="hard">Hard</option>
-                </select>
+                  <SelectTrigger id="habit-streak">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="soft">Soft</SelectItem>
+                    <SelectItem value="hard">Hard</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {presets.map((preset) => (
-                <button
+                <Button
                   key={preset.id}
                   type="button"
+                  variant="outline"
                   onClick={() => handlePresetClick(preset)}
-                  className="flex flex-col gap-1 rounded-xl border p-3 text-left hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
+                  className="h-auto flex-col items-start gap-1 whitespace-normal rounded-xl p-3 text-left"
                 >
                   <span className="font-medium">{preset.name}</span>
-                  <span className="mt-1 self-start rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700 capitalize dark:bg-blue-900 dark:text-blue-300">
-                      {preset.category_key.replace(/_/g, ' ')}
-                    </span>
-                </button>
+                  <Badge variant="secondary" className="mt-1 rounded-full capitalize">
+                    {preset.category_key.replace(/_/g, ' ')}
+                  </Badge>
+                </Button>
               ))}
             </div>
           )}
@@ -351,18 +328,18 @@ export function HabitCreationSheet({ onClose, editHabit }: HabitCreationSheetPro
 
         {/* Footer */}
         {activeTab === 'quick-add' && (
-          <div className="border-t px-4 py-3 dark:border-gray-700">
-            <button
+          <SheetFooter className="border-t px-4 py-3">
+            <Button
               type="button"
+              size="lg"
               onClick={handleSubmit}
               disabled={createHabit.isPending || updateHabit.isPending}
-              className="w-full rounded-xl bg-blue-500 py-3 font-medium text-white hover:bg-blue-600 disabled:opacity-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
             >
               {editHabit ? 'Save Changes' : 'Add Habit'}
-            </button>
-          </div>
+            </Button>
+          </SheetFooter>
         )}
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }

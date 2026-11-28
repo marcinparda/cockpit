@@ -52,7 +52,7 @@ export function SortableCategoryGroup<T extends SortableHabit>({
 
   return (
     <section aria-label={categoryName}>
-      <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+      <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         {categoryName}
       </h2>
 

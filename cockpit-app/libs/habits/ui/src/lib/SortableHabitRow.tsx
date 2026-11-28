@@ -3,6 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Archive, Pencil, MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Badge, Button } from '@cockpit-app/shared-react-ui';
 import { HABIT_ICONS } from './icons';
 import { truncateName } from './utils/text';
 
@@ -46,19 +47,21 @@ export function SortableHabitRow<T extends SortableHabit>({
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-center gap-3 rounded-xl border bg-white px-3 py-3 dark:border-gray-700 dark:bg-gray-900"
+      className="flex items-center gap-3 rounded-xl border bg-card px-3 py-3 text-card-foreground"
     >
       {/* Drag handle */}
-      <button
+      <Button
         type="button"
+        variant="ghost"
+        size="icon"
         data-testid="drag-handle"
-        className="cursor-grab touch-none text-gray-400 hover:text-gray-600 active:cursor-grabbing dark:hover:text-gray-300"
+        className="size-7 cursor-grab touch-none text-muted-foreground active:cursor-grabbing"
         aria-label="Drag to reorder"
         {...attributes}
         {...listeners}
       >
         <GripVertical size={18} aria-hidden="true" />
-      </button>
+      </Button>
 
       {/* Icon */}
       <div
@@ -80,58 +83,64 @@ export function SortableHabitRow<T extends SortableHabit>({
           {truncateName(habit.name)}
         </span>
         {habit.category_name && (
-          <span className="text-xs text-gray-500">{habit.category_name}</span>
+          <span className="text-xs text-muted-foreground">{habit.category_name}</span>
         )}
       </button>
 
       {/* Category badge */}
       {habit.category_name && (
-        <span className="hidden shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-800 dark:text-gray-300 sm:inline">
+        <Badge variant="secondary" className="hidden rounded-full sm:inline-flex">
           {habit.category_name}
-        </span>
+        </Badge>
       )}
 
       {/* Action menu */}
       <div className="relative">
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="icon"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="Actions"
           aria-expanded={menuOpen}
-          className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="size-8 rounded-full"
         >
           <MoreVertical size={18} aria-hidden="true" />
-        </button>
+        </Button>
 
         {menuOpen && (
           <div
             role="menu"
-            className="absolute right-0 top-8 z-10 w-36 rounded-xl border bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900"
+            className="absolute right-0 top-9 z-10 flex w-36 flex-col rounded-xl border bg-popover p-1 text-popover-foreground shadow-lg"
           >
-            <button
+            <Button
               role="menuitem"
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 setMenuOpen(false);
                 onEdit(habit);
               }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+              className="justify-start"
             >
               <Pencil size={14} aria-hidden="true" />
               Edit
-            </button>
-            <button
+            </Button>
+            <Button
               role="menuitem"
               type="button"
+              variant="ghost"
+              size="sm"
               onClick={() => {
                 setMenuOpen(false);
                 onArchive(habit);
               }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800"
+              className="justify-start"
             >
               <Archive size={14} aria-hidden="true" />
               {habit.is_archived ? 'Unarchive' : 'Archive'}
-            </button>
+            </Button>
           </div>
         )}
       </div>

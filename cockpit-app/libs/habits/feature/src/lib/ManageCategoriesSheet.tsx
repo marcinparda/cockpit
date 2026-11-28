@@ -1,5 +1,15 @@
 import { useState } from 'react';
 import { X, Pencil, Trash2, Check, Plus } from 'lucide-react';
+import { ColorSwatchPicker } from '@cockpit-app/habits-ui';
+import {
+  Button,
+  Input,
+  Separator,
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@cockpit-app/shared-react-ui';
 import {
   HabitCategory,
   useCategories,
@@ -70,34 +80,16 @@ export function ManageCategoriesSheet({ onClose }: ManageCategoriesSheetProps) {
   }
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Manage categories"
-      className="fixed inset-0 z-[60] flex items-end"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
-      <div className="relative flex h-[80vh] w-full flex-col rounded-t-2xl bg-white dark:bg-gray-900">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b px-4 py-3 dark:border-gray-700">
-          <h2 className="text-lg font-semibold">Manage Categories</h2>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
-          >
-            <X size={20} aria-hidden="true" />
-          </button>
-        </div>
+    <Sheet open onOpenChange={(open) => !open && onClose()}>
+      <SheetContent aria-label="Manage categories" className="h-[80vh] gap-0">
+        <SheetHeader className="border-b px-4 py-3">
+          <SheetTitle>Manage Categories</SheetTitle>
+        </SheetHeader>
 
         {/* Category list */}
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {categories.length === 0 && (
-            <p className="text-center text-sm text-gray-500">No categories yet</p>
+            <p className="text-center text-sm text-muted-foreground">No categories yet</p>
           )}
 
           <ul className="flex flex-col gap-2">
@@ -106,26 +98,16 @@ export function ManageCategoriesSheet({ onClose }: ManageCategoriesSheetProps) {
                 /* Inline edit row */
                 <li
                   key={cat.id}
-                  className="flex items-center gap-2 rounded-xl border p-2 dark:border-gray-700"
+                  className="flex items-center gap-2 rounded-xl border p-2"
                 >
-                  <div className="flex gap-1">
-                    {COLORS.map((c) => (
-                      <button
-                        key={c}
-                        type="button"
-                        aria-label={c}
-                        aria-pressed={editing.color === c}
-                        onClick={() => setEditing((e) => e && { ...e, color: c })}
-                        className={`h-5 w-5 rounded-full border-2 ${
-                          editing.color === c
-                            ? 'border-gray-900 dark:border-white'
-                            : 'border-transparent'
-                        }`}
-                        style={{ backgroundColor: c }}
-                      />
-                    ))}
-                  </div>
-                  <input
+                  <ColorSwatchPicker
+                    colors={COLORS}
+                    value={editing.color}
+                    onChange={(c) => setEditing((e) => e && { ...e, color: c })}
+                    size="sm"
+                    className="flex-nowrap"
+                  />
+                  <Input
                     type="text"
                     value={editing.name}
                     onChange={(e) =>
@@ -133,91 +115,84 @@ export function ManageCategoriesSheet({ onClose }: ManageCategoriesSheetProps) {
                     }
                     onKeyDown={(e) => e.key === 'Enter' && saveEdit()}
                     autoFocus
-                    className="flex-1 rounded-lg border px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                    className="h-8 flex-1"
                     aria-label="Category name"
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={saveEdit}
                     disabled={updateCategory.isPending}
                     aria-label="Save"
-                    className="rounded-full p-1 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 disabled:opacity-50"
+                    className="size-8 rounded-full text-green-600"
                   >
                     <Check size={16} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={() => setEditing(null)}
                     aria-label="Cancel"
-                    className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="size-8 rounded-full"
                   >
                     <X size={16} />
-                  </button>
+                  </Button>
                 </li>
               ) : (
                 /* Display row */
                 <li
                   key={cat.id}
-                  className="flex items-center gap-3 rounded-xl border px-3 py-2 dark:border-gray-700"
+                  className="flex items-center gap-3 rounded-xl border px-3 py-2"
                 >
                   <span
                     className="h-4 w-4 flex-shrink-0 rounded-full"
                     style={{ backgroundColor: cat.color ?? '#6b7280' }}
                   />
                   <span className="flex-1 text-sm font-medium">{cat.name}</span>
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={() => startEdit(cat)}
                     aria-label={`Edit ${cat.name}`}
-                    className="rounded-full p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="size-8 rounded-full"
                   >
                     <Pencil size={14} />
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
                     onClick={() => handleDelete(cat)}
                     aria-label={`Delete ${cat.name}`}
                     disabled={deleteCategory.isPending}
-                    className="rounded-full p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 disabled:opacity-50"
+                    className="size-8 rounded-full text-destructive"
                   >
                     <Trash2 size={14} />
-                  </button>
+                  </Button>
                 </li>
               ),
             )}
           </ul>
 
-          {/* Divider */}
-          <div className="my-4 border-t dark:border-gray-700" />
+          <Separator className="my-4" />
 
           {/* Create new category */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-              Add New Category
-            </h3>
+            <h3 className="text-sm font-semibold">Add New Category</h3>
 
-            {/* Color picker */}
-            <div className="flex gap-2">
-              {COLORS.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  aria-label={c}
-                  aria-pressed={newColor === c}
-                  onClick={() => setNewColor(c)}
-                  className={`h-7 w-7 rounded-full border-2 transition-transform ${
-                    newColor === c
-                      ? 'scale-110 border-gray-900 dark:border-white'
-                      : 'border-transparent'
-                  }`}
-                  style={{ backgroundColor: c }}
-                />
-              ))}
-            </div>
+            <ColorSwatchPicker
+              colors={COLORS}
+              value={newColor}
+              onChange={setNewColor}
+              size="md"
+            />
 
             {/* Name input */}
             <div className="flex gap-2">
-              <input
+              <Input
                 type="text"
                 value={newName}
                 onChange={(e) => {
@@ -227,29 +202,29 @@ export function ManageCategoriesSheet({ onClose }: ManageCategoriesSheetProps) {
                 onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                 placeholder="Category name"
                 aria-label="New category name"
+                aria-invalid={createError ? true : undefined}
                 aria-describedby={createError ? 'create-error' : undefined}
-                className="flex-1 rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+                className="flex-1"
               />
-              <button
+              <Button
                 type="button"
                 onClick={handleCreate}
                 disabled={createCategory.isPending}
                 aria-label="Create category"
-                className="flex items-center gap-1 rounded-xl bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600 disabled:opacity-50"
               >
                 <Plus size={16} />
                 Add
-              </button>
+              </Button>
             </div>
 
             {createError && (
-              <p id="create-error" className="text-sm text-red-500">
+              <p id="create-error" className="text-sm text-destructive">
                 {createError}
               </p>
             )}
           </div>
         </div>
-      </div>
-    </div>
+      </SheetContent>
+    </Sheet>
   );
 }

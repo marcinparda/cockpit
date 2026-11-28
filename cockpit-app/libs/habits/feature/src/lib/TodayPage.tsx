@@ -14,7 +14,9 @@ import {
   ConfettiAnimation,
   DayStrip,
   HABIT_ICONS,
+  PageHeader,
   parseDateKey,
+  StreakBadge,
   toDateKey,
   truncateName,
   weekOf,
@@ -199,15 +201,17 @@ export function TodayPage() {
           onSelect={setSelected}
           onToday={() => setSelected(today)}
         />
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold">{isToday ? 'Today' : dateLabel}</h1>
-          {activeHabits.length > 0 && (
-            <span className="text-sm font-medium text-muted-foreground">
-              {completedCount}/{activeHabits.length}
-            </span>
-          )}
-        </div>
-        {isToday && <p className="text-sm text-muted-foreground">{dateLabel}</p>}
+        <PageHeader
+          title={isToday ? 'Today' : dateLabel}
+          description={isToday ? dateLabel : undefined}
+          actions={
+            activeHabits.length > 0 ? (
+              <span className="text-sm font-medium text-muted-foreground">
+                {completedCount}/{activeHabits.length}
+              </span>
+            ) : undefined
+          }
+        />
       </div>
 
       {/* Empty state */}
@@ -248,8 +252,6 @@ export function TodayPage() {
             {group.habits.map((habit) => {
               const entry = entryFor(habit, selected);
               const Icon = HABIT_ICONS[habit.icon] ?? Star;
-              const showStreak =
-                habit.streak_mode !== 'none' && habit.current_streak > 0;
               const subtitle =
                 habit.type === 'numeric' && entry?.numeric_value != null
                   ? `${entry.numeric_value}${habit.target_value != null ? `/${habit.target_value}` : ''}`
@@ -262,14 +264,10 @@ export function TodayPage() {
                   title={truncateName(habit.name)}
                   subtitle={subtitle}
                   badge={
-                    showStreak ? (
-                      <span
-                        data-testid="streak-badge"
-                        className="rounded-full bg-orange-500 px-1.5 py-0.5 text-[10px] font-bold text-white"
-                      >
-                        🔥 {habit.current_streak}
-                      </span>
-                    ) : undefined
+                    <StreakBadge
+                      streakMode={habit.streak_mode}
+                      currentStreak={habit.current_streak}
+                    />
                   }
                   value={rowValue(habit, entry)}
                   onSelectDone={() => selectDone(habit)}

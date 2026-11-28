@@ -73,6 +73,25 @@ describe('HabitsPage', () => {
     expect(screen.getByText('Archived Habit')).toBeInTheDocument();
   });
 
+  it('shows a loading spinner while habits load', () => {
+    vi.mocked(dataAccess.useHabits).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any);
+
+    render(withProviders(<HabitsPage />));
+
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument();
+  });
+
+  it('opens Manage categories from the header', () => {
+    render(withProviders(<HabitsPage />));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Manage categories' }));
+
+    expect(screen.getByRole('dialog', { name: 'Manage categories' })).toBeInTheDocument();
+  });
+
   it('shows empty state when no habits exist', () => {
     vi.mocked(dataAccess.useHabits).mockReturnValue({
       data: [],

@@ -4,6 +4,8 @@ import {
   useSettings,
   useUpdateSettings,
 } from '@cockpit-app/habits-data-access';
+import { PageHeader, Switch } from '@cockpit-app/habits-ui';
+import { Button, Input } from '@cockpit-app/shared-react-ui';
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
@@ -82,7 +84,7 @@ export function SettingsPage() {
   if (isLoading) {
     return (
       <div className="container mx-auto px-4 py-6">
-        <h1 className="text-2xl font-bold">Settings</h1>
+        <PageHeader title="Settings" />
         <p className="text-muted-foreground mt-4">Loading...</p>
       </div>
     );
@@ -92,7 +94,7 @@ export function SettingsPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <PageHeader title="Settings" />
 
       <section aria-labelledby="notifications-heading">
         <h2 id="notifications-heading" className="text-lg font-semibold mb-4">
@@ -105,27 +107,13 @@ export function SettingsPage() {
               Receive reminders to log your habits
             </p>
           </div>
-          <button
+          <Switch
             data-testid="push-toggle"
-            type="button"
-            role="switch"
-            aria-checked={notificationsEnabled}
+            aria-label="Push Notifications"
+            checked={notificationsEnabled}
             disabled={isPending || isSubscribing}
-            onClick={() => void handlePushToggle()}
-            className={[
-              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-              notificationsEnabled ? 'bg-primary' : 'bg-muted',
-            ].join(' ')}
-          >
-            <span
-              className={[
-                'inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform',
-                notificationsEnabled ? 'translate-x-6' : 'translate-x-1',
-              ].join(' ')}
-            />
-          </button>
+            onCheckedChange={() => void handlePushToggle()}
+          />
         </div>
 
         {pushError && (
@@ -144,25 +132,27 @@ export function SettingsPage() {
             One reminder a day, sent only if some habits are still not logged.
           </p>
           <div className="flex items-center gap-3">
-            <input
+            <Input
               data-testid="reminder-time"
               type="time"
               aria-label="Reminder time"
               value={reminderTime}
               disabled={isPending}
               onChange={(e) => handleReminderChange(e.target.value)}
-              className="rounded-md border bg-background px-3 py-2"
+              className="w-auto"
             />
             {reminderTime && (
-              <button
+              <Button
                 data-testid="reminder-clear"
                 type="button"
+                variant="link"
+                size="sm"
                 disabled={isPending}
                 onClick={() => updateSettings({ reminder_time: null })}
-                className="text-sm text-muted-foreground underline"
+                className="text-muted-foreground underline"
               >
                 Clear
-              </button>
+              </Button>
             )}
           </div>
           <p className="text-sm text-muted-foreground">

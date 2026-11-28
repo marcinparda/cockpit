@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import * as dataAccess from '@cockpit-app/habits-data-access';
@@ -17,7 +18,7 @@ const mockDeleteMutate = vi.fn();
 
 const categories = [
   createCategoryMock({ id: 'cat-1', name: 'Health', color: '#22c55e' }),
-  createCategoryMock({ id: 'cat-2', name: 'Work', color: null }),
+  createCategoryMock({ id: 'cat-2', name: 'Work', color: undefined }),
 ];
 
 describe('ManageCategoriesSheet', () => {
@@ -56,11 +57,16 @@ describe('ManageCategoriesSheet', () => {
     expect(onClose).toHaveBeenCalled();
   });
 
-  it('closes when backdrop is clicked', () => {
+  it('closes on Escape', async () => {
     const onClose = vi.fn();
     render(<ManageCategoriesSheet onClose={onClose} />);
-    fireEvent.click(screen.getByRole('dialog'));
+    await userEvent.keyboard('{Escape}');
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('is a dialog named Manage categories', () => {
+    render(<ManageCategoriesSheet onClose={vi.fn()} />);
+    expect(screen.getByRole('dialog', { name: 'Manage categories' })).toBeInTheDocument();
   });
 
   it('shows validation error when creating with an empty name', () => {

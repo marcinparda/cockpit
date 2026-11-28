@@ -14,10 +14,13 @@ import {
   HABIT_ICONS,
   HeatmapCalendar,
   LineBarChart,
+  PageHeader,
+  SegmentedControl,
   heatmapRange,
   toDateKey,
   type HeatmapState,
 } from '@cockpit-app/habits-ui';
+import { Badge, Button } from '@cockpit-app/shared-react-ui';
 import { HabitSheet } from './HabitSheet';
 import { HabitCreationSheet } from './HabitCreationSheet';
 
@@ -133,34 +136,33 @@ export function HabitDetailPage() {
 
   return (
     <div className="flex flex-col gap-4 px-4 py-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+      <PageHeader
+        title={habit.name}
+        description={habit.category_name ?? undefined}
+        leading={
           <div
-            className="flex h-10 w-10 items-center justify-center rounded-xl"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
             style={{ backgroundColor: habit.color ?? '#3b82f6' }}
           >
             <IconComponent size={22} color="white" aria-hidden="true" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold">{habit.name}</h1>
-            {habit.category_name && (
-              <p className="text-sm text-muted-foreground">{habit.category_name}</p>
-            )}
-          </div>
-        </div>
-        <button
-          type="button"
-          onClick={() => setEditOpen(true)}
-          className="rounded-full p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
-          aria-label="Edit habit"
-        >
-          <Pencil size={18} aria-hidden="true" />
-        </button>
-      </div>
+        }
+        actions={
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => setEditOpen(true)}
+            className="rounded-full"
+            aria-label="Edit habit"
+          >
+            <Pencil size={18} aria-hidden="true" />
+          </Button>
+        }
+      />
 
       {/* Streak section */}
-      <div className="grid grid-cols-3 gap-3 rounded-xl border p-4 dark:border-gray-700">
+      <div className="grid grid-cols-3 gap-3 rounded-xl border p-4">
         <div className="flex flex-col items-center">
           <span className="text-2xl font-bold">{streak?.current_streak ?? habit.current_streak}</span>
           <span className="text-xs text-muted-foreground">Current streak</span>
@@ -170,49 +172,39 @@ export function HabitDetailPage() {
           <span className="text-xs text-muted-foreground">Best streak</span>
         </div>
         <div className="flex flex-col items-center">
-          <span
-            className="rounded-full px-2 py-1 text-xs font-medium capitalize"
-            style={{ backgroundColor: habit.color ?? '#3b82f6', color: 'white' }}
+          <Badge
+            className="rounded-full px-2 py-1 capitalize text-white"
+            style={{ backgroundColor: habit.color ?? '#3b82f6' }}
           >
             {habit.streak_mode}
-          </span>
+          </Badge>
           <span className="text-xs text-muted-foreground">Mode</span>
         </div>
       </div>
 
       {/* Freeze button */}
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="lg"
         onClick={handleApplyFreeze}
         disabled={createFreeze.isPending}
-        className="flex items-center justify-center gap-2 rounded-xl border py-3 text-sm font-medium hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-700 dark:hover:bg-gray-800"
+        className="h-auto rounded-xl py-3"
         aria-label={`Apply freeze — ${remainingFreezes} remaining this month`}
       >
         Apply Freeze
-        <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700 dark:bg-blue-900 dark:text-blue-300">
+        <Badge variant="secondary" className="rounded-full font-bold">
           {remainingFreezes}
-        </span>
+        </Badge>
         <span className="text-xs text-muted-foreground">remaining</span>
-      </button>
+      </Button>
 
-      {/* Time range selector */}
-      <div role="group" aria-label="Time range" className="flex gap-1.5">
-        {TIME_RANGES.map((range) => (
-          <button
-            key={range}
-            type="button"
-            onClick={() => setTimeRange(range)}
-            aria-pressed={timeRange === range}
-            className={`flex-1 rounded-lg py-1.5 text-xs sm:text-sm font-medium transition-colors ${
-              timeRange === range
-                ? 'bg-blue-500 text-white'
-                : 'border hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800'
-            }`}
-          >
-            {range}
-          </button>
-        ))}
-      </div>
+      <SegmentedControl
+        options={TIME_RANGES}
+        value={timeRange}
+        onChange={setTimeRange}
+        aria-label="Time range"
+      />
 
       {/* Graph */}
       {entriesLoading ? (
@@ -221,7 +213,7 @@ export function HabitDetailPage() {
         </div>
       ) : (
         <>
-          <div className="rounded-xl border p-4 dark:border-gray-700">
+          <div className="rounded-xl border p-4">
             <HeatmapCalendar
               entries={heatmapEntries}
               color={habit.color ?? '#3b82f6'}
@@ -230,7 +222,7 @@ export function HabitDetailPage() {
             />
           </div>
           {habit.type === 'numeric' && (
-            <div className="rounded-xl border p-4 dark:border-gray-700">
+            <div className="rounded-xl border p-4">
               <LineBarChart
                 data={chartData}
                 targetValue={habit.target_value ?? undefined}
@@ -239,7 +231,7 @@ export function HabitDetailPage() {
             </div>
           )}
           {habit.type === 'text' && (
-            <div className="flex flex-col gap-2 rounded-xl border p-4 dark:border-gray-700">
+            <div className="flex flex-col gap-2 rounded-xl border p-4">
               <h2 className="text-sm font-semibold">Journal entries</h2>
               {entries.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No entries yet</p>
@@ -261,7 +253,7 @@ export function HabitDetailPage() {
 
       {/* Entry log (boolean/numeric habits) */}
       {habit.type !== 'text' && (
-        <div className="flex flex-col gap-2 rounded-xl border p-4 dark:border-gray-700">
+        <div className="flex flex-col gap-2 rounded-xl border p-4">
           <h2 className="text-sm font-semibold">Recent entries</h2>
           {entries.length === 0 ? (
             <p className="text-sm text-muted-foreground">No entries yet</p>

@@ -13,6 +13,7 @@ import {
   useStatsToday,
   useStatsWeekly,
 } from '@cockpit-app/habits-data-access';
+import { PageHeader } from '@cockpit-app/habits-ui';
 
 export function StatsPage() {
   const { data: todayStats, isLoading: todayLoading } = useStatsToday();
@@ -22,7 +23,7 @@ export function StatsPage() {
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-8">
-      <h1 className="text-2xl font-bold">Stats</h1>
+      <PageHeader title="Stats" />
 
       <section aria-labelledby="today-heading">
         <h2 id="today-heading" className="text-lg font-semibold mb-2">

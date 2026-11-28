@@ -6,8 +6,12 @@ import {
   useHabits,
 } from '@cockpit-app/habits-data-access';
 import {
+  Checkbox,
+  PageHeader,
   SortableCategoryGroup,
+  Spinner,
 } from '@cockpit-app/habits-ui';
+import { Button } from '@cockpit-app/shared-react-ui';
 import { HabitCreationSheet } from './HabitCreationSheet';
 import { ManageCategoriesSheet } from './ManageCategoriesSheet';
 
@@ -74,41 +78,38 @@ export function HabitsPage() {
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-6">
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Habits</h1>
+      <PageHeader
+        title="Habits"
+        className="mb-4"
+        actions={
+          <>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setCategoriesOpen(true)}
+              aria-label="Manage categories"
+              className="text-muted-foreground"
+            >
+              <Tag size={14} />
+              Categories
+            </Button>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setCategoriesOpen(true)}
-            aria-label="Manage categories"
-            className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-          >
-            <Tag size={14} />
-            Categories
-          </button>
-
-          <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-            <input
-              type="checkbox"
-              checked={showArchived}
-              onChange={(e) => setShowArchived(e.target.checked)}
-              aria-label="Show archived"
-              className="h-4 w-4 rounded"
-            />
-            Show archived
-          </label>
-        </div>
-      </div>
+            <Checkbox checked={showArchived} onCheckedChange={setShowArchived}>
+              Show archived
+            </Checkbox>
+          </>
+        }
+      />
 
       {isLoading ? (
         <div className="flex justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" aria-label="Loading" />
+          <Spinner />
         </div>
       ) : filtered.length === 0 ? (
         <div
           data-testid="empty-habits"
-          className="flex flex-col items-center gap-3 py-16 text-gray-500"
+          className="flex flex-col items-center gap-3 py-16 text-muted-foreground"
         >
           <p className="text-lg">No habits yet</p>
           <p className="text-sm">Tap + to add your first habit</p>
@@ -128,18 +129,19 @@ export function HabitsPage() {
         </div>
       )}
 
-      {/* FAB */}
-      <button
+      {/* FAB: sits above the shell's mobile bottom nav */}
+      <Button
         type="button"
+        size="icon"
         onClick={() => {
           setEditHabit(undefined);
           setSheetOpen(true);
         }}
         aria-label="Add habit"
-        className="fixed bottom-20 right-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+        className="fixed bottom-20 right-4 size-14 rounded-full shadow-lg"
       >
-        <Plus size={24} aria-hidden="true" />
-      </button>
+        <Plus className="size-6" aria-hidden="true" />
+      </Button>
 
       {sheetOpen && (
         <HabitCreationSheet onClose={handleSheetClose} editHabit={editHabit} />

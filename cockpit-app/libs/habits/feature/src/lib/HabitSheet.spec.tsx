@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -65,9 +66,9 @@ describe('HabitSheet', () => {
     const input = screen.getByLabelText(/Value/i);
     fireEvent.change(input, { target: { value: '4' } });
 
-    // Progress bar rendered as a div with bg-blue-500
-    const progressBar = document.querySelector('.bg-blue-500');
-    expect(progressBar).toBeInTheDocument();
+    expect(
+      screen.getByRole('progressbar', { name: 'Progress to target' }),
+    ).toHaveAttribute('aria-valuenow', '4');
   });
 
   it('calls upsertEntry with numeric_value when Confirm is clicked', () => {
@@ -139,7 +140,18 @@ describe('HabitSheet', () => {
     );
   });
 
-  it('closes the sheet when backdrop is clicked', () => {
+  it('is a dialog named after the check-in', () => {
+    render(
+      withQueryClient(
+        <HabitSheet habit={baseHabit} date="2026-11-18" entry={null} onClose={vi.fn()} />,
+      ),
+    );
+    expect(
+      screen.getByRole('dialog', { name: `Check in for ${baseHabit.name}` }),
+    ).toBeInTheDocument();
+  });
+
+  it('closes the sheet on Escape', async () => {
     const onClose = vi.fn();
     render(
       withQueryClient(
@@ -147,8 +159,20 @@ describe('HabitSheet', () => {
       ),
     );
 
-    const dialog = screen.getByRole('dialog');
-    fireEvent.click(dialog);
+    await userEvent.keyboard('{Escape}');
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('closes the sheet from the Close button', () => {
+    const onClose = vi.fn();
+    render(
+      withQueryClient(
+        <HabitSheet habit={baseHabit} date="2026-11-18" entry={null} onClose={onClose} />,
+      ),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close' }));
 
     expect(onClose).toHaveBeenCalled();
   });

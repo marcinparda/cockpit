@@ -1,4 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -26,7 +27,13 @@ vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
   useHabits: vi.fn(() => ({ data: [], isLoading: false })),
 }));
 
-const { createHabitMock } = dataAccess;
+const { createCategoryMock, createHabitMock } = dataAccess;
+
+/** Open the shared (Radix) Select labelled `label` and pick `option`. */
+async function chooseOption(label: RegExp, option: string) {
+  await userEvent.click(screen.getByLabelText(label));
+  await userEvent.click(await screen.findByRole('option', { name: option }));
+}
 
 function makeQueryClient() {
   return new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -108,22 +115,21 @@ describe('HabitCreationSheet form interactions', () => {
     expect(colorButton).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('shows target input when numeric type is selected', () => {
+  it('shows target input when numeric type is selected', async () => {
     const onClose = vi.fn();
     render(withProviders(<HabitCreationSheet onClose={onClose} />));
 
-    const typeSelect = screen.getByLabelText(/^Type$/i);
-    fireEvent.change(typeSelect, { target: { value: 'numeric' } });
+    expect(document.getElementById('habit-target')).not.toBeInTheDocument();
+    await chooseOption(/^Type$/i, 'Numeric');
 
     expect(document.getElementById('habit-target')).toBeInTheDocument();
   });
 
-  it('fills target value field when numeric type selected', () => {
+  it('fills target value field when numeric type selected', async () => {
     const onClose = vi.fn();
     render(withProviders(<HabitCreationSheet onClose={onClose} />));
 
-    const typeSelect = screen.getByLabelText(/^Type$/i);
-    fireEvent.change(typeSelect, { target: { value: 'numeric' } });
+    await chooseOption(/^Type$/i, 'Numeric');
 
     const targetInput = document.getElementById('habit-target') as HTMLInputElement;
     expect(targetInput).toBeInTheDocument();
@@ -131,14 +137,25 @@ describe('HabitCreationSheet form interactions', () => {
     expect(targetInput.value).toBe('30');
   });
 
-  it('closes sheet when backdrop is clicked', () => {
+  it('closes sheet on Escape', async () => {
     const onClose = vi.fn();
     render(withProviders(<HabitCreationSheet onClose={onClose} />));
 
-    const dialog = screen.getByRole('dialog');
-    fireEvent.click(dialog);
+    await userEvent.keyboard('{Escape}');
 
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it('is a dialog named Add habit, or Edit habit when editing', () => {
+    const { unmount } = render(withProviders(<HabitCreationSheet onClose={vi.fn()} />));
+    expect(screen.getByRole('dialog', { name: 'Add habit' })).toBeInTheDocument();
+    unmount();
+    render(
+      withProviders(
+        <HabitCreationSheet onClose={vi.fn()} editHabit={createHabitMock()} />,
+      ),
+    );
+    expect(screen.getByRole('dialog', { name: 'Edit habit' })).toBeInTheDocument();
   });
 
   it('changes category and icon fields', () => {
@@ -158,17 +175,42 @@ describe('HabitCreationSheet form interactions', () => {
     }
   });
 
-  it('updates frequency and streak mode via select fields', () => {
+  it('updates frequency and streak mode via select fields', async () => {
     const onClose = vi.fn();
     render(withProviders(<HabitCreationSheet onClose={onClose} />));
 
-    const freqSelect = screen.getByLabelText(/Frequency/i);
-    fireEvent.change(freqSelect, { target: { value: 'weekly' } });
-    expect((freqSelect as HTMLSelectElement).value).toBe('weekly');
+    await chooseOption(/Frequency/i, 'Weekly');
+    expect(screen.getByLabelText(/Frequency/i)).toHaveTextContent('Weekly');
 
-    const streakSelect = screen.getByLabelText(/Streak Mode/i);
-    fireEvent.change(streakSelect, { target: { value: 'hard' } });
-    expect((streakSelect as HTMLSelectElement).value).toBe('hard');
+    await chooseOption(/Streak Mode/i, 'Hard');
+    expect(screen.getByLabelText(/Streak Mode/i)).toHaveTextContent('Hard');
+  });
+
+  it('picks a category and sends its id, or null for No category', async () => {
+    const mockCreate = vi.fn();
+    vi.mocked(dataAccess.useHabitMutations).mockReturnValue({
+      createHabit: { mutate: mockCreate, isPending: false },
+      updateHabit: { mutate: vi.fn(), isPending: false },
+    } as any);
+    const health = createCategoryMock({ name: 'Health' });
+    vi.mocked(dataAccess.useCategories).mockReturnValue({ data: [health] } as any);
+    render(withProviders(<HabitCreationSheet onClose={vi.fn()} />));
+
+    fireEvent.change(screen.getByLabelText(/habit name/i), { target: { value: 'Run' } });
+    await chooseOption(/^Type$/i, 'Boolean (yes/no)');
+    await chooseOption(/Category/i, 'Health');
+    fireEvent.click(screen.getByRole('button', { name: /add habit/i }));
+    expect(mockCreate).toHaveBeenLastCalledWith(
+      expect.objectContaining({ category_id: health.id }),
+      expect.any(Object),
+    );
+
+    await chooseOption(/Category/i, 'No category');
+    fireEvent.click(screen.getByRole('button', { name: /add habit/i }));
+    expect(mockCreate).toHaveBeenLastCalledWith(
+      expect.objectContaining({ category_id: null }),
+      expect.any(Object),
+    );
   });
 });
 
@@ -229,9 +271,7 @@ describe('HabitCreationSheet submit valid form', () => {
     const nameInput = screen.getByLabelText(/habit name/i);
     fireEvent.change(nameInput, { target: { value: 'Morning Run' } });
 
-    // Select type via the select dropdown (label text is "Type")
-    const typeSelect = screen.getByLabelText(/^Type$/i);
-    fireEvent.change(typeSelect, { target: { value: 'boolean' } });
+    await chooseOption(/^Type$/i, 'Boolean (yes/no)');
 
     // Submit
     const submitButton = screen.getByRole('button', { name: /add habit/i });
