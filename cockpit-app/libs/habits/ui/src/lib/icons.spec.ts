@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { HABIT_ICONS } from '../icons/index';
+import { HABIT_ICONS } from './icons';
 
 describe('HABIT_ICONS', () => {
   it('does not map two different keys to the same icon component', () => {

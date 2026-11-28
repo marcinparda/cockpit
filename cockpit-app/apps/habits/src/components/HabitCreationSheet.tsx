@@ -7,8 +7,7 @@ import {
   useHabitMutations,
   usePresets,
 } from '@cockpit-app/habits-data-access';
-import { IconPicker } from './IconPicker';
-import { HABIT_COLORS } from '../colors';
+import { HABIT_COLORS, IconPicker } from '@cockpit-app/habits-ui';
 
 interface HabitCreationSheetProps {
   onClose: () => void;

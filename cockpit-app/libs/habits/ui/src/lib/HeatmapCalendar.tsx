@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { toDateKey } from '../utils/date';
+import { toDateKey } from './utils/date';
 
 export type HeatmapState = 'done' | 'notDone' | 'unlogged';
 

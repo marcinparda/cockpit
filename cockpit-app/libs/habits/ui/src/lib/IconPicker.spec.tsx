@@ -1,8 +1,8 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
-import { IconPicker } from '../components/IconPicker';
-import { HABIT_ICONS } from '../icons/index';
+import { IconPicker } from './IconPicker';
+import { HABIT_ICONS } from './icons';
 
 describe('IconPicker', () => {
   it('renders a button for every available icon', () => {
@@ -25,5 +25,12 @@ describe('IconPicker', () => {
       'aria-pressed',
       'true',
     );
+  });
+
+  it('calls onSelect with the clicked icon key', () => {
+    const onSelect = vi.fn();
+    render(<IconPicker selected="Star" onSelect={onSelect} />);
+    fireEvent.click(screen.getAllByRole('button')[0]);
+    expect(onSelect).toHaveBeenCalledWith(Object.keys(HABIT_ICONS)[0]);
   });
 });

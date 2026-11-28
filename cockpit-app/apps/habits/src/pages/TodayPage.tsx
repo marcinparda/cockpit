@@ -10,11 +10,16 @@ import {
   useHabits,
 } from '@cockpit-app/habits-data-access';
 import { HabitSheet } from '../components/HabitSheet';
-import { ConfettiAnimation } from '../components/ConfettiAnimation';
-import { DayStrip, type DayCompletion } from '../components/DayStrip';
-import { HABIT_ICONS } from '../icons';
-import { truncateName } from '../utils/text';
-import { parseDateKey, toDateKey, weekOf } from '../utils/date';
+import {
+  ConfettiAnimation,
+  DayStrip,
+  HABIT_ICONS,
+  parseDateKey,
+  toDateKey,
+  truncateName,
+  weekOf,
+  type DayCompletion,
+} from '@cockpit-app/habits-ui';
 
 type EntryLike = Pick<
   HabitEntry,

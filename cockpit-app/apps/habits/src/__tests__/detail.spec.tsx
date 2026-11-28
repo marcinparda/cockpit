@@ -38,9 +38,7 @@ vi.mock('recharts', () => ({
 }));
 
 import * as dataAccess from '@cockpit-app/habits-data-access';
-import { toDateKey, addDays } from '../utils/date';
-import { HeatmapCalendar, heatmapRange } from '../components/HeatmapCalendar';
-import { LineBarChart } from '../components/LineBarChart';
+import { addDays, heatmapRange, toDateKey } from '@cockpit-app/habits-ui';
 import HabitDetailPage from '../pages/HabitDetailPage';
 import { createHabitMock } from '@cockpit-app/habits-data-access';
 
@@ -85,67 +83,6 @@ const mockTextHabit = createHabitMock({
   ...mockBooleanHabit,
   id: 'habit-3',
   type: 'text',
-});
-
-describe('HeatmapCalendar', () => {
-  it('renders correct number of cells for a 12-week range', () => {
-    const entries = {};
-    render(
-      <HeatmapCalendar
-        entries={entries}
-        color="#22c55e"
-        weeks={12}
-      />,
-    );
-
-    // 12 weeks × 7 days = 84 cells
-    expect(gridCells()).toHaveLength(84 - FUTURE_DAYS_THIS_WEEK);
-  });
-});
-
-describe('HeatmapCalendar states', () => {
-  const today = toDateKey(new Date());
-  const yesterday = addDays(today, -1);
-
-  it('labels done / not done / unlogged distinctly', () => {
-    render(
-      <HeatmapCalendar
-        entries={{ [today]: 'done', [yesterday]: 'notDone' }}
-        color="#22c55e"
-      />,
-    );
-    expect(screen.getByRole('gridcell', { name: `${today}: done` })).toBeInTheDocument();
-    expect(screen.getByRole('gridcell', { name: `${yesterday}: not done` })).toBeInTheDocument();
-    expect(
-      screen.getByRole('gridcell', { name: `${addDays(today, -2)}: unlogged` }),
-    ).toBeInTheDocument();
-  });
-
-  it('does not render days after today and reports clicks on past cells', () => {
-    const onCellClick = vi.fn();
-    render(<HeatmapCalendar entries={{}} color="#22c55e" onCellClick={onCellClick} />);
-    expect(screen.queryByRole('gridcell', { name: `${addDays(today, 1)}: unlogged` })).toBeNull();
-    expect(screen.getByRole('gridcell', { name: `${today}: unlogged` })).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('gridcell', { name: `${yesterday}: unlogged` }));
-    expect(onCellClick).toHaveBeenCalledWith(yesterday, 'unlogged');
-  });
-});
-
-describe('LineBarChart', () => {
-  it('renders with provided data without crashing', () => {
-    const data = [
-      { date: '2025-01-01', value: 10, avg: 10 },
-      { date: '2025-01-02', value: 20, avg: 15 },
-    ];
-
-    render(
-      <LineBarChart data={data} targetValue={30} />,
-    );
-
-    expect(screen.getByTestId('responsive-container')).toBeInTheDocument();
-    expect(screen.getByTestId('composed-chart')).toBeInTheDocument();
-  });
 });
 
 describe('HabitDetailPage', () => {

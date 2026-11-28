@@ -1,7 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { vi, describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom';
-import { DayStrip } from '../components/DayStrip';
+import { DayStrip } from './DayStrip';
 
 // 2026-11-18 is a Wednesday → week Mon 16 … Sun 22
 describe('DayStrip', () => {

@@ -10,26 +10,23 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import {
-  Habit,
-} from '@cockpit-app/habits-data-access';
-import { SortableHabitRow } from './SortableHabitRow';
+import { SortableHabitRow, type SortableHabit } from './SortableHabitRow';
 
-interface SortableCategoryGroupProps {
+interface SortableCategoryGroupProps<T extends SortableHabit> {
   categoryName: string;
-  habits: Habit[];
-  onEdit: (habit: Habit) => void;
-  onArchive: (habit: Habit) => void;
+  habits: T[];
+  onEdit: (habit: T) => void;
+  onArchive: (habit: T) => void;
   onReorder: (id: string, newSortOrder: number) => void;
 }
 
-export function SortableCategoryGroup({
+export function SortableCategoryGroup<T extends SortableHabit>({
   categoryName,
   habits,
   onEdit,
   onArchive,
   onReorder,
-}: SortableCategoryGroupProps) {
+}: SortableCategoryGroupProps<T>) {
   const sensors = useSensors(useSensor(PointerSensor));
 
   function handleDragEnd(event: DragEndEvent) {

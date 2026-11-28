@@ -3,19 +3,31 @@ import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Archive, Pencil, MoreVertical } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Habit,
-} from '@cockpit-app/habits-data-access';
-import { HABIT_ICONS } from '../icons/index';
-import { truncateName } from '../utils/text';
+import { HABIT_ICONS } from './icons';
+import { truncateName } from './utils/text';
 
-interface SortableHabitRowProps {
-  habit: Habit;
-  onEdit: (habit: Habit) => void;
-  onArchive: (habit: Habit) => void;
+/** Fields a sortable habit row reads; any richer habit object satisfies it. */
+export interface SortableHabit {
+  id: string;
+  name: string;
+  icon: string;
+  color?: string | null;
+  category_name?: string | null;
+  is_archived: boolean;
+  sort_order: number;
 }
 
-export function SortableHabitRow({ habit, onEdit, onArchive }: SortableHabitRowProps) {
+interface SortableHabitRowProps<T extends SortableHabit> {
+  habit: T;
+  onEdit: (habit: T) => void;
+  onArchive: (habit: T) => void;
+}
+
+export function SortableHabitRow<T extends SortableHabit>({
+  habit,
+  onEdit,
+  onArchive,
+}: SortableHabitRowProps<T>) {
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 

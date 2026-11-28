@@ -1,4 +1,4 @@
-import { HABIT_ICONS } from '../icons/index';
+import { HABIT_ICONS } from './icons';
 
 interface IconPickerProps {
   selected: string;

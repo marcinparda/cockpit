@@ -14,7 +14,10 @@ import TodayPage from '../pages/TodayPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { createHabitMock } from '@cockpit-app/habits-data-access';
-import { addDays, toDateKey } from '../utils/date';
+import {
+  addDays,
+  toDateKey,
+} from '@cockpit-app/habits-ui';
 
 const today = toDateKey(new Date());
 const yesterday = addDays(today, -1);

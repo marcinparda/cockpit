@@ -5,7 +5,9 @@ import {
   useHabitMutations,
   useHabits,
 } from '@cockpit-app/habits-data-access';
-import { SortableCategoryGroup } from '../components/SortableCategoryGroup';
+import {
+  SortableCategoryGroup,
+} from '@cockpit-app/habits-ui';
 import { HabitCreationSheet } from '../components/HabitCreationSheet';
 import { ManageCategoriesSheet } from '../components/ManageCategoriesSheet';
 

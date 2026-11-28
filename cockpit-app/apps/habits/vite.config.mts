@@ -44,11 +44,6 @@ export default defineConfig(() => ({
       exclude: [
         'src/main.tsx',
         'src/app/router.tsx',
-        // Drag-and-drop wrapper components: dnd-kit context callbacks
-        // cannot be meaningfully unit tested without a full DnD simulator
-        'src/components/SortableCategoryGroup.tsx',
-        'src/components/SortableHabitRow.tsx',
-        'src/components/ConfettiAnimation.tsx',
       ],
       reporter: ['text-summary', 'lcov'],
     },

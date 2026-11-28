@@ -25,9 +25,7 @@ vi.mock('@cockpit-app/habits-data-access', async (importOriginal) => ({
 }));
 
 // Must import after vi.mock declarations
-import { IconPicker } from '../components/IconPicker';
 import { HabitCreationSheet } from '../components/HabitCreationSheet';
-import { SortableHabitRow } from '../components/SortableHabitRow';
 import HabitsPage from '../pages/HabitsPage';
 import * as dataAccess from '@cockpit-app/habits-data-access';
 
@@ -99,40 +97,6 @@ describe('HabitCreationSheet', () => {
 
     const nameInput = screen.getByLabelText(/habit name/i);
     expect((nameInput as HTMLInputElement).value).toBe('Daily Exercise');
-  });
-});
-
-// Test 3: IconPicker renders icons and calls onSelect
-describe('IconPicker', () => {
-  it('renders icon list and calls onSelect when icon is clicked', () => {
-    const onSelect = vi.fn();
-    render(withProviders(<IconPicker selected="Star" onSelect={onSelect} />));
-
-    // Should render some icons
-    const icons = screen.getAllByRole('button');
-    expect(icons.length).toBeGreaterThan(0);
-
-    // Click an icon button
-    fireEvent.click(icons[0]);
-    expect(onSelect).toHaveBeenCalledWith(expect.any(String));
-  });
-});
-
-// Test 4: SortableHabitRow renders drag handle and habit name
-describe('SortableHabitRow', () => {
-  it('renders drag handle and habit name', () => {
-    render(
-      withProviders(
-        <SortableHabitRow
-          habit={baseHabit}
-          onEdit={vi.fn()}
-          onArchive={vi.fn()}
-        />,
-      ),
-    );
-
-    expect(screen.getByTestId('drag-handle')).toBeInTheDocument();
-    expect(screen.getByText('Morning Run')).toBeInTheDocument();
   });
 });
 

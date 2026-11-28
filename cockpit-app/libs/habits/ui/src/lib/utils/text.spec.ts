@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { truncateName } from '../utils/text';
+import { truncateName } from './text';
 
 describe('truncateName', () => {
   it('returns name unchanged when exactly 50 chars', () => {

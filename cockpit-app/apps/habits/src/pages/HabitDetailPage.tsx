@@ -10,12 +10,16 @@ import {
   type Habit,
   type HabitEntry,
 } from '@cockpit-app/habits-data-access';
-import { HeatmapCalendar, heatmapRange, type HeatmapState } from '../components/HeatmapCalendar';
+import {
+  HABIT_ICONS,
+  HeatmapCalendar,
+  LineBarChart,
+  heatmapRange,
+  toDateKey,
+  type HeatmapState,
+} from '@cockpit-app/habits-ui';
 import { HabitSheet } from '../components/HabitSheet';
-import { toDateKey } from '../utils/date';
-import { LineBarChart } from '../components/LineBarChart';
 import { HabitCreationSheet } from '../components/HabitCreationSheet';
-import { HABIT_ICONS } from '../icons';
 
 const TIME_RANGES = ['6M', '1Y'] as const;
 type TimeRange = (typeof TIME_RANGES)[number];

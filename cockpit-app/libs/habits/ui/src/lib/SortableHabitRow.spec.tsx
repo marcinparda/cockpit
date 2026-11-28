@@ -2,16 +2,33 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import '@testing-library/jest-dom';
 import { MemoryRouter } from 'react-router-dom';
-import { SortableHabitRow } from '../components/SortableHabitRow';
-import { createHabitMock } from '@cockpit-app/habits-data-access';
+import { SortableHabitRow, type SortableHabit } from './SortableHabitRow';
 
-const baseHabit = createHabitMock({ id: 'habit-1' });
+const baseHabit: SortableHabit = {
+  id: 'habit-1',
+  name: 'Morning Run',
+  icon: 'Running',
+  color: '#ff6b6b',
+  category_name: undefined,
+  is_archived: false,
+  sort_order: 0,
+};
 
 function withRouter(ui: React.ReactElement) {
   return <MemoryRouter>{ui}</MemoryRouter>;
 }
 
 describe('SortableHabitRow', () => {
+  it('renders drag handle and habit name', () => {
+    render(
+      withRouter(
+        <SortableHabitRow habit={baseHabit} onEdit={vi.fn()} onArchive={vi.fn()} />,
+      ),
+    );
+    expect(screen.getByTestId('drag-handle')).toBeInTheDocument();
+    expect(screen.getByText('Morning Run')).toBeInTheDocument();
+  });
+
   it('renders short names unchanged', () => {
     render(
       withRouter(

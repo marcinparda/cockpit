@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import '@testing-library/jest-dom';
-import { StreakBadge } from '../components/StreakBadge';
+import { StreakBadge } from './StreakBadge';
 
 describe('StreakBadge', () => {
   it('renders nothing when streakMode is none', () => {

@@ -1,6 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@cockpit-app/shared-react-ui';
-import { addDays, parseDateKey, weekOf } from '../utils/date';
+import { addDays, parseDateKey, weekOf } from './utils/date';
 
 export type DayCompletion = 'full' | 'partial' | 'empty';
 
