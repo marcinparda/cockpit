@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import type { UserInfoResponse } from '@cockpit-app/api-types';
 import { useUser } from '@cockpit-app/shared-react-data-access';
 import { logout } from '@cockpit-app/common-shared-data-access';
@@ -11,12 +11,13 @@ interface RequireUserProps {
 export function RequireUser({ children }: RequireUserProps) {
   const { isLoading, data: user } = useUser();
 
-  if (isLoading) return null;
+  const missing = !isLoading && !user;
 
-  if (!user) {
-    logout();
-    return null;
-  }
+  useEffect(() => {
+    if (missing) logout();
+  }, [missing]);
+
+  if (isLoading || !user) return null;
 
   return <>{children(user)}</>;
 }

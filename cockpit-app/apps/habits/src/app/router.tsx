@@ -1,3 +1,4 @@
+import type { UserInfoResponse } from '@cockpit-app/api-types';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import TodayPage from '../pages/TodayPage';
 import HabitsPage from '../pages/HabitsPage';
@@ -7,7 +8,7 @@ import HabitDetailPage from '../pages/HabitDetailPage';
 import AppLayout from '../components/AppLayout';
 
 interface RouterProps {
-  user: { email: string };
+  user: Pick<UserInfoResponse, 'email'>;
 }
 
 export default function Router({ user }: RouterProps) {

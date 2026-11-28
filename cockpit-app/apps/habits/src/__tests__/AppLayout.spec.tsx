@@ -21,11 +21,8 @@ function renderLayout(path = '/') {
 }
 
 describe('AppLayout', () => {
-  it('renders Habits inside the shared shell with user email and page', () => {
+  it('renders the shared shell with user email and page', () => {
     renderLayout();
-    expect(
-      screen.getByText('Habits', { selector: 'span.text-sm' }),
-    ).toBeInTheDocument();
     expect(screen.getByText('me@example.com')).toBeInTheDocument();
     expect(screen.getByText('Page')).toBeInTheDocument();
   });

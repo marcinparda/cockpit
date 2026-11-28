@@ -21,7 +21,7 @@ describe('PermissionGuard', () => {
     render(
       <PermissionGuard feature="tasks" action="read">
         <span>Protected content</span>
-      </PermissionGuard>
+      </PermissionGuard>,
     );
 
     expect(screen.getByText('Protected content')).toBeInTheDocument();
@@ -34,9 +34,13 @@ describe('PermissionGuard', () => {
     });
 
     render(
-      <PermissionGuard feature="tasks" action="read" fallback={<span>Loading</span>}>
+      <PermissionGuard
+        feature="tasks"
+        action="read"
+        fallback={<span>Loading</span>}
+      >
         <span>Protected content</span>
-      </PermissionGuard>
+      </PermissionGuard>,
     );
 
     expect(screen.getByText('Loading')).toBeInTheDocument();
@@ -52,7 +56,7 @@ describe('PermissionGuard', () => {
     const { container } = render(
       <PermissionGuard feature="tasks" action="write">
         <span>Protected content</span>
-      </PermissionGuard>
+      </PermissionGuard>,
     );
 
     expect(logout).toHaveBeenCalled();

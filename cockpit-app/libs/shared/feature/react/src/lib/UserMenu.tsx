@@ -1,9 +1,10 @@
+import type { UserInfoResponse } from '@cockpit-app/api-types';
 import { LogOut } from 'lucide-react';
 import { logout } from '@cockpit-app/common-shared-data-access';
 import { Button } from '@cockpit-app/shared-react-ui';
 
 interface UserMenuProps {
-  user: { email: string };
+  user: Pick<UserInfoResponse, 'email'>;
 }
 
 export function UserMenu({ user }: UserMenuProps) {
