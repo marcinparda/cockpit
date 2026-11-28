@@ -26,6 +26,20 @@ _Avoid_: backend, server, cockpit-api (as a conceptual name)
 The App that shows the owner's public CV to anonymous visitors and the private app to a logged-in user.
 _Avoid_: portfolio
 
+### Frontend libraries
+
+**Shared UI**:
+The lib `shared-react-ui` holding generic components used by two or more Apps. Pure: imports no data-access.
+_Avoid_: component library, design system
+
+**App UI**:
+The lib `libs/<app>/ui` holding presentational components used by one App. Pure like Shared UI; created only when the App needs it. Moves to Shared UI once a second App needs the component.
+_Avoid_: components folder, local components
+
+**App feature**:
+The lib `libs/<app>/feature` holding data-connected containers of one App: they use data-access hooks and compose App UI and Shared UI. Created only when the App needs it. Unrelated to the Feature in a Permission.
+_Avoid_: feature (bare), container lib, smart components
+
 ### Users and access
 
 **Authentication**:
@@ -45,7 +59,7 @@ The single static bearer secret (`MCP_API_KEY`) that grants access to the MCP se
 _Avoid_: API key, token
 
 **Permission**:
-A Feature and Action pair (e.g. `habits` + `read`) that a User is allowed to perform.
+A Feature and Action pair (e.g. `habits` + `read`; a Feature here is an API permission area, not an App feature lib) that a User is allowed to perform.
 _Avoid_: access right, scope
 
 **Role**:

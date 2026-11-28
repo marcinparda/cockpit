@@ -7,6 +7,7 @@ export default [
   {
     ignores: [
       '**/dist',
+      '**/storybook-static',
       '**/vite.config.*.timestamp*',
       '**/vitest.config.*.timestamp*',
     ],
@@ -28,11 +29,7 @@ export default [
             },
             {
               sourceTag: 'type:ui',
-              onlyDependOnLibsWithTags: [
-                'type:util',
-                'type:data-access',
-                'type:ui',
-              ],
+              onlyDependOnLibsWithTags: ['type:util', 'type:ui'],
             },
             {
               sourceTag: 'type:feature',
@@ -54,19 +51,19 @@ export default [
             },
             {
               sourceTag: 'scope:login',
-              onlyDependOnLibsWithTags: ['scope:shared'],
+              onlyDependOnLibsWithTags: ['scope:shared', 'scope:login'],
             },
             {
               sourceTag: 'scope:cv',
-              onlyDependOnLibsWithTags: ['scope:shared'],
+              onlyDependOnLibsWithTags: ['scope:shared', 'scope:cv'],
             },
             {
               sourceTag: 'scope:store',
-              onlyDependOnLibsWithTags: ['scope:shared'],
+              onlyDependOnLibsWithTags: ['scope:shared', 'scope:store'],
             },
             {
               sourceTag: 'scope:habits',
-              onlyDependOnLibsWithTags: ['scope:shared'],
+              onlyDependOnLibsWithTags: ['scope:shared', 'scope:habits'],
             },
           ],
         },

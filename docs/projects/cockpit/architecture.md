@@ -34,7 +34,8 @@ The backend follows a strict 3-layer pattern per service. The frontend enforces 
   - `apps/habits/` — React 19: habit tracker (same pattern as cockpit, service worker for push notifications)
 - **Lib Layer Hierarchy** (strict, enforced by ESLint):
   ```
-  util  →  data-access  →  ui  →  feature
+  util  →  data-access  →  feature
+  util  →  ui  →  feature   (ui never imports data-access, see ADR 0005)
   ```
 - **Shared Libraries** (`libs/shared/`):
   - `types/` — `@cockpit-app/api-types`: OpenAPI-generated TypeScript types
@@ -42,7 +43,7 @@ The backend follows a strict 3-layer pattern per service. The frontend enforces 
   - `ui/react/` — Shared React component library (`@cockpit-app/shared-react-ui`): shadcn/ui-style primitives (Select, AlertDialog, Toaster, etc.) using Radix UI + CVA + Tailwind
   - `feature/` — Shared feature modules
   - `utils/` — Pure utility functions
-- **Cockpit-specific** (`libs/cockpit/`): Dashboard-specific UI components
+- **App-specific** (`libs/<app>/ui`, `libs/<app>/feature`): created only when an App needs them; e.g. `libs/cockpit/` holds Dashboard-specific UI components
 
 ### Deployment — `deployment-scripts/`
 - **Location**: `deployment-scripts/`, `.github/workflows/`
